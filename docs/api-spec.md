@@ -68,11 +68,11 @@ Base path: `/api/v1`. JSON only. Cookie (Sanctum) auth.
 | POST / DELETE | `/comparisons/{id}/share` | Create or return the share link token / stop sharing |
 | GET (public) | `/shared/comparisons/{token}` | Read-only view of a shared comparison |
 
-## Compare (public, AI throttled)
+## Compare (public)
 | Method | Path | Purpose |
 |--------|------|---------|
-| POST | `/compare` | Body `{ product_ids: [2..4] }` returns spec matrix with per-row winner |
-| POST | `/compare/verdict` | AI explanation of strengths, weaknesses and verdict |
+| POST | `/compare` | Public, no AI (no daily limit); body `{ product_ids: [2..4] }` returns spec matrix with per-row winner |
+| POST | `/compare/verdict` | Public, daily AI limit applied; AI explanation of strengths, weaknesses and verdict |
 
 ## Assistant
 | Method | Path | Purpose |

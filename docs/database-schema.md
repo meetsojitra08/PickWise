@@ -56,7 +56,7 @@ products ─┬─< product_images
 |--------|------|-------|
 | id | bigint PK | |
 | category_id | FK → categories | `restrictOnDelete`, indexed |
-| brand_id | FK → brands | indexed |
+| brand_id | FK → brands | `restrictOnDelete`, indexed |
 | name | varchar(200) | |
 | slug | varchar unique | |
 | summary | varchar(300) | one-liner for cards |
@@ -144,7 +144,7 @@ Unique `(product_id, user_id)` where `user_id` is not null (one review per user 
 `id`, `user_id` null, `feature` (`assistant` \| `compare` \| `review_summary`), `model`, `prompt_tokens`, `completion_tokens`, `latency_ms`, `status` (`ok` \| `error` \| `rate_limited`), `error_code` null, `created_at`. Index `(user_id, created_at)`, `(feature, created_at)`. Used for quotas and the admin analytics dashboard.
 
 ### admin_activity_logs
-`id`, `admin_id` FK, `action` (e.g. `product.updated`), `subject_type`, `subject_id`, `changes` jsonb null (before/after diff), `ip_address`, `created_at`. Append-only: no update or delete endpoints exist.
+`id`, `admin_id` FK (`restrictOnDelete` — admins are deactivated, never deleted, so audit entries keep their author), `action` (e.g. `product.updated`), `subject_type`, `subject_id`, `changes` jsonb null (before/after diff), `ip_address`, `created_at`. Append-only: no update or delete endpoints exist.
 
 ## Value Score (transparent, explainable)
 

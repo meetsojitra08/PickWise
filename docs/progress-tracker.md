@@ -102,7 +102,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [ ] **P8-S8** OpenAPI-style API docs generated or hand-written · `docs`
 
 ## P9: Release (branch `phase/P9-release`)
-- [ ] **P9-S1** README: screenshots, architecture diagram, AI design notes · `docs`
+- [ ] **P9-S1** README: screenshots, architecture diagram, AI design notes; add MIT LICENSE · `docs`
 - [ ] **P9-S2** Demo seed data and demo accounts · `db`
 - [ ] **P9-S3** Production Docker config and deployment notes · `build`
 - [ ] **P9-S4** Deploy a live demo (host of your choice; document in README) · `chore`
