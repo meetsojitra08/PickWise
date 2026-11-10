@@ -1,0 +1,52 @@
+# Environment & secrets (never commit real secrets)
+.env
+.env.*
+!.env.example
+
+# PHP / Laravel
+vendor/
+auth.json
+/backend/bootstrap/cache/*.php
+!/backend/bootstrap/cache/.gitignore
+/backend/public/hot
+/backend/public/storage
+/backend/public/build/
+/backend/storage/*.key
+/backend/storage/logs/*.log
+.phpunit.cache/
+phpunit.result.cache
+.pest/
+
+# Node / React / Vite
+node_modules/
+dist/
+dist-ssr/
+*.local
+*.tsbuildinfo
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+coverage/
+playwright-report/
+test-results/
+
+# Docker local volumes & runtime artifacts
+docker-data/
+docker/data/
+*.pid
+*.sock
+*.log
+
+# OS & IDEs
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
