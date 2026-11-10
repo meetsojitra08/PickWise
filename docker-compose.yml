@@ -1,0 +1,121 @@
+services:
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "${NGINX_PORT:-8080}:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./backend:/var/www/html:ro
+    depends_on:
+      app:
+        condition: service_started
+      web:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - pickwise
+
+  app: &php-service
+    build:
+      context: ./docker/php
+    image: pickwise-php:dev
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pickwise
+
+  queue:
+    <<: *php-service
+    command:
+      - sh
+      - -c
+      - |
+        until [ -f /var/www/html/artisan ] && [ -f /var/www/html/vendor/autoload.php ]; do
+          sleep 5
+        done
+        exec php artisan queue:work --sleep=3 --tries=3
+
+  scheduler:
+    <<: *php-service
+    command:
+      - sh
+      - -c
+      - |
+        until [ -f /var/www/html/artisan ] && [ -f /var/www/html/vendor/autoload.php ]; do
+          sleep 5
+        done
+        exec php artisan schedule:work
+
+  db:
+    image: postgres:17-alpine
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-pickwise}
+      POSTGRES_USER: ${DB_USERNAME:-pickwise}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pickwise}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-pickwise} -d ${DB_DATABASE:-pickwise}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - pickwise
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - pickwise
+
+  web:
+    build:
+      context: ./docker/node
+    image: pickwise-node:dev
+    working_dir: /app
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    restart: unless-stopped
+    networks:
+      - pickwise
+
+  mailpit:
+    image: axllent/mailpit:v1
+    ports:
+      - "${MAILPIT_PORT:-8025}:8025"
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+    restart: unless-stopped
+    networks:
+      - pickwise
+
+volumes:
+  pgdata:
+  redisdata:
+  frontend_node_modules:
+
+networks:
+  pickwise:
+    driver: bridge
