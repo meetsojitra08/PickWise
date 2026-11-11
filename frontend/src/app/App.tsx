@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, Link, Route, Routes } from 'react-router';
 import { AppProviders } from '@/app/providers';
 import { Button } from '@/components/ui/button';
+import { RequireGuest } from '@/features/auth/components/RequireGuest';
+import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { RegisterPage } from '@/features/auth/pages/RegisterPage';
 
 function DesignSystemPreview() {
   const [isDark, setIsDark] = useState(() =>
@@ -53,6 +56,15 @@ function DesignSystemPreview() {
             and dark tokens are active.
           </p>
         </div>
+
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <Button asChild size="sm">
+            <Link to="/login">Log in</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/register">Create account</Link>
+          </Button>
+        </div>
       </section>
     </main>
   );
@@ -63,6 +75,11 @@ export function App() {
     <AppProviders>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<DesignSystemPreview />} />
+          <Route element={<RequireGuest />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
           <Route path="*" element={<DesignSystemPreview />} />
         </Routes>
       </BrowserRouter>
