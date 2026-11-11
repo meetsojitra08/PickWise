@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
+import { BrowserRouter, Route, Routes } from 'react-router';
+import { AppProviders } from '@/app/providers';
 import { Button } from '@/components/ui/button';
 
-export function App() {
+function DesignSystemPreview() {
   const [isDark, setIsDark] = useState(() =>
     document.documentElement.classList.contains('dark'),
   );
@@ -53,5 +55,17 @@ export function App() {
         </div>
       </section>
     </main>
+  );
+}
+
+export function App() {
+  return (
+    <AppProviders>
+      <BrowserRouter>
+        <Routes>
+          <Route path="*" element={<DesignSystemPreview />} />
+        </Routes>
+      </BrowserRouter>
+    </AppProviders>
   );
 }
