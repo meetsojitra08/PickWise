@@ -24,6 +24,8 @@ Route::middleware('throttle:public-api')->group(function (): void {
         ->name('api.v1.categories.filters');
     Route::get('/products', [ProductController::class, 'index'])
         ->name('api.v1.products.index');
+    Route::get('/products/{slug}', [ProductController::class, 'show'])
+        ->name('api.v1.products.show');
 });
 
 Route::prefix('auth')->group(function (): void {
