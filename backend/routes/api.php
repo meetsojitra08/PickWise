@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Customer\AccountController;
 use App\Http\Controllers\Api\V1\Public\HealthController;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -39,3 +40,14 @@ Route::prefix('auth')->group(function (): void {
         ->middleware('auth:sanctum')
         ->name('api.v1.auth.me');
 });
+
+Route::prefix('account')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::patch('/profile', [AccountController::class, 'updateProfile'])
+            ->name('api.v1.account.profile.update');
+        Route::put('/password', [AccountController::class, 'updatePassword'])
+            ->name('api.v1.account.password.update');
+        Route::put('/preferences', [AccountController::class, 'updatePreferences'])
+            ->name('api.v1.account.preferences.update');
+    });

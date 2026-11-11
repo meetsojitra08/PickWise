@@ -28,6 +28,12 @@ const RegisterPage = lazy(() =>
   })),
 );
 
+const AccountPage = lazy(() =>
+  import('@/features/account/pages/AccountPage').then((module) => ({
+    default: module.AccountPage,
+  })),
+);
+
 export function AppRoutes() {
   return (
     <Suspense fallback={<AuthGuardFallback />}>
@@ -63,15 +69,7 @@ export function AppRoutes() {
           />
 
           <Route element={<RequireAuth />}>
-            <Route
-              path="/account"
-              element={
-                <RoutePlaceholderPage
-                  title="Your account"
-                  description="Profile settings, password updates, preferences, wishlist, saved comparisons, and assistant history live here."
-                />
-              }
-            />
+            <Route path="/account" element={<AccountPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />
