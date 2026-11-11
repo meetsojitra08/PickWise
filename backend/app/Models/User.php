@@ -9,9 +9,11 @@ use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 #[Fillable(['name', 'email', 'password', 'preferences'])]
 #[Hidden(['password', 'remember_token'])]
@@ -44,6 +46,18 @@ class User extends Authenticatable
             'preferences' => 'array',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Normalize email addresses to lowercase for case-insensitive lookups in PostgreSQL.
+     *
+     * @return Attribute<string, string>
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: static fn (string $value): string => Str::lower(trim($value)),
+        );
     }
 
     public function isAdmin(): bool
