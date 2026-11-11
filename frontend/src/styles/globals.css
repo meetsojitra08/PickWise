@@ -1,39 +1,241 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/bricolage-grotesque/opsz.css";
+@import "@fontsource-variable/figtree";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Typography */
+  --font-sans: 'Figtree Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: var(--font-heading);
+
+  /* Type scale (12 / 14 / 16 / 18 / 20 / 24 / 30 / 38 / 48) */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.55;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.4;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 1.25;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 1.2;
+  --text-4xl: 2.375rem;
+  --text-4xl--line-height: 1.15;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.1;
+
+  /* Hierarchical radii: controls 10px, images 12px, cards 16px, surfaces/sheets 24px */
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-card);
+  --radius-xl: var(--radius-card);
+  --radius-2xl: var(--radius-surface);
+  --radius-control: var(--radius);
+  --radius-media: 0.75rem;
+  --radius-card: 1rem;
+  --radius-surface: 1.5rem;
+
+  /* Elevation: soft layered shadow reserved for floating surfaces */
+  --shadow-float: var(--shadow-float-value);
+
+  /* Semantic colours */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-positive: var(--positive);
+  --color-positive-foreground: var(--positive-foreground);
+  --color-positive-subtle: var(--positive-subtle);
+  --color-negative: var(--negative);
+  --color-negative-foreground: var(--negative-foreground);
+  --color-negative-subtle: var(--negative-subtle);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-verdict-surface: var(--verdict-surface);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Charts & sidebar (admin) */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  line-height: 1.6;
-  background-color: #f6f7f5;
-  color: #17212b;
+:root {
+  --radius: 0.625rem;
+  --background: #f6f7f5;
+  --foreground: #17212b;
+  --card: #ffffff;
+  --card-foreground: #17212b;
+  --popover: #ffffff;
+  --popover-foreground: #17212b;
+  --primary: #0f5e5a;
+  --primary-foreground: #ffffff;
+  --secondary: #eaece8;
+  --secondary-foreground: #17212b;
+  --muted: #ecefeb;
+  --muted-foreground: #5b6773;
+  --accent: #f2b134;
+  --accent-foreground: #17212b;
+  --positive: #2e7d4f;
+  --positive-foreground: #ffffff;
+  --positive-subtle: #edf6f0;
+  --negative: #c0482f;
+  --negative-foreground: #ffffff;
+  --negative-subtle: #fcf2ef;
+  --destructive: var(--negative);
+  --destructive-foreground: var(--negative-foreground);
+  --warning: #b7791f;
+  --warning-foreground: #ffffff;
+  --warning-subtle: #fdf6e9;
+  --verdict-surface: #fdfaf2;
+  --border: #e2e6e3;
+  --input: #cfd6d2;
+  --ring: #0f5e5a;
+  --chart-1: #0f5e5a;
+  --chart-2: #f2b134;
+  --chart-3: #2e7d4f;
+  --chart-4: #5b6773;
+  --chart-5: #c0482f;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #17212b;
+  --sidebar-primary: #0f5e5a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ecefeb;
+  --sidebar-accent-foreground: #17212b;
+  --sidebar-border: #e2e6e3;
+  --sidebar-ring: #0f5e5a;
+  --shadow-float-value:
+    0 4px 12px -2px rgb(23 33 43 / 0.08),
+    0 12px 32px -4px rgb(23 33 43 / 0.08);
 }
 
-.app-shell {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
+.dark {
+  --background: #0f1519;
+  --foreground: #e8edea;
+  --card: #161e24;
+  --card-foreground: #e8edea;
+  --popover: #161e24;
+  --popover-foreground: #e8edea;
+  --primary: #3fb6ae;
+  --primary-foreground: #0f1519;
+  --secondary: #1f2a32;
+  --secondary-foreground: #e8edea;
+  --muted: #1b242b;
+  --muted-foreground: #9aa7b0;
+  --accent: #f2b134;
+  --accent-foreground: #0f1519;
+  --positive: #4caf75;
+  --positive-foreground: #0f1519;
+  --positive-subtle: #142a1f;
+  --negative: #e56b52;
+  --negative-foreground: #0f1519;
+  --negative-subtle: #2d1815;
+  --destructive: var(--negative);
+  --destructive-foreground: var(--negative-foreground);
+  --warning: #e0a33a;
+  --warning-foreground: #0f1519;
+  --warning-subtle: #2b2213;
+  --verdict-surface: #1b211d;
+  --border: #26323a;
+  --input: #32414b;
+  --ring: #3fb6ae;
+  --chart-1: #3fb6ae;
+  --chart-2: #f2b134;
+  --chart-3: #4caf75;
+  --chart-4: #9aa7b0;
+  --chart-5: #e56b52;
+  --sidebar: #161e24;
+  --sidebar-foreground: #e8edea;
+  --sidebar-primary: #3fb6ae;
+  --sidebar-primary-foreground: #0f1519;
+  --sidebar-accent: #1f2a32;
+  --sidebar-accent-foreground: #e8edea;
+  --sidebar-border: #26323a;
+  --sidebar-ring: #3fb6ae;
+  --shadow-float-value:
+    0 4px 12px -2px rgb(0 0 0 / 0.35),
+    0 12px 32px -4px rgb(0 0 0 / 0.45);
 }
 
-.app-card {
-  max-width: 560px;
-  padding: 32px;
-  border: 1px solid #e2e6e3;
-  border-radius: 16px;
-  background-color: #ffffff;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans text-base antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }
 
-.app-title {
-  margin: 0 0 8px;
-  font-size: 1.875rem;
-  line-height: 1.2;
-}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 
-.app-subtitle {
-  margin: 0;
-  color: #5b6773;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
