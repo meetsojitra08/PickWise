@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createQueryClient } from '@/app/query-client';
+import { ThemeProvider } from '@/app/ThemeProvider';
 import { AuthProvider } from '@/features/auth/components/AuthProvider';
 
 interface AppProvidersProps {
@@ -14,7 +15,9 @@ export function AppProviders({ children, queryClient }: AppProvidersProps) {
 
   return (
     <QueryClientProvider client={activeClient}>
-      <AuthProvider>{children}</AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
