@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P2, Catalog & discovery
-**Current step:** P2-S2
-**Last updated:** 2026-11-11 (P2-S1)
+**Current step:** P2-S3
+**Last updated:** 2026-11-11 (P2-S2)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -32,7 +32,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 
 ## P2: Catalog & discovery (branch `phase/P2-catalog`)
 - [x] **P2-S1** Migrations: categories, brands, products, images · `db(catalog)`
-- [ ] **P2-S2** Migrations: spec_definitions, product_specs, price_history · `db(catalog)`
+- [x] **P2-S2** Migrations: spec_definitions, product_specs, price_history · `db(catalog)`
 - [ ] **P2-S3** Models, relationships, factories · `feat(catalog)`
 - [ ] **P2-S4** Deterministic showcase seeders (6 categories, ~60 products, specs, history) · `db(catalog)`
 - [ ] **P2-S5** `GET /categories` and category filter facets · `feat(catalog)`

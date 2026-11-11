@@ -279,18 +279,23 @@ test('catalog tables enforce unique slugs and foreign key delete behaviours', fu
 });
 
 test('catalog migrations roll back and re-apply cleanly', function (): void {
-    $migrationFiles = [
-        database_path('migrations/2026_11_11_150020_create_categories_table.php'),
-        database_path('migrations/2026_11_11_150021_create_brands_table.php'),
-        database_path('migrations/2026_11_11_150022_create_products_table.php'),
-        database_path('migrations/2026_11_11_150023_create_product_images_table.php'),
-    ];
+    // Roll back downstream migrations (e.g. spec_definitions, product_specs, price_history) before parent tables.
+    $allMigrationFiles = glob(database_path('migrations/*.php')) ?: [];
+    sort($allMigrationFiles);
+
+    $migrationFiles = array_values(array_filter(
+        $allMigrationFiles,
+        static fn (string $path): bool => basename($path) >= '2026_11_11_150020_create_categories_table.php',
+    ));
 
     /** @var list<Migration> $migrations */
-    $migrations = array_map(
-        static fn (string $path): Migration => require $path,
-        $migrationFiles,
-    );
+    $migrations = array_values(array_filter(
+        array_map(
+            static fn (string $path): Migration => require $path,
+            $migrationFiles,
+        ),
+        static fn (Migration $migration): bool => $migration->shouldRun(),
+    ));
 
     foreach (array_reverse($migrations) as $migration) {
         $migration->down();
