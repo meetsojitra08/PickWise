@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\AccountController;
 use App\Http\Controllers\Api\V1\Public\CategoryController;
 use App\Http\Controllers\Api\V1\Public\HealthController;
+use App\Http\Controllers\Api\V1\Public\ProductController;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -21,6 +22,8 @@ Route::middleware('throttle:public-api')->group(function (): void {
         ->name('api.v1.categories.index');
     Route::get('/categories/{slug}/filters', [CategoryController::class, 'filters'])
         ->name('api.v1.categories.filters');
+    Route::get('/products', [ProductController::class, 'index'])
+        ->name('api.v1.products.index');
 });
 
 Route::prefix('auth')->group(function (): void {

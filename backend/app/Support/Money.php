@@ -48,4 +48,29 @@ final class Money
 
         return $sign.$normalizedInteger.'.'.$normalizedFraction;
     }
+
+    /**
+     * Compare two decimal money values without floating-point arithmetic.
+     */
+    public static function compare(string|int|float $left, string|int|float $right): int
+    {
+        $normalizedLeft = self::normalizeAmount($left);
+        $normalizedRight = self::normalizeAmount($right);
+
+        if (function_exists('bccomp')) {
+            return bccomp($normalizedLeft, $normalizedRight, 2);
+        }
+
+        return self::toMinorUnits($normalizedLeft) <=> self::toMinorUnits($normalizedRight);
+    }
+
+    private static function toMinorUnits(string $normalizedAmount): int
+    {
+        $isNegative = str_starts_with($normalizedAmount, '-');
+        $unsigned = ltrim($normalizedAmount, '-');
+        [$whole, $fraction] = explode('.', $unsigned, 2);
+        $units = ((int) $whole * 100) + (int) $fraction;
+
+        return $isNegative ? -$units : $units;
+    }
 }

@@ -39,3 +39,10 @@ test('money helper rejects non-numeric amounts', function (): void {
     expect(static fn (): string => Money::normalizeAmount('not-a-price'))
         ->toThrow(InvalidArgumentException::class);
 });
+
+test('money helper compares decimal amounts without floating point drift', function (): void {
+    expect(Money::compare('1000.00', '1000'))->toBe(0)
+        ->and(Money::compare('9999.99', '10000.00'))->toBe(-1)
+        ->and(Money::compare('42999.50', '42999.49'))->toBe(1)
+        ->and(Money::compare(0, '0.00'))->toBe(0);
+});
