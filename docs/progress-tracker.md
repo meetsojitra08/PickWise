@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P1, Authentication & accounts
-**Current step:** P1-S1
-**Last updated:** 2026-11-11 (P0-S10)
+**Current step:** P1-S2
+**Last updated:** 2026-11-11 (P1-S1)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -22,7 +22,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P0-S10** API conventions: response envelope, exception handler, request ID · `feat(api)`
 
 ## P1: Authentication & accounts (branch `phase/P1-auth`)
-- [ ] **P1-S1** `users` migration with role, preferences, is_active; `UserRole` enum · `db(auth)`
+- [x] **P1-S1** `users` migration with role, preferences, is_active; `UserRole` enum · `db(auth)`
 - [ ] **P1-S2** Sanctum SPA auth: register, login, logout, me (+ tests) · `feat(auth)`
 - [ ] **P1-S3** Login throttling, `role` middleware, policies scaffold · `feat(auth)`
 - [ ] **P1-S4** Frontend API client (CSRF + error normalisation), auth provider and guards · `feat(auth)`

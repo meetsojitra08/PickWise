@@ -11,3 +11,6 @@ parameters:
 
     # Target level 6+ per docs/code-standards.md
     level: 6
+
+    # Laravel 13 models define casts via the casts() method rather than $casts
+    parseModelCastsMethod: true
