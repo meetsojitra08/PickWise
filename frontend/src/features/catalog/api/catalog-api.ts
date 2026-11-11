@@ -3,6 +3,7 @@ import type {
   CatalogCategoriesResponse,
   CatalogFacetsResponse,
   CatalogProductsResponse,
+  ProductDetailResponse,
 } from '@/features/catalog/types/catalog-api';
 
 export function getCatalogCategories(signal?: AbortSignal) {
@@ -24,4 +25,11 @@ export function getCatalogProducts(
     params,
     signal,
   });
+}
+
+export function getCatalogProduct(slug: string, signal?: AbortSignal) {
+  return apiClient.get<ProductDetailResponse>(
+    `/products/${encodeURIComponent(slug)}`,
+    { signal },
+  );
 }

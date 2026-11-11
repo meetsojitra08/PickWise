@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   getCatalogCategories,
   getCatalogFacets,
+  getCatalogProduct,
   getCatalogProducts,
 } from '@/features/catalog/api/catalog-api';
 
@@ -12,12 +13,21 @@ export const catalogKeys = {
     [...catalogKeys.all, 'facets', category] as const,
   products: (params: string) =>
     [...catalogKeys.all, 'products', params] as const,
+  product: (slug: string) => [...catalogKeys.all, 'product', slug] as const,
 };
 
 export function useCatalogCategories() {
   return useQuery({
     queryKey: catalogKeys.categories(),
     queryFn: ({ signal }) => getCatalogCategories(signal),
+  });
+}
+
+export function useCatalogProduct(slug: string) {
+  return useQuery({
+    queryKey: catalogKeys.product(slug),
+    queryFn: ({ signal }) => getCatalogProduct(slug, signal),
+    enabled: slug !== '',
   });
 }
 

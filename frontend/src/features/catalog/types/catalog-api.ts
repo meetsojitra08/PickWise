@@ -45,3 +45,30 @@ export interface CatalogFacets {
 export type CatalogProductsResponse = ApiPaginatedResponse<ProductSummary>;
 export type CatalogCategoriesResponse = ApiSuccessResponse<CatalogCategory[]>;
 export type CatalogFacetsResponse = ApiSuccessResponse<CatalogFacets>;
+
+export interface ProductDetailImage {
+  id: number;
+  url: string | null;
+  alt_text: string;
+  sort_order: number;
+  is_primary: boolean;
+}
+
+export interface ProductDetailSpec {
+  key: string;
+  label: string;
+  unit: string | null;
+  data_type: 'number' | 'text' | 'boolean';
+  value: string | number | boolean | null;
+  is_comparable: boolean;
+  higher_is_better: boolean | null;
+}
+
+export interface ProductDetail extends ProductSummary {
+  description: string | null;
+  store_url: string | null;
+  images: ProductDetailImage[];
+  specs: ProductDetailSpec[];
+}
+
+export type ProductDetailResponse = ApiSuccessResponse<ProductDetail>;

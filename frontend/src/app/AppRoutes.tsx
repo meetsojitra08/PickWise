@@ -35,6 +35,12 @@ const AccountPage = lazy(() =>
   })),
 );
 
+const ProductDetailRoute = lazy(() =>
+  import('@/features/catalog/pages/ProductDetailPage').then((module) => ({
+    default: module.ProductDetailRoute,
+  })),
+);
+
 export function AppRoutes() {
   return (
     <Suspense fallback={<AuthGuardFallback />}>
@@ -42,6 +48,7 @@ export function AppRoutes() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<CatalogPage />} />
+          <Route path="/products/:slug" element={<ProductDetailRoute />} />
           <Route
             path="/compare"
             element={
