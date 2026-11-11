@@ -273,17 +273,17 @@ test('user can save and clear shopping preferences', function (): void {
         ]);
 
     $saveResponse->assertOk()
-        ->assertJsonPath('data.preferences', [
+        ->assertJsonPath('data.preferences.budget_default', 90000)
+        ->assertJsonPath('data.preferences.favourite_categories', ['laptops', 'monitors'])
+        ->assertJsonPath('data.preferences.priorities', ['battery', 'display', 'price']);
+
+    expect($saveResponse->json('data.preferences'))
+        ->toHaveCount(3)
+        ->and($user->fresh()?->preferences)->toEqual([
             'budget_default' => 90000,
             'favourite_categories' => ['laptops', 'monitors'],
             'priorities' => ['battery', 'display', 'price'],
         ]);
-
-    expect($user->fresh()?->preferences)->toEqual([
-        'budget_default' => 90000,
-        'favourite_categories' => ['laptops', 'monitors'],
-        'priorities' => ['battery', 'display', 'price'],
-    ]);
 
     $zeroBudgetResponse = $this->actingAs($user)
         ->putJson('/api/v1/account/preferences', [
@@ -293,11 +293,11 @@ test('user can save and clear shopping preferences', function (): void {
         ]);
 
     $zeroBudgetResponse->assertOk()
-        ->assertJsonPath('data.preferences', [
-            'budget_default' => 0,
-            'favourite_categories' => [],
-            'priorities' => [],
-        ]);
+        ->assertJsonPath('data.preferences.budget_default', 0)
+        ->assertJsonPath('data.preferences.favourite_categories', [])
+        ->assertJsonPath('data.preferences.priorities', []);
+
+    expect($zeroBudgetResponse->json('data.preferences'))->toHaveCount(3);
 
     $clearResponse = $this->actingAs($user)
         ->putJson('/api/v1/account/preferences', [
