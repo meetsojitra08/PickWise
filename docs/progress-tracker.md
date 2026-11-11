@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P0, Foundation
-**Current step:** P0-S8
-**Last updated:** 2026-11-11 (P0-S7)
+**Current step:** P0-S9
+**Last updated:** 2026-11-11 (P0-S8)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -17,7 +17,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P0-S5** Add Redis: phpredis in PHP image, set session/queue/cache to Redis, connection health check · `chore(redis)`
 - [x] **P0-S6** Create React + Vite + TypeScript app in `frontend/`, Nginx proxy `/api` · `chore(frontend)`
 - [x] **P0-S7** Tailwind CSS + shadcn/ui init, design tokens (light and dark), fonts · `feat(ui)`
-- [ ] **P0-S8** Tooling: Pint, Larastan, Pest, ESLint, Prettier, Vitest · `chore(tooling)`
+- [x] **P0-S8** Tooling: Pint, Larastan, Pest, ESLint, Prettier, Vitest · `chore(tooling)`
 - [ ] **P0-S9** GitHub Actions CI (lint, analyse, test, build) · `ci`
 - [ ] **P0-S10** API conventions: response envelope, exception handler, request ID · `feat(api)`
 

@@ -29,7 +29,9 @@ export function App() {
             variant="outline"
             size="icon"
             onClick={toggleTheme}
-            aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+            aria-label={
+              isDark ? 'Switch to light theme' : 'Switch to dark theme'
+            }
           >
             {isDark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
           </Button>

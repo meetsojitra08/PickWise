@@ -2,70 +2,61 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Tests\TestCase;
 
-class PostgresExtensionsMigrationTest extends TestCase
-{
-    use RefreshDatabase;
+uses(RefreshDatabase::class);
 
-    public function test_migrations_run_cleanly_and_enable_postgres_extensions_when_on_pgsql(): void
-    {
-        $this->assertTrue(Schema::hasTable('migrations'));
-        $this->assertTrue(Schema::hasTable('users'));
+test('migrations run cleanly and enable postgres extensions when on pgsql', function (): void {
+    expect(Schema::hasTable('migrations'))->toBeTrue()
+        ->and(Schema::hasTable('users'))->toBeTrue();
 
-        $migrationRecorded = DB::table('migrations')
-            ->where('migration', 'like', '%_enable_pg_trgm_and_unaccent_extensions')
-            ->exists();
+    $migrationRecorded = DB::table('migrations')
+        ->where('migration', 'like', '%_enable_pg_trgm_and_unaccent_extensions')
+        ->exists();
 
-        if (DB::getDriverName() === 'pgsql') {
-            $this->assertTrue($migrationRecorded);
+    if (DB::getDriverName() === 'pgsql') {
+        expect($migrationRecorded)->toBeTrue();
 
-            /** @var list<string> $extensions */
-            $extensions = DB::table('pg_extension')
-                ->whereIn('extname', ['pg_trgm', 'unaccent'])
-                ->pluck('extname')
-                ->all();
+        /** @var list<string> $extensions */
+        $extensions = DB::table('pg_extension')
+            ->whereIn('extname', ['pg_trgm', 'unaccent'])
+            ->pluck('extname')
+            ->all();
 
-            $this->assertEqualsCanonicalizing(['pg_trgm', 'unaccent'], $extensions);
+        expect($extensions)->toEqualCanonicalizing(['pg_trgm', 'unaccent']);
 
-            /** @var object{score: float|string}|null $similarity */
-            $similarity = DB::selectOne("SELECT similarity('laptop', 'laptp') AS score");
-            $this->assertNotNull($similarity);
-            $this->assertGreaterThan(0.0, (float) $similarity->score);
+        /** @var object{score: float|string}|null $similarity */
+        $similarity = DB::selectOne("SELECT similarity('laptop', 'laptp') AS score");
+        expect($similarity)->not->toBeNull();
+        expect((float) $similarity->score)->toBeGreaterThan(0.0);
 
-            /** @var object{clean: string}|null $unaccented */
-            $unaccented = DB::selectOne("SELECT unaccent('Café') AS clean");
-            $this->assertNotNull($unaccented);
-            $this->assertSame('Cafe', $unaccented->clean);
+        /** @var object{clean: string}|null $unaccented */
+        $unaccented = DB::selectOne("SELECT unaccent('Café') AS clean");
+        expect($unaccented)->not->toBeNull();
+        expect($unaccented->clean)->toBe('Cafe');
 
-            return;
-        }
-
-        $this->assertFalse($migrationRecorded);
+        return;
     }
 
-    public function test_extension_migration_respects_database_driver(): void
-    {
-        $files = glob(database_path('migrations/*_enable_pg_trgm_and_unaccent_extensions.php'));
-        $this->assertIsArray($files);
-        $this->assertCount(1, $files);
+    expect($migrationRecorded)->toBeFalse();
+});
 
-        $migration = require $files[0];
-        $this->assertInstanceOf(Migration::class, $migration);
+test('extension migration respects database driver', function (): void {
+    $files = glob(database_path('migrations/*_enable_pg_trgm_and_unaccent_extensions.php'));
+    expect($files)->toBeArray()->toHaveCount(1);
 
-        $isPostgres = DB::connection($migration->getConnection())->getDriverName() === 'pgsql';
-        $this->assertSame($isPostgres, $migration->shouldRun());
+    $migration = require $files[0];
+    expect($migration)->toBeInstanceOf(Migration::class);
 
-        if (! $isPostgres) {
-            // Direct invocation must also guard against non-PostgreSQL drivers (e.g. migrate --pretend).
-            $migration->up();
-            $migration->down();
-        }
+    $isPostgres = DB::connection($migration->getConnection())->getDriverName() === 'pgsql';
+    expect($migration->shouldRun())->toBe($isPostgres);
+
+    if (! $isPostgres) {
+        // Direct invocation must also guard against non-PostgreSQL drivers (e.g. migrate --pretend).
+        $migration->up();
+        $migration->down();
     }
-}
+});

@@ -2,87 +2,77 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature;
-
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Session;
-use Tests\TestCase;
 
-class RedisIntegrationTest extends TestCase
-{
-    public function test_phpredis_extension_is_loaded_and_configured_as_client(): void
-    {
-        $this->assertTrue(extension_loaded('redis'));
-        $this->assertSame('phpredis', config('database.redis.client'));
+test('phpredis extension is loaded and configured as client', function (): void {
+    expect(extension_loaded('redis'))->toBeTrue()
+        ->and(config('database.redis.client'))->toBe('phpredis');
+});
+
+test('env example sets redis for session queue and cache', function (): void {
+    $envExample = file_get_contents(base_path('.env.example'));
+
+    expect($envExample)->toBeString()
+        ->toMatch('/^SESSION_DRIVER=redis$/m')
+        ->toMatch('/^QUEUE_CONNECTION=redis$/m')
+        ->toMatch('/^CACHE_STORE=redis$/m')
+        ->toMatch('/^REDIS_CLIENT=phpredis$/m')
+        ->toMatch('/^REDIS_HOST=redis$/m');
+});
+
+test('redis cache store reads and writes with ttl', function (): void {
+    $store = Cache::store('redis');
+    $key = 'pickwise:test:cache:'.bin2hex(random_bytes(8));
+
+    try {
+        expect($store->put($key, 'ok', 60))->toBeTrue()
+            ->and($store->get($key))->toBe('ok');
+    } finally {
+        $store->forget($key);
     }
 
-    public function test_env_example_sets_redis_for_session_queue_and_cache(): void
-    {
-        $envExample = file_get_contents(base_path('.env.example'));
-        $this->assertIsString($envExample);
+    expect($store->get($key))->toBeNull();
+});
 
-        $this->assertMatchesRegularExpression('/^SESSION_DRIVER=redis$/m', $envExample);
-        $this->assertMatchesRegularExpression('/^QUEUE_CONNECTION=redis$/m', $envExample);
-        $this->assertMatchesRegularExpression('/^CACHE_STORE=redis$/m', $envExample);
-        $this->assertMatchesRegularExpression('/^REDIS_CLIENT=phpredis$/m', $envExample);
-        $this->assertMatchesRegularExpression('/^REDIS_HOST=redis$/m', $envExample);
+test('redis session driver reads and writes sessions', function (): void {
+    $sessionId = 'test-session-'.bin2hex(random_bytes(8));
+
+    $writer = Session::driver('redis');
+    $writer->setId($sessionId);
+    $writer->start();
+    $writer->put('probe', 'pickwise');
+    $writer->save();
+
+    try {
+        $reader = Session::driver('redis');
+        $reader->setId($sessionId);
+        $reader->start();
+
+        expect($reader->get('probe'))->toBe('pickwise');
+    } finally {
+        $writer->getHandler()->destroy($sessionId);
     }
+});
 
-    public function test_redis_cache_store_reads_and_writes_with_ttl(): void
-    {
-        $store = Cache::store('redis');
-        $key = 'pickwise:test:cache:'.bin2hex(random_bytes(8));
+test('redis queue connection pushes and pops jobs', function (): void {
+    $queue = Queue::connection('redis');
+    expect($queue)->toBeInstanceOf(RedisQueue::class);
 
-        try {
-            $this->assertTrue($store->put($key, 'ok', 60));
-            $this->assertSame('ok', $store->get($key));
-        } finally {
-            $store->forget($key);
-        }
+    $queueName = 'test-p0-s5-'.bin2hex(random_bytes(4));
 
-        $this->assertNull($store->get($key));
+    try {
+        $queue->push('ProbeJob', ['step' => 'P0-S5'], $queueName);
+        $job = $queue->pop($queueName);
+
+        expect($job)->not->toBeNull()
+            ->and($job->getName())->toBe('ProbeJob')
+            ->and($job->payload()['data'])->toBe(['step' => 'P0-S5']);
+
+        $job->delete();
+    } finally {
+        $queue->clear($queueName);
     }
-
-    public function test_redis_session_driver_reads_and_writes_sessions(): void
-    {
-        $sessionId = 'test-session-'.bin2hex(random_bytes(8));
-
-        $writer = Session::driver('redis');
-        $writer->setId($sessionId);
-        $writer->start();
-        $writer->put('probe', 'pickwise');
-        $writer->save();
-
-        try {
-            $reader = Session::driver('redis');
-            $reader->setId($sessionId);
-            $reader->start();
-
-            $this->assertSame('pickwise', $reader->get('probe'));
-        } finally {
-            $writer->getHandler()->destroy($sessionId);
-        }
-    }
-
-    public function test_redis_queue_connection_pushes_and_pops_jobs(): void
-    {
-        $queue = Queue::connection('redis');
-        $this->assertInstanceOf(RedisQueue::class, $queue);
-
-        $queueName = 'test-p0-s5-'.bin2hex(random_bytes(4));
-
-        try {
-            $queue->push('ProbeJob', ['step' => 'P0-S5'], $queueName);
-            $job = $queue->pop($queueName);
-
-            $this->assertNotNull($job);
-            $this->assertSame('ProbeJob', $job->getName());
-            $this->assertSame(['step' => 'P0-S5'], $job->payload()['data']);
-            $job->delete();
-        } finally {
-            $queue->clear($queueName);
-        }
-    }
-}
+});

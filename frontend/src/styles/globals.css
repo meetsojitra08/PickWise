@@ -1,15 +1,19 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/bricolage-grotesque/opsz.css";
-@import "@fontsource-variable/figtree";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
+@import '@fontsource-variable/figtree';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   /* Typography */
-  --font-sans: 'Figtree Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-heading: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans:
+    'Figtree Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-heading:
+    'Bricolage Grotesque Variable', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', sans-serif;
   --font-display: var(--font-heading);
 
   /* Type scale (12 / 14 / 16 / 18 / 20 / 24 / 30 / 38 / 48) */
@@ -138,8 +142,7 @@
   --sidebar-border: #e2e6e3;
   --sidebar-ring: #0f5e5a;
   --shadow-float-value:
-    0 4px 12px -2px rgb(23 33 43 / 0.08),
-    0 12px 32px -4px rgb(23 33 43 / 0.08);
+    0 4px 12px -2px rgb(23 33 43 / 0.08), 0 12px 32px -4px rgb(23 33 43 / 0.08);
 }
 
 .dark {
@@ -186,8 +189,7 @@
   --sidebar-border: #26323a;
   --sidebar-ring: #3fb6ae;
   --shadow-float-value:
-    0 4px 12px -2px rgb(0 0 0 / 0.35),
-    0 12px 32px -4px rgb(0 0 0 / 0.45);
+    0 4px 12px -2px rgb(0 0 0 / 0.35), 0 12px 32px -4px rgb(0 0 0 / 0.45);
 }
 
 @layer base {
