@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\AccountController;
+use App\Http\Controllers\Api\V1\Public\CategoryController;
 use App\Http\Controllers\Api\V1\Public\HealthController;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -14,6 +15,13 @@ use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 Route::get('/health', HealthController::class)->name('api.v1.health');
+
+Route::middleware('throttle:public-api')->group(function (): void {
+    Route::get('/categories', [CategoryController::class, 'index'])
+        ->name('api.v1.categories.index');
+    Route::get('/categories/{slug}/filters', [CategoryController::class, 'filters'])
+        ->name('api.v1.categories.filters');
+});
 
 Route::prefix('auth')->group(function (): void {
     Route::middleware([
