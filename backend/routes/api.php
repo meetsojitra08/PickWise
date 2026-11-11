@@ -24,8 +24,12 @@ Route::prefix('auth')->group(function (): void {
     ])->withoutMiddleware([
         EnsureFrontendRequestsAreStateful::class,
     ])->group(function (): void {
-        Route::post('/register', [AuthController::class, 'register'])->name('api.v1.auth.register');
-        Route::post('/login', [AuthController::class, 'login'])->name('api.v1.auth.login');
+        Route::post('/register', [AuthController::class, 'register'])
+            ->middleware('throttle:register')
+            ->name('api.v1.auth.register');
+        Route::post('/login', [AuthController::class, 'login'])
+            ->middleware('throttle:login')
+            ->name('api.v1.auth.login');
         Route::post('/logout', [AuthController::class, 'logout'])
             ->middleware('auth:sanctum')
             ->name('api.v1.auth.logout');
