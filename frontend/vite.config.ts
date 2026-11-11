@@ -16,6 +16,11 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     strictPort: true,
+    // Poll inside the Docker container so Windows bind-mount edits trigger HMR reliably.
+    watch: {
+      usePolling: true,
+      interval: 300,
+    },
     proxy: {
       '/api': {
         target: apiProxyTarget,
