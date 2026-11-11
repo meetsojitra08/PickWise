@@ -2,7 +2,7 @@
 
 **Current phase:** P2, Catalog & discovery
 **Current step:** P2-S10
-**Last updated:** 2026-11-11 (P2-S9)
+**Last updated:** 2026-11-12 (P2-S10)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -40,7 +40,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P2-S7** Postgres full-text search + trigram typo tolerance · `feat(catalog)`
 - [x] **P2-S8** `GET /products/{slug}` with Resources · `feat(product)`
 - [x] **P2-S9** FE: `ProductCard`, `PriceTag`, `RatingStars`, skeletons · `feat(ui)`
-- [ ] **P2-S10** FE: catalog page with `FilterPanel`, URL-synced filters, pagination · `feat(catalog)`
+- [x] **P2-S10** FE: catalog page with `FilterPanel`, URL-synced filters, pagination · `feat(catalog)`
 - [ ] **P2-S11** FE: product detail page (gallery, specs, availability) · `feat(product)`
 - [ ] **P2-S12** FE: global search with command palette and suggestions · `feat(catalog)`
 - [ ] **P2-S13** Value Score service + tests, show on cards and detail · `feat(catalog)`
