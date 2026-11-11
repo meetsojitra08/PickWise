@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P0, Foundation
-**Current step:** P0-S4
-**Last updated:** 2026-11-11 (P0-S3)
+**Current step:** P0-S5
+**Last updated:** 2026-11-11 (P0-S4)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -13,7 +13,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P0-S1** Initialise Git repo, `.gitignore`, README stub, copy `/docs` · `chore(docs)`
 - [x] **P0-S2** Docker: PHP-FPM, Nginx, PostgreSQL, Redis, Node services, `docker-compose.yml` · `chore(docker)`
 - [x] **P0-S3** Create Laravel 13 app in `backend/`, connect to Postgres, health endpoint · `chore(backend)`
-- [ ] **P0-S4** Enable `pg_trgm` and `unaccent` extensions via migration · `chore(db)`
+- [x] **P0-S4** Enable `pg_trgm` and `unaccent` extensions via migration · `chore(db)`
 - [ ] **P0-S5** Add Redis: phpredis in PHP image, set session/queue/cache to Redis, connection health check · `chore(redis)`
 - [ ] **P0-S6** Create React + Vite + TypeScript app in `frontend/`, Nginx proxy `/api` · `chore(frontend)`
 - [ ] **P0-S7** Tailwind CSS + shadcn/ui init, design tokens (light and dark), fonts · `feat(ui)`
