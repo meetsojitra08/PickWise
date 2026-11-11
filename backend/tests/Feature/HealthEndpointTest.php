@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Redis\Connections\Connection as RedisConnection;
 use Illuminate\Redis\RedisManager;
+use Illuminate\Support\Str;
 use Mockery\MockInterface;
 
 test('built in up endpoint returns ok', function (): void {
@@ -12,8 +13,10 @@ test('built in up endpoint returns ok', function (): void {
 });
 
 test('api health endpoint returns ok when dependencies are reachable', function (): void {
-    $this->getJson('/api/v1/health')
-        ->assertOk()
+    $response = $this->getJson('/api/v1/health');
+
+    $response->assertOk()
+        ->assertHeader('X-Request-Id')
         ->assertExactJson([
             'data' => [
                 'status' => 'ok',
@@ -21,6 +24,8 @@ test('api health endpoint returns ok when dependencies are reachable', function 
                 'redis' => 'ok',
             ],
         ]);
+
+    expect(Str::isUuid((string) $response->headers->get('X-Request-Id')))->toBeTrue();
 });
 
 test('api health endpoint returns 503 when database is unreachable', function (): void {
@@ -30,8 +35,12 @@ test('api health endpoint returns 503 when database is unreachable', function ()
             ->andThrow(new RuntimeException('Connection refused'));
     });
 
-    $this->getJson('/api/v1/health')
-        ->assertStatus(503)
+    $response = $this->getJson('/api/v1/health');
+    $requestId = (string) $response->headers->get('X-Request-Id');
+
+    expect(Str::isUuid($requestId))->toBeTrue();
+
+    $response->assertStatus(503)
         ->assertExactJson([
             'error' => [
                 'code' => 'service_unavailable',
@@ -40,6 +49,7 @@ test('api health endpoint returns 503 when database is unreachable', function ()
                     'database' => 'error',
                     'redis' => 'ok',
                 ],
+                'request_id' => $requestId,
             ],
         ]);
 });
@@ -51,8 +61,10 @@ test('api health endpoint returns 503 when redis is unreachable', function (): v
             ->andThrow(new RuntimeException('Redis connection refused'));
     });
 
-    $this->getJson('/api/v1/health')
+    $this->withHeader('X-Request-Id', 'health-redis-503')
+        ->getJson('/api/v1/health')
         ->assertStatus(503)
+        ->assertHeader('X-Request-Id', 'health-redis-503')
         ->assertExactJson([
             'error' => [
                 'code' => 'service_unavailable',
@@ -61,6 +73,7 @@ test('api health endpoint returns 503 when redis is unreachable', function (): v
                     'database' => 'ok',
                     'redis' => 'error',
                 ],
+                'request_id' => 'health-redis-503',
             ],
         ]);
 });
@@ -78,8 +91,10 @@ test('api health endpoint returns 503 when redis ping returns false', function (
             ->andReturn($connection);
     });
 
-    $this->getJson('/api/v1/health')
+    $this->withHeader('X-Request-Id', 'health-ping-false')
+        ->getJson('/api/v1/health')
         ->assertStatus(503)
+        ->assertHeader('X-Request-Id', 'health-ping-false')
         ->assertExactJson([
             'error' => [
                 'code' => 'service_unavailable',
@@ -88,6 +103,7 @@ test('api health endpoint returns 503 when redis ping returns false', function (
                     'database' => 'ok',
                     'redis' => 'error',
                 ],
+                'request_id' => 'health-ping-false',
             ],
         ]);
 });
@@ -105,8 +121,10 @@ test('api health endpoint returns 503 when both dependencies are unreachable', f
             ->andThrow(new RuntimeException('Redis connection refused'));
     });
 
-    $this->getJson('/api/v1/health')
+    $this->withHeader('X-Request-Id', 'health-both-down')
+        ->getJson('/api/v1/health')
         ->assertStatus(503)
+        ->assertHeader('X-Request-Id', 'health-both-down')
         ->assertExactJson([
             'error' => [
                 'code' => 'service_unavailable',
@@ -115,6 +133,7 @@ test('api health endpoint returns 503 when both dependencies are unreachable', f
                     'database' => 'error',
                     'redis' => 'error',
                 ],
+                'request_id' => 'health-both-down',
             ],
         ]);
 });

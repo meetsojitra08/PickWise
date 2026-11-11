@@ -1,8 +1,8 @@
 # Progress Tracker
 
-**Current phase:** P0, Foundation
-**Current step:** P0-S10
-**Last updated:** 2026-11-11 (P0-S9)
+**Current phase:** P1, Authentication & accounts
+**Current step:** P1-S1
+**Last updated:** 2026-11-11 (P0-S10)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -19,7 +19,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P0-S7** Tailwind CSS + shadcn/ui init, design tokens (light and dark), fonts · `feat(ui)`
 - [x] **P0-S8** Tooling: Pint, Larastan, Pest, ESLint, Prettier, Vitest · `chore(tooling)`
 - [x] **P0-S9** GitHub Actions CI (lint, analyse, test, build) · `ci`
-- [ ] **P0-S10** API conventions: response envelope, exception handler, request ID · `feat(api)`
+- [x] **P0-S10** API conventions: response envelope, exception handler, request ID · `feat(api)`
 
 ## P1: Authentication & accounts (branch `phase/P1-auth`)
 - [ ] **P1-S1** `users` migration with role, preferences, is_active; `UserRole` enum · `db(auth)`
