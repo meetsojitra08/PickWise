@@ -11,17 +11,21 @@ use App\Enums\ProductSort;
 use App\Enums\SpecDataType;
 use App\Models\Brand;
 use App\Models\Product;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Executes public catalog product search, dynamic spec filtering, sorting, and pagination.
+ *
+ * @phpstan-import-type PreparedSearchTerms from PostgresProductSearch
  */
 final class ProductSearchQuery
 {
     public function __construct(
         private readonly ActiveCategoryScope $categoryScope,
+        private readonly PostgresProductSearch $postgresSearch,
     ) {}
 
     /**
@@ -72,14 +76,71 @@ final class ProductSearchQuery
             ? trim((string) preg_replace('/\s+/u', ' ', $criteria->query))
             : '';
         $searchTokens = $normalizedSearch !== '' ? $this->tokenize($normalizedSearch) : [];
+        $sort = $criteria->resolvedSort();
+
+        $connection = $query->getConnection();
+        $isPostgres = $connection instanceof Connection && $connection->getDriverName() === 'pgsql';
+
+        if ($searchTokens !== [] && $isPostgres) {
+            return $this->searchWithPostgres(
+                baseQuery: $query,
+                criteria: $criteria,
+                sort: $sort,
+                normalizedSearch: $normalizedSearch,
+                tokens: $searchTokens,
+            );
+        }
 
         if ($searchTokens !== []) {
             $this->applyKeywordFilter($query, $searchTokens);
         }
 
-        $this->applySorting($query, $criteria->resolvedSort(), $normalizedSearch, $searchTokens);
+        $this->applySorting($query, $sort, $normalizedSearch, $searchTokens);
 
         return $query
+            ->paginate(
+                perPage: $criteria->perPage,
+                page: $criteria->page,
+            )
+            ->withQueryString();
+    }
+
+    /**
+     * Run two-stage PostgreSQL search: indexed full-text first, trigram typo fallback when zero rows match.
+     *
+     * @param  EloquentBuilder<Product>  $baseQuery
+     * @param  list<string>  $tokens
+     * @return LengthAwarePaginator<int, Product>
+     */
+    private function searchWithPostgres(
+        EloquentBuilder $baseQuery,
+        ProductSearchCriteria $criteria,
+        ProductSort $sort,
+        string $normalizedSearch,
+        array $tokens,
+    ): LengthAwarePaginator {
+        $terms = $this->postgresSearch->prepareTerms($tokens);
+
+        $primaryQuery = clone $baseQuery;
+        $this->postgresSearch->applyFullTextFilter($primaryQuery, $terms);
+        $this->applySorting($primaryQuery, $sort, $normalizedSearch, $tokens, $terms);
+
+        $paginator = $primaryQuery
+            ->paginate(
+                perPage: $criteria->perPage,
+                page: $criteria->page,
+            )
+            ->withQueryString();
+
+        if ($paginator->total() > 0 || ! $terms['has_fallback_candidates']) {
+            return $paginator;
+        }
+
+        $fallbackQuery = clone $baseQuery;
+        $this->postgresSearch->applyTrigramFallbackFilter($fallbackQuery, $terms);
+        $this->applySorting($fallbackQuery, $sort, $normalizedSearch, $tokens, $terms);
+
+        return $fallbackQuery
             ->paginate(
                 perPage: $criteria->perPage,
                 page: $criteria->page,
@@ -186,15 +247,17 @@ final class ProductSearchQuery
     /**
      * @param  EloquentBuilder<Product>  $query
      * @param  list<string>  $tokens
+     * @param  PreparedSearchTerms|null  $postgresTerms
      */
     private function applySorting(
         EloquentBuilder $query,
         ProductSort $sort,
         string $normalizedSearch,
         array $tokens,
+        ?array $postgresTerms = null,
     ): void {
         match ($sort) {
-            ProductSort::Relevance => $this->applyRelevanceSort($query, $normalizedSearch, $tokens),
+            ProductSort::Relevance => $this->applyRelevanceSort($query, $normalizedSearch, $tokens, $postgresTerms),
             ProductSort::PriceAsc => $query
                 ->orderBy('products.price')
                 ->orderBy('products.id'),
@@ -215,10 +278,22 @@ final class ProductSearchQuery
     /**
      * @param  EloquentBuilder<Product>  $query
      * @param  list<string>  $tokens
+     * @param  PreparedSearchTerms|null  $postgresTerms
      */
-    private function applyRelevanceSort(EloquentBuilder $query, string $normalizedSearch, array $tokens): void
-    {
+    private function applyRelevanceSort(
+        EloquentBuilder $query,
+        string $normalizedSearch,
+        array $tokens,
+        ?array $postgresTerms = null,
+    ): void {
         if ($normalizedSearch === '' || $tokens === []) {
+            $this->applyValueSort($query);
+
+            return;
+        }
+
+        if ($postgresTerms !== null) {
+            $this->postgresSearch->applyRelevanceOrder($query, $normalizedSearch, $postgresTerms);
             $this->applyValueSort($query);
 
             return;
