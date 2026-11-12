@@ -3,6 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  AuthContext,
+  type AuthContextValue,
+} from '@/features/auth/hooks/auth-context';
 import { ProductDetailRoute } from '@/features/catalog/pages/ProductDetailPage';
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -11,6 +15,37 @@ function jsonResponse(body: unknown, status = 200): Response {
     headers: { 'Content-Type': 'application/json' },
   });
 }
+
+const guestAuth: AuthContextValue = {
+  user: null,
+  status: 'unauthenticated',
+  isLoading: false,
+  isAuthenticated: false,
+  isAdmin: false,
+  authError: null,
+  login: async () => {
+    throw new Error('Not implemented in this test.');
+  },
+  register: async () => {
+    throw new Error('Not implemented in this test.');
+  },
+  logout: async () => {},
+  refetchUser: async () => null,
+};
+
+const emptyReviewsResponse = {
+  data: [],
+  links: { first: null, last: null, prev: null, next: null },
+  meta: {
+    current_page: 1,
+    per_page: 10,
+    total: 0,
+    last_page: 1,
+    rating_distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+    own_pending_review: null,
+    has_reviewed: false,
+  },
+};
 
 function mockProductEndpoints(
   historyPoints: unknown[] = [],
@@ -28,6 +63,9 @@ function mockProductEndpoints(
     }
     if (requestUrl.includes('/similar')) {
       return jsonResponse({ data: similarProducts });
+    }
+    if (requestUrl.includes('/reviews')) {
+      return jsonResponse(emptyReviewsResponse);
     }
     return jsonResponse({ data: product });
   });
@@ -98,11 +136,13 @@ function renderProductPage() {
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={['/products/northstar-studio-14']}>
-        <Routes>
-          <Route path="/products/:slug" element={<ProductDetailRoute />} />
-        </Routes>
-      </MemoryRouter>
+      <AuthContext.Provider value={guestAuth}>
+        <MemoryRouter initialEntries={['/products/northstar-studio-14']}>
+          <Routes>
+            <Route path="/products/:slug" element={<ProductDetailRoute />} />
+          </Routes>
+        </MemoryRouter>
+      </AuthContext.Provider>
     </QueryClientProvider>,
   );
 }
@@ -154,6 +194,17 @@ describe('ProductDetailRoute', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('No similar products yet')).toBeInTheDocument();
     expect(
+      screen.getByRole('heading', { name: 'Ratings & reviews' }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        'No reviews yet. Be the first to share your experience.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Log in to write a review' }),
+    ).toHaveAttribute('href', '/login');
+    expect(
       screen.getByRole('img', { name: /Price history from/ }),
     ).toBeInTheDocument();
     expect(container.querySelectorAll('circle.fill-accent')).toHaveLength(2);
@@ -197,6 +248,9 @@ describe('ProductDetailRoute', () => {
       }
       if (requestUrl.includes('/similar')) {
         return jsonResponse({ data: [] });
+      }
+      if (requestUrl.includes('/reviews')) {
+        return jsonResponse(emptyReviewsResponse);
       }
       return jsonResponse({ data: minimalProduct });
     });

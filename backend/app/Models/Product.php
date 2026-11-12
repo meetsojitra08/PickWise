@@ -124,6 +124,14 @@ class Product extends Model
     }
 
     /**
+     * @return HasMany<Review, $this>
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
      * @param  Builder<self>  $query
      */
     public function scopePublished(Builder $query): void

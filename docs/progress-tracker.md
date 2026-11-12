@@ -1,8 +1,8 @@
 # Progress Tracker
 
-**Current phase:** P2, Catalog & discovery
-**Current step:** P2-S15
-**Last updated:** 2026-11-12 (P2-S15 in progress)
+**Current phase:** P3, Reviews
+**Current step:** P3-S4
+**Last updated:** 2026-11-12 (P3-S4 committed)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -45,13 +45,13 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P2-S12** FE: global search with command palette and suggestions · `feat(catalog)`
 - [x] **P2-S13** Value Score service + tests, show on cards and detail · `feat(catalog)`
 - [x] **P2-S14** Price history endpoint and chart · `feat(product)`
-- [~] **P2-S15** Similar products endpoint and section · `feat(product)`
+- [x] **P2-S15** Similar products endpoint and section · `feat(product)`
 
 ## P3: Reviews (branch `phase/P3-reviews`)
-- [ ] **P3-S1** Reviews migration, model, policy, rating aggregates · `db(review)`
-- [ ] **P3-S2** List reviews + create/update/delete own review (+ tests) · `feat(review)`
-- [ ] **P3-S3** Seed realistic reviews (mixed sentiment) · `db(review)`
-- [ ] **P3-S4** FE: rating distribution, review list, review form · `feat(review)`
+- [x] **P3-S1** Reviews migration, model, policy, rating aggregates · `db(review)`
+- [x] **P3-S2** List reviews + create/update/delete own review (+ tests) · `feat(review)`
+- [x] **P3-S3** Seed realistic reviews (mixed sentiment) · `db(review)`
+- [x] **P3-S4** FE: rating distribution, review list, review form · `feat(review)`
 
 ## P4: Wishlist & comparison (branch `phase/P4-compare`)
 - [ ] **P4-S1** Wishlist endpoints (+ tests) · `feat(wishlist)`
@@ -112,8 +112,11 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 ---
 
 ## Blockers
-- P2-S14 verification: Pest cannot read `backend/vendor/autoload.php`, and PHPStan cannot read `backend/phpstan.neon`; those checks could not run. Frontend `npm run test` has 2 failures in `App.test.tsx` (auth/session shell rendering); 69 tests pass, including all 4 product detail tests.
-- P2-S15 verification: Pest and PHPStan remain blocked by the same backend files. Frontend full test run has 3 failures in `App.test.tsx` (auth/session shell rendering); 69 tests pass, including all 5 product detail tests. Docker is unavailable in this environment.
+- P2-S14/P2-S15 historical verification: backend Pest and PHPStan were blocked by inaccessible `backend/vendor/autoload.php` and `backend/phpstan.neon`. Frontend tests had auth/session shell failures at that time.
+- P3-S1 verification: PHP syntax checks and Pint pass. Pest cannot open `backend/vendor/autoload.php`; PHPStan cannot read `backend/phpstan.neon`. Frontend lint, typecheck, 72 tests, and production build pass.
+- P3-S2 verification: Pint and PHP syntax checks pass. Pest cannot open `backend/vendor/autoload.php`; PHPStan cannot read `backend/phpstan.neon`. Frontend lint, typecheck, 72 tests, and production build pass.
+- P3-S3 verification: PHP syntax checks, Pint, and `git diff --check` pass. Pest cannot open `backend/vendor/autoload.php`, and PHPStan cannot read `backend/phpstan.neon`; seeder feature test remains unverified.
+- P3-S4 verification: `backend/vendor` is available again. Pint and PHPStan pass (seven pre-existing findings fixed), full Pest passes (152 tests), frontend lint/typecheck/80 tests/production build pass, and `git diff --check` is clean.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
