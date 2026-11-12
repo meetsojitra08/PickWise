@@ -5,6 +5,7 @@ import type {
   CatalogProductsResponse,
   ProductDetailResponse,
   ProductPriceHistoryResponse,
+  SimilarProductsResponse,
 } from '@/features/catalog/types/catalog-api';
 
 export function getCatalogCategories(signal?: AbortSignal) {
@@ -41,6 +42,13 @@ export function getCatalogProductPriceHistory(
 ) {
   return apiClient.get<ProductPriceHistoryResponse>(
     `/products/${encodeURIComponent(slug)}/price-history`,
+    { signal },
+  );
+}
+
+export function getCatalogSimilarProducts(slug: string, signal?: AbortSignal) {
+  return apiClient.get<SimilarProductsResponse>(
+    `/products/${encodeURIComponent(slug)}/similar`,
     { signal },
   );
 }

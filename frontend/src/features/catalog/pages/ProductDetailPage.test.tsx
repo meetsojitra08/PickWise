@@ -12,7 +12,10 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-function mockProductEndpoints(historyPoints: unknown[] = []) {
+function mockProductEndpoints(
+  historyPoints: unknown[] = [],
+  similarProducts: unknown[] = [],
+) {
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
     const requestUrl =
       typeof input === 'string'
@@ -22,6 +25,9 @@ function mockProductEndpoints(historyPoints: unknown[] = []) {
           : input.url;
     if (requestUrl.includes('/price-history')) {
       return jsonResponse({ data: { currency: 'INR', points: historyPoints } });
+    }
+    if (requestUrl.includes('/similar')) {
+      return jsonResponse({ data: similarProducts });
     }
     return jsonResponse({ data: product });
   });
@@ -144,6 +150,10 @@ describe('ProductDetailRoute', () => {
       await screen.findByText('2 recorded prices over time.'),
     ).toBeInTheDocument();
     expect(
+      await screen.findByRole('heading', { name: 'Similar products' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('No similar products yet')).toBeInTheDocument();
+    expect(
       screen.getByRole('img', { name: /Price history from/ }),
     ).toBeInTheDocument();
     expect(container.querySelectorAll('circle.fill-accent')).toHaveLength(2);
@@ -175,16 +185,20 @@ describe('ProductDetailRoute', () => {
       availability: 'out_of_stock',
       availability_label: 'Out of Stock',
     };
-    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) =>
-      (typeof input === 'string'
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const requestUrl = typeof input === 'string'
         ? input
         : input instanceof URL
           ? input.href
-          : input.url
-      ).includes('/price-history')
-        ? jsonResponse({ data: { currency: 'INR', points: [] } })
-        : jsonResponse({ data: minimalProduct }),
-    );
+          : input.url;
+      if (requestUrl.includes('/price-history')) {
+        return jsonResponse({ data: { currency: 'INR', points: [] } });
+      }
+      if (requestUrl.includes('/similar')) {
+        return jsonResponse({ data: [] });
+      }
+      return jsonResponse({ data: minimalProduct });
+    });
 
     renderProductPage();
     await screen.findByRole('heading', { level: 1, name: product.name });
@@ -239,6 +253,23 @@ describe('ProductDetailRoute', () => {
     expect(screen.getByText('Lowest')).toBeInTheDocument();
     expect(screen.getByText('Highest')).toBeInTheDocument();
     expect(container.querySelectorAll('circle.fill-accent')).toHaveLength(1);
+  });
+
+  it('shows matching product cards in the similar products section', async () => {
+    const match = {
+      ...product,
+      id: 15,
+      name: 'Northstar Creator 15',
+      slug: 'northstar-creator-15',
+      price: { amount: '94999.00', currency: 'INR' },
+    };
+    mockProductEndpoints([], [match]);
+
+    renderProductPage();
+
+    expect(
+      await screen.findByRole('link', { name: 'Northstar Creator 15' }),
+    ).toHaveAttribute('href', '/products/northstar-creator-15');
   });
 
   it('shows the product-specific 404 state for unknown slugs', async () => {

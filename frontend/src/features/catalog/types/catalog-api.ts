@@ -43,6 +43,7 @@ export interface CatalogFacets {
 }
 
 export type CatalogProductsResponse = ApiPaginatedResponse<ProductSummary>;
+export type SimilarProductsResponse = ApiSuccessResponse<ProductSummary[]>;
 export type CatalogCategoriesResponse = ApiSuccessResponse<CatalogCategory[]>;
 export type CatalogFacetsResponse = ApiSuccessResponse<CatalogFacets>;
 

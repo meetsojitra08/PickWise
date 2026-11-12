@@ -28,6 +28,8 @@ Route::middleware('throttle:public-api')->group(function (): void {
         ->name('api.v1.products.show');
     Route::get('/products/{slug}/price-history', [ProductController::class, 'priceHistory'])
         ->name('api.v1.products.price-history');
+    Route::get('/products/{slug}/similar', [ProductController::class, 'similar'])
+        ->name('api.v1.products.similar');
 });
 
 Route::prefix('auth')->group(function (): void {

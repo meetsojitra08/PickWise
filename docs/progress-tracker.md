@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P2, Catalog & discovery
-**Current step:** P2-S14
-**Last updated:** 2026-11-12 (P2-S14 in progress)
+**Current step:** P2-S15
+**Last updated:** 2026-11-12 (P2-S15 in progress)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -44,8 +44,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P2-S11** FE: product detail page (gallery, specs, availability) · `feat(product)`
 - [x] **P2-S12** FE: global search with command palette and suggestions · `feat(catalog)`
 - [x] **P2-S13** Value Score service + tests, show on cards and detail · `feat(catalog)`
-- [~] **P2-S14** Price history endpoint and chart · `feat(product)`
-- [ ] **P2-S15** Similar products endpoint and section · `feat(product)`
+- [x] **P2-S14** Price history endpoint and chart · `feat(product)`
+- [~] **P2-S15** Similar products endpoint and section · `feat(product)`
 
 ## P3: Reviews (branch `phase/P3-reviews`)
 - [ ] **P3-S1** Reviews migration, model, policy, rating aggregates · `db(review)`
@@ -113,6 +113,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 
 ## Blockers
 - P2-S14 verification: Pest cannot read `backend/vendor/autoload.php`, and PHPStan cannot read `backend/phpstan.neon`; those checks could not run. Frontend `npm run test` has 2 failures in `App.test.tsx` (auth/session shell rendering); 69 tests pass, including all 4 product detail tests.
+- P2-S15 verification: Pest and PHPStan remain blocked by the same backend files. Frontend full test run has 3 failures in `App.test.tsx` (auth/session shell rendering); 69 tests pass, including all 5 product detail tests. Docker is unavailable in this environment.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
