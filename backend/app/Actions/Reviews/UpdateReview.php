@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 final class UpdateReview
 {
-    /** @param array{rating: int, title: string, body: string} $attributes */
     public function __construct(private readonly ProductRatingAggregator $ratingAggregator) {}
 
     /** @param array{rating: int, title: string, body: string} $attributes */

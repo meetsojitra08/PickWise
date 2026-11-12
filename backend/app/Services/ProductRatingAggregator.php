@@ -14,15 +14,17 @@ final class ProductRatingAggregator
 {
     public function recalculate(Product $product): void
     {
+        /** @var object{rating_avg: float|int|string, rating_count: int|string} $aggregate */
         $aggregate = Review::query()
             ->approved()
             ->where('product_id', $product->getKey())
             ->selectRaw('COUNT(*) AS rating_count, COALESCE(AVG(rating), 0) AS rating_avg')
+            ->toBase()
             ->first();
 
         $product->forceFill([
-            'rating_avg' => number_format((float) ($aggregate?->rating_avg ?? 0), 2, '.', ''),
-            'rating_count' => (int) ($aggregate?->rating_count ?? 0),
+            'rating_avg' => number_format((float) ($aggregate->rating_avg ?? 0), 2, '.', ''),
+            'rating_count' => (int) ($aggregate->rating_count ?? 0),
         ])->saveQuietly();
     }
 }

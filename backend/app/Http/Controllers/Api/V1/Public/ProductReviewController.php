@@ -32,6 +32,7 @@ class ProductReviewController extends Controller
                 'own_pending_review' => $result['own_pending_review'] === null
                     ? null
                     : (new ReviewResource($result['own_pending_review']))->toArray($request),
+                'has_reviewed' => $result['has_reviewed'],
             ]])
             ->response()
             ->setStatusCode(Response::HTTP_OK);

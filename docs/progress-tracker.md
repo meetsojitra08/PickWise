@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P3, Reviews
-**Current step:** P3-S3
-**Last updated:** 2026-11-12 (P3-S3 committed)
+**Current step:** P3-S4
+**Last updated:** 2026-11-12 (P3-S4 committed)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -51,7 +51,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P3-S1** Reviews migration, model, policy, rating aggregates · `db(review)`
 - [x] **P3-S2** List reviews + create/update/delete own review (+ tests) · `feat(review)`
 - [x] **P3-S3** Seed realistic reviews (mixed sentiment) · `db(review)`
-- [ ] **P3-S4** FE: rating distribution, review list, review form · `feat(review)`
+- [x] **P3-S4** FE: rating distribution, review list, review form · `feat(review)`
 
 ## P4: Wishlist & comparison (branch `phase/P4-compare`)
 - [ ] **P4-S1** Wishlist endpoints (+ tests) · `feat(wishlist)`
@@ -116,6 +116,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P3-S1 verification: PHP syntax checks and Pint pass. Pest cannot open `backend/vendor/autoload.php`; PHPStan cannot read `backend/phpstan.neon`. Frontend lint, typecheck, 72 tests, and production build pass.
 - P3-S2 verification: Pint and PHP syntax checks pass. Pest cannot open `backend/vendor/autoload.php`; PHPStan cannot read `backend/phpstan.neon`. Frontend lint, typecheck, 72 tests, and production build pass.
 - P3-S3 verification: PHP syntax checks, Pint, and `git diff --check` pass. Pest cannot open `backend/vendor/autoload.php`, and PHPStan cannot read `backend/phpstan.neon`; seeder feature test remains unverified.
+- P3-S4 verification: `backend/vendor` is available again. Pint and PHPStan pass (seven pre-existing findings fixed), full Pest passes (152 tests), frontend lint/typecheck/80 tests/production build pass, and `git diff --check` is clean.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.

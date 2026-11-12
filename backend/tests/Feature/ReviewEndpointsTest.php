@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 
 uses(RefreshDatabase::class);
@@ -35,15 +36,21 @@ test('review listing paginates approved reviews and only exposes the signed in u
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $ownPending->id)
         ->assertJsonPath('data.0.status', 'pending')
+        ->assertJsonPath('data.0.is_own', true)
         ->assertJsonPath('meta.rating_distribution.5', 1)
         ->assertJsonPath('meta.rating_distribution.1', 0)
-        ->assertJsonPath('meta.own_pending_review.id', $ownPending->id);
+        ->assertJsonPath('meta.own_pending_review.id', $ownPending->id)
+        ->assertJsonPath('meta.has_reviewed', true);
+
+    Auth::forgetGuards();
 
     $this->getJson('/api/v1/products/reviewable-product/reviews')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $approved->id)
-        ->assertJsonPath('meta.own_pending_review', null);
+        ->assertJsonPath('data.0.is_own', false)
+        ->assertJsonPath('meta.own_pending_review', null)
+        ->assertJsonPath('meta.has_reviewed', false);
 });
 
 test('customers can create one validated pending review and duplicates receive a clear error', function (): void {
@@ -72,7 +79,7 @@ test('customers can create one validated pending review and duplicates receive a
         'rating' => 6,
         'title' => 'x',
         'body' => 'short',
-    ])->assertUnprocessable()->assertJsonValidationErrors(['rating', 'title', 'body']);
+    ])->assertUnprocessable()->assertJsonValidationErrors(['rating', 'title', 'body'], 'error.details');
 });
 
 test('review owners can edit and delete while other users receive forbidden', function (): void {

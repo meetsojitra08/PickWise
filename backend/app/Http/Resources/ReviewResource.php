@@ -20,7 +20,8 @@ class ReviewResource extends JsonResource
             'title' => $this->title,
             'body' => $this->body,
             'status' => $this->status->value,
-            'author_name' => $this->user?->name ?? $this->author_name ?? 'Customer',
+            'author_name' => ($this->user_id === null ? $this->author_name : $this->user->name) ?? 'Customer',
+            'is_own' => $request->user() !== null && $request->user()->id === $this->user_id,
             'created_at' => $this->created_at?->toIso8601ZuluString(),
         ];
     }

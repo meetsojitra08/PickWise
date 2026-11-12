@@ -12,7 +12,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 final class ProductReviewsQuery
 {
-    /** @return array{reviews: LengthAwarePaginator, distribution: array<int, int>, own_pending_review: Review|null} */
+    /** @return array{reviews: LengthAwarePaginator<int, Review>, distribution: array<int, int>, own_pending_review: Review|null, has_reviewed: bool} */
     public function forProduct(Product $product, ?User $user, int $page, int $perPage): array
     {
         $reviews = Review::query()
@@ -47,6 +47,16 @@ final class ProductReviewsQuery
             ->with('user:id,name')
             ->first();
 
-        return ['reviews' => $reviews, 'distribution' => $distribution, 'own_pending_review' => $ownPending];
+        $hasReviewed = $user !== null && Review::query()
+            ->where('product_id', $product->id)
+            ->where('user_id', $user->id)
+            ->exists();
+
+        return [
+            'reviews' => $reviews,
+            'distribution' => $distribution,
+            'own_pending_review' => $ownPending,
+            'has_reviewed' => $hasReviewed,
+        ];
     }
 }
