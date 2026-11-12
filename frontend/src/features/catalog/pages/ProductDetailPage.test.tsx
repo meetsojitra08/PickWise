@@ -186,11 +186,12 @@ describe('ProductDetailRoute', () => {
       availability_label: 'Out of Stock',
     };
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
-      const requestUrl = typeof input === 'string'
-        ? input
-        : input instanceof URL
-          ? input.href
-          : input.url;
+      const requestUrl =
+        typeof input === 'string'
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url;
       if (requestUrl.includes('/price-history')) {
         return jsonResponse({ data: { currency: 'INR', points: [] } });
       }

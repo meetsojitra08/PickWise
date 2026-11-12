@@ -20,11 +20,13 @@ class ProductPriceHistoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $product = $this->resource;
+
         return [
-            'currency' => $this->currency,
-            'points' => $this->priceHistory->map(fn (PriceHistory $point): array => [
-                'recorded_at' => $point->recorded_at?->toDateString(),
-                'price' => Money::toArray($point->price, $this->currency),
+            'currency' => $product->currency,
+            'points' => $product->priceHistory->map(fn (PriceHistory $point): array => [
+                'recorded_at' => $point->recorded_at->toDateString(),
+                'price' => Money::toArray($point->price, $product->currency),
             ])->values()->all(),
         ];
     }
