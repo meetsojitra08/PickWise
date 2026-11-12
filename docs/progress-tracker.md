@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P3, Reviews
-**Current step:** P3-S1
-**Last updated:** 2026-11-12 (P3-S1 in progress)
+**Current step:** P3-S2
+**Last updated:** 2026-11-12 (P3-S2 in progress)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -48,8 +48,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P2-S15** Similar products endpoint and section · `feat(product)`
 
 ## P3: Reviews (branch `phase/P3-reviews`)
-- [~] **P3-S1** Reviews migration, model, policy, rating aggregates · `db(review)`
-- [ ] **P3-S2** List reviews + create/update/delete own review (+ tests) · `feat(review)`
+- [x] **P3-S1** Reviews migration, model, policy, rating aggregates · `db(review)`
+- [~] **P3-S2** List reviews + create/update/delete own review (+ tests) · `feat(review)`
 - [ ] **P3-S3** Seed realistic reviews (mixed sentiment) · `db(review)`
 - [ ] **P3-S4** FE: rating distribution, review list, review form · `feat(review)`
 
@@ -114,6 +114,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 ## Blockers
 - P2-S14/P2-S15 historical verification: backend Pest and PHPStan were blocked by inaccessible `backend/vendor/autoload.php` and `backend/phpstan.neon`. Frontend tests had auth/session shell failures at that time.
 - P3-S1 verification: PHP syntax checks and Pint pass. Pest cannot open `backend/vendor/autoload.php`; PHPStan cannot read `backend/phpstan.neon`. Frontend lint, typecheck, 72 tests, and production build pass.
+- P3-S2 verification: Pint and PHP syntax checks pass. Pest cannot open `backend/vendor/autoload.php`; PHPStan cannot read `backend/phpstan.neon`. Frontend lint, typecheck, 72 tests, and production build pass.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.

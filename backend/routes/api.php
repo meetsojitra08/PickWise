@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\AccountController;
+use App\Http\Controllers\Api\V1\Customer\ReviewController;
 use App\Http\Controllers\Api\V1\Public\CategoryController;
 use App\Http\Controllers\Api\V1\Public\HealthController;
 use App\Http\Controllers\Api\V1\Public\ProductController;
+use App\Http\Controllers\Api\V1\Public\ProductReviewController;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -30,6 +32,19 @@ Route::middleware('throttle:public-api')->group(function (): void {
         ->name('api.v1.products.price-history');
     Route::get('/products/{slug}/similar', [ProductController::class, 'similar'])
         ->name('api.v1.products.similar');
+    Route::get('/products/{slug}/reviews', [ProductReviewController::class, 'index'])
+        ->name('api.v1.products.reviews.index');
+});
+
+Route::post('/products/{slug}/reviews', [ProductReviewController::class, 'store'])
+    ->middleware(['auth:sanctum', 'throttle:review-create'])
+    ->name('api.v1.products.reviews.store');
+
+Route::middleware('auth:sanctum')->group(function (): void {
+    Route::patch('/reviews/{review}', [ReviewController::class, 'update'])
+        ->name('api.v1.reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])
+        ->name('api.v1.reviews.destroy');
 });
 
 Route::prefix('auth')->group(function (): void {

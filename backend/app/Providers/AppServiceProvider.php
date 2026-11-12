@@ -66,6 +66,14 @@ class AppServiceProvider extends ServiceProvider
                 ->by($ip)
                 ->response($this->rateLimitedResponse('Too many requests. Please try again in a minute.'));
         });
+
+        RateLimiter::for('review-create', function (Request $request): Limit {
+            $userId = $request->user()?->getAuthIdentifier() ?? 'guest';
+
+            return Limit::perHour(5)
+                ->by((string) $userId)
+                ->response($this->rateLimitedResponse('You have submitted too many reviews. Please try again later.'));
+        });
     }
 
     private function configureAuthorization(): void
