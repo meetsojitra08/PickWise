@@ -8,8 +8,10 @@ use App\Enums\ApiErrorCode;
 use App\Http\Responses\ApiResponse;
 use App\Models\Review;
 use App\Models\User;
+use App\Models\WishlistItem;
 use App\Policies\ReviewPolicy;
 use App\Policies\UserPolicy;
+use App\Policies\WishlistItemPolicy;
 use Closure;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\JsonResponse;
@@ -80,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Review::class, ReviewPolicy::class);
+        Gate::policy(WishlistItem::class, WishlistItemPolicy::class);
 
         Gate::define(
             'access-admin',

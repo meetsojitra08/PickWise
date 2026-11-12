@@ -132,6 +132,14 @@ class Product extends Model
     }
 
     /**
+     * @return HasMany<WishlistItem, $this>
+     */
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
+    }
+
+    /**
      * @param  Builder<self>  $query
      */
     public function scopePublished(Builder $query): void

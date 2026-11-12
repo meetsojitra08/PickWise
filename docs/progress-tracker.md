@@ -1,8 +1,8 @@
 # Progress Tracker
 
-**Current phase:** P3, Reviews
-**Current step:** P3-S4
-**Last updated:** 2026-11-12 (P3-S4 committed)
+**Current phase:** P4, Wishlist & comparison
+**Current step:** P4-S1
+**Last updated:** 2026-11-12 (P4-S1 committed)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -54,7 +54,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P3-S4** FE: rating distribution, review list, review form · `feat(review)`
 
 ## P4: Wishlist & comparison (branch `phase/P4-compare`)
-- [ ] **P4-S1** Wishlist endpoints (+ tests) · `feat(wishlist)`
+- [x] **P4-S1** Wishlist endpoints (+ tests) · `feat(wishlist)`
 - [ ] **P4-S2** FE: wishlist toggle (optimistic) and account wishlist tab · `feat(wishlist)`
 - [ ] **P4-S3** Compare matrix endpoint (spec rows, per-row winner using `higher_is_better`) · `feat(compare)`
 - [ ] **P4-S4** FE: `CompareTray` (2 to 4 items, persists across navigation) · `feat(compare)`
@@ -117,6 +117,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P3-S2 verification: Pint and PHP syntax checks pass. Pest cannot open `backend/vendor/autoload.php`; PHPStan cannot read `backend/phpstan.neon`. Frontend lint, typecheck, 72 tests, and production build pass.
 - P3-S3 verification: PHP syntax checks, Pint, and `git diff --check` pass. Pest cannot open `backend/vendor/autoload.php`, and PHPStan cannot read `backend/phpstan.neon`; seeder feature test remains unverified.
 - P3-S4 verification: `backend/vendor` is available again. Pint and PHPStan pass (seven pre-existing findings fixed), full Pest passes (152 tests), frontend lint/typecheck/80 tests/production build pass, and `git diff --check` is clean.
+- P4-S1 verification: Pint, PHPStan, and full Pest pass inside the `app` container (160 tests, 4625 assertions). Host PHP lacks the `redis` extension, so the Redis/health tests fail on the host; they pass in Docker. Frontend lint, typecheck, 80 tests, and production build pass. `git diff --check` is clean.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
