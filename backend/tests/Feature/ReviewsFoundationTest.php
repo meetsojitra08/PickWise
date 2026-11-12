@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\ProductRatingAggregator;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 
@@ -47,7 +48,8 @@ test('a customer can have only one review per product while seeded reviews can o
 
     Review::create($attributes);
 
-    expect(fn () => Review::create($attributes))->toThrow(QueryException::class);
+    expect(fn () => DB::transaction(static fn () => Review::create($attributes)))
+        ->toThrow(QueryException::class);
 
     $seeded = Review::create([
         ...$attributes,
