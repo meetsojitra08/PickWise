@@ -42,9 +42,11 @@ export function useCatalogFacets(category: string) {
 export function useCatalogProducts(
   params: Record<string, string | string[]>,
   queryKey: string,
+  enabled = true,
 ) {
   return useQuery({
     queryKey: catalogKeys.products(queryKey),
     queryFn: ({ signal }) => getCatalogProducts(params, signal),
+    enabled,
   });
 }

@@ -1,4 +1,4 @@
-import { Heart, Search } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { Link, NavLink } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -7,6 +7,7 @@ import { PickwiseLogo } from './PickwiseLogo';
 import { ThemeToggle } from './ThemeToggle';
 import { UserMenu } from './UserMenu';
 import { PRIMARY_NAV_ITEMS } from './navigation';
+import { GlobalSearchDialog } from '@/features/catalog/components/GlobalSearchDialog';
 
 function desktopNavLinkClass({ isActive }: { isActive: boolean }): string {
   return cn(
@@ -41,11 +42,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon-lg">
-            <Link to="/products" aria-label="Search products">
-              <Search className="size-4" strokeWidth={1.5} aria-hidden="true" />
-            </Link>
-          </Button>
+          <GlobalSearchDialog />
 
           <Button
             asChild

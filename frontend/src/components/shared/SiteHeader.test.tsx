@@ -105,8 +105,8 @@ describe('SiteHeader', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'Search products' }),
-    ).toHaveAttribute('href', '/products');
+      screen.getByRole('button', { name: 'Search products' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Wishlist' })).toHaveAttribute(
       'href',
       '/account?tab=wishlist',
