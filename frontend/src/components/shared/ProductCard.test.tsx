@@ -65,7 +65,10 @@ describe('ProductCard', () => {
     expect(image).toHaveAttribute('height', '600');
 
     expect(screen.getByText('Lenovo')).toBeInTheDocument();
-    expect(screen.getByText('Value 92')).toBeInTheDocument();
+    expect(screen.getByText('Value 92')).toHaveAttribute(
+      'title',
+      expect.stringContaining('4-star baseline and five assumed reviews'),
+    );
     expect(
       screen.getByRole('link', { name: 'Lenovo Yoga Slim 7 Pro 14 OLED' }),
     ).toHaveAttribute('href', '/products/lenovo-yoga-slim-7-pro-14');

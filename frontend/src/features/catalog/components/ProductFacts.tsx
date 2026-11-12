@@ -46,8 +46,8 @@ export function ProductFacts({
         {product.value_score !== null ? (
           <button
             type="button"
-            title="Value Score blends category-relative spec strength (40%), rating confidence (30%), and price efficiency (30%)."
-            aria-label={`Value score ${product.value_score} out of 100. It blends category-relative spec strength (40%), rating confidence (30%), and price efficiency (30%).`}
+            title="It combines how comparable specs rank in this category (40%), rating confidence (30%), and spec strength for the price (30%). Lower-is-better specs are reversed; ratings use a 4-star baseline and five assumed reviews."
+            aria-label={`Value score ${product.value_score} out of 100. It combines category-ranked specs at 40%, rating confidence at 30%, and spec strength for the price at 30%.`}
             className="inline-flex min-h-8 cursor-help items-center gap-1.5 rounded-full bg-accent/20 px-3 text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             Value score{' '}

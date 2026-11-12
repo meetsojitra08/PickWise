@@ -103,6 +103,7 @@ export function ProductCard({
                   <Badge
                     variant="accent"
                     aria-label={`Value score ${product.value_score} out of 100`}
+                    title="It combines how comparable specs rank in this category (40%), rating confidence (30%), and spec strength for the price (30%). Lower-is-better specs are reversed; ratings use a 4-star baseline and five assumed reviews."
                     className="tabular-nums"
                   >
                     Value {product.value_score}

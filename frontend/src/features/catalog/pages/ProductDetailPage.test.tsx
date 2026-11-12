@@ -111,6 +111,10 @@ describe('ProductDetailRoute', () => {
     expect(screen.getByText('GB')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
     expect(screen.getByTitle(/40%.*30%.*30%/)).toHaveTextContent('Value score');
+    expect(screen.getByTitle(/40%.*30%.*30%/)).toHaveAttribute(
+      'title',
+      expect.stringContaining('4-star baseline and five assumed reviews'),
+    );
 
     const storeLink = screen.getAllByRole('link', {
       name: /view on store/i,

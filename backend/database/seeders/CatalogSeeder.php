@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductSpec;
 use App\Models\SpecDefinition;
+use App\Services\ValueScoreCalculator;
 use Carbon\CarbonImmutable;
 use Database\Seeders\Catalog\CatalogDefinitions;
 use Database\Seeders\Catalog\CatalogMediaGenerator;
@@ -72,6 +73,8 @@ class CatalogSeeder extends Seeder
                         anchorDate: $anchorDate,
                     );
                 }
+
+                app(ValueScoreCalculator::class)->recalculateCategory($category->id);
             }
         });
     }
