@@ -6,7 +6,9 @@ namespace App\Providers;
 
 use App\Enums\ApiErrorCode;
 use App\Http\Responses\ApiResponse;
+use App\Models\Review;
 use App\Models\User;
+use App\Policies\ReviewPolicy;
 use App\Policies\UserPolicy;
 use Closure;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -69,6 +71,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureAuthorization(): void
     {
         Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Review::class, ReviewPolicy::class);
 
         Gate::define(
             'access-admin',
