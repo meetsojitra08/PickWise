@@ -9,6 +9,7 @@ import { AuthGuardFallback } from '@/features/auth/components/AuthGuardFallback'
 import { RequireAdmin } from '@/features/auth/components/RequireAdmin';
 import { RequireAuth } from '@/features/auth/components/RequireAuth';
 import { RequireGuest } from '@/features/auth/components/RequireGuest';
+import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
 
 const AdminLayout = lazy(() =>
   import('@/app/layouts/AdminLayout').then((module) => ({
@@ -34,21 +35,20 @@ const AccountPage = lazy(() =>
   })),
 );
 
+const ProductDetailRoute = lazy(() =>
+  import('@/features/catalog/pages/ProductDetailPage').then((module) => ({
+    default: module.ProductDetailRoute,
+  })),
+);
+
 export function AppRoutes() {
   return (
     <Suspense fallback={<AuthGuardFallback />}>
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route
-            path="/products"
-            element={
-              <RoutePlaceholderPage
-                title="Browse catalog"
-                description="Product search, category filters, sorting, and Value Scores are scheduled for Phase 2."
-              />
-            }
-          />
+          <Route path="/products" element={<CatalogPage />} />
+          <Route path="/products/:slug" element={<ProductDetailRoute />} />
           <Route
             path="/compare"
             element={

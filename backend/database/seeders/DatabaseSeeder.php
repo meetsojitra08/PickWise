@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,11 +19,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $user = User::query()->firstOrNew(['email' => 'test@example.com']);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        if (! $user->exists) {
+            $user->fill([
+                'name' => 'Test User',
+                'password' => Hash::make('password'),
+            ]);
+            $user->email_verified_at = now();
+            $user->role = UserRole::Customer;
+            $user->is_active = true;
+            $user->save();
+        }
+
+        $this->call([
+            CatalogSeeder::class,
         ]);
     }
 }

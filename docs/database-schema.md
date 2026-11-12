@@ -158,7 +158,15 @@ value_score = round( 100 * (
 ) )
 ```
 
-Document the formula on the product page tooltip. Being able to explain this is the point.
+Implementation details (deterministic defaults):
+
+- Consider published, non-deleted products in the same category.
+- For each numeric comparable spec with `higher_is_better` set, rank products that have a value. Use a 0–1 midrank percentile; ties share the midpoint of their rank, and a singleton or fully tied group gets 0.5. Invert the percentile for lower-is-better specs. Average a product's available spec percentiles with equal weight; ignore missing values, text, boolean, and directionless specs. Products with no usable numeric comparable spec have no score.
+- Rating confidence is the Bayesian adjusted average divided by 5: `(rating_avg * rating_count + 4.0 * 5) / (rating_count + 5) / 5`. This uses a 4-star prior with five prior reviews.
+- Price efficiency is `spec_strength / price`, ranked as a 0–1 midrank percentile among scored products in the category. Prices are positive and use the category's currency.
+- Round the weighted result to the nearest integer. Recalculation stores the score on each product.
+
+Document this formula on product cards and the product page tooltip. Being able to explain this is the point.
 
 ## Seeding plan
 

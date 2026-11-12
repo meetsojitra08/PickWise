@@ -34,6 +34,10 @@ export default defineConfig({
         target: apiProxyTarget,
         changeOrigin: false,
       },
+      '/storage': {
+        target: apiProxyTarget,
+        changeOrigin: false,
+      },
     },
   },
 });

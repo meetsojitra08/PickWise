@@ -16,6 +16,11 @@ export type ApiErrorCode =
   | 'unknown_error'
   | (string & {});
 
+export interface MoneyValue {
+  amount: string;
+  currency: string;
+}
+
 export interface ApiSuccessResponse<T> {
   data: T;
   meta?: Record<string, unknown>;

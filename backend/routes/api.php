@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\AccountController;
+use App\Http\Controllers\Api\V1\Public\CategoryController;
 use App\Http\Controllers\Api\V1\Public\HealthController;
+use App\Http\Controllers\Api\V1\Public\ProductController;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -14,6 +16,21 @@ use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 Route::get('/health', HealthController::class)->name('api.v1.health');
+
+Route::middleware('throttle:public-api')->group(function (): void {
+    Route::get('/categories', [CategoryController::class, 'index'])
+        ->name('api.v1.categories.index');
+    Route::get('/categories/{slug}/filters', [CategoryController::class, 'filters'])
+        ->name('api.v1.categories.filters');
+    Route::get('/products', [ProductController::class, 'index'])
+        ->name('api.v1.products.index');
+    Route::get('/products/{slug}', [ProductController::class, 'show'])
+        ->name('api.v1.products.show');
+    Route::get('/products/{slug}/price-history', [ProductController::class, 'priceHistory'])
+        ->name('api.v1.products.price-history');
+    Route::get('/products/{slug}/similar', [ProductController::class, 'similar'])
+        ->name('api.v1.products.similar');
+});
 
 Route::prefix('auth')->group(function (): void {
     Route::middleware([

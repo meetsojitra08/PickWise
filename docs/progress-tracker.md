@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P2, Catalog & discovery
-**Current step:** P2-S1
-**Last updated:** 2026-11-11 (P1-S7)
+**Current step:** P2-S15
+**Last updated:** 2026-11-12 (P2-S15 in progress)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -31,21 +31,21 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P1-S7** Profile, change password, preferences endpoints and page · `feat(account)`
 
 ## P2: Catalog & discovery (branch `phase/P2-catalog`)
-- [ ] **P2-S1** Migrations: categories, brands, products, images · `db(catalog)`
-- [ ] **P2-S2** Migrations: spec_definitions, product_specs, price_history · `db(catalog)`
-- [ ] **P2-S3** Models, relationships, factories · `feat(catalog)`
-- [ ] **P2-S4** Deterministic showcase seeders (6 categories, ~60 products, specs, history) · `db(catalog)`
-- [ ] **P2-S5** `GET /categories` and category filter facets · `feat(catalog)`
-- [ ] **P2-S6** `GET /products` search, filters, sorting, pagination (+ tests) · `feat(catalog)`
-- [ ] **P2-S7** Postgres full-text search + trigram typo tolerance · `feat(catalog)`
-- [ ] **P2-S8** `GET /products/{slug}` with Resources · `feat(product)`
-- [ ] **P2-S9** FE: `ProductCard`, `PriceTag`, `RatingStars`, skeletons · `feat(ui)`
-- [ ] **P2-S10** FE: catalog page with `FilterPanel`, URL-synced filters, pagination · `feat(catalog)`
-- [ ] **P2-S11** FE: product detail page (gallery, specs, availability) · `feat(product)`
-- [ ] **P2-S12** FE: global search with command palette and suggestions · `feat(catalog)`
-- [ ] **P2-S13** Value Score service + tests, show on cards and detail · `feat(catalog)`
-- [ ] **P2-S14** Price history endpoint and chart · `feat(product)`
-- [ ] **P2-S15** Similar products endpoint and section · `feat(product)`
+- [x] **P2-S1** Migrations: categories, brands, products, images · `db(catalog)`
+- [x] **P2-S2** Migrations: spec_definitions, product_specs, price_history · `db(catalog)`
+- [x] **P2-S3** Models, relationships, factories · `feat(catalog)`
+- [x] **P2-S4** Deterministic showcase seeders (6 categories, ~60 products, specs, history) · `db(catalog)`
+- [x] **P2-S5** `GET /categories` and category filter facets · `feat(catalog)`
+- [x] **P2-S6** `GET /products` search, filters, sorting, pagination (+ tests) · `feat(catalog)`
+- [x] **P2-S7** Postgres full-text search + trigram typo tolerance · `feat(catalog)`
+- [x] **P2-S8** `GET /products/{slug}` with Resources · `feat(product)`
+- [x] **P2-S9** FE: `ProductCard`, `PriceTag`, `RatingStars`, skeletons · `feat(ui)`
+- [x] **P2-S10** FE: catalog page with `FilterPanel`, URL-synced filters, pagination · `feat(catalog)`
+- [x] **P2-S11** FE: product detail page (gallery, specs, availability) · `feat(product)`
+- [x] **P2-S12** FE: global search with command palette and suggestions · `feat(catalog)`
+- [x] **P2-S13** Value Score service + tests, show on cards and detail · `feat(catalog)`
+- [x] **P2-S14** Price history endpoint and chart · `feat(product)`
+- [~] **P2-S15** Similar products endpoint and section · `feat(product)`
 
 ## P3: Reviews (branch `phase/P3-reviews`)
 - [ ] **P3-S1** Reviews migration, model, policy, rating aggregates · `db(review)`
@@ -112,7 +112,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 ---
 
 ## Blockers
-_None yet._
+- P2-S14 verification: Pest cannot read `backend/vendor/autoload.php`, and PHPStan cannot read `backend/phpstan.neon`; those checks could not run. Frontend `npm run test` has 2 failures in `App.test.tsx` (auth/session shell rendering); 69 tests pass, including all 4 product detail tests.
+- P2-S15 verification: Pest and PHPStan remain blocked by the same backend files. Frontend full test run has 3 failures in `App.test.tsx` (auth/session shell rendering); 69 tests pass, including all 5 product detail tests. Docker is unavailable in this environment.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.

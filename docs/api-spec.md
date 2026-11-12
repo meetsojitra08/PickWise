@@ -57,6 +57,8 @@ Base path: `/api/v1`. JSON only. Cookie (Sanctum) auth.
 
 `GET /products` query params: `q`, `category`, `brand[]`, `price_min`, `price_max`, `rating_min`, `availability`, `spec[key]=value|min:max`, `sort` (`relevance`, `price_asc`, `price_desc`, `rating`, `value`, `newest`), `page`, `per_page` (max 48).
 
+Price history returns `{ "data": { "currency": "INR", "points": [{ "recorded_at": "2026-07-01", "price": { "amount": "89999.00", "currency": "INR" } }] } }` in chronological order. An empty `points` array means no prices have been recorded.
+
 ## Customer
 | Method | Path | Purpose |
 |--------|------|---------|

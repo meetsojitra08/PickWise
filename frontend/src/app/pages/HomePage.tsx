@@ -1,6 +1,7 @@
 import { ArrowRight, Columns3, MessageSquareText, Search } from 'lucide-react';
 import { Link } from 'react-router';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
@@ -49,8 +50,28 @@ export function HomePage() {
           grounded recommendations within your budget.
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <Button asChild size="lg">
+        <form
+          action="/products"
+          method="get"
+          className="mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row"
+        >
+          <label htmlFor="home-search" className="sr-only">
+            Search products
+          </label>
+          <Input
+            id="home-search"
+            type="search"
+            name="q"
+            placeholder="Search products by name, brand, or category"
+            className="h-12 flex-1"
+          />
+          <Button type="submit" size="lg">
+            <Search className="size-4" strokeWidth={1.5} aria-hidden="true" />
+            Search products
+          </Button>
+        </form>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <Button asChild variant="outline" size="lg">
             <Link to="/products">
               Browse catalog
               <ArrowRight

@@ -43,6 +43,7 @@ States: loading skeleton, 404 ("This product isn't available."), out-of-stock ba
 - [ ] An unknown slug shows the 404 state, not a crash.
 - [ ] Toggling wishlist/compare updates immediately and persists.
 - [ ] The Value Score tooltip explains the formula in plain language.
+- [ ] The price history chart shows recorded prices, marks the minimum and maximum, and provides an accessible table alternative.
 
 ## 9. Tests
 - Backend: detail resource shape, 404s, Value Score calculator (unit tests with fixed numbers).

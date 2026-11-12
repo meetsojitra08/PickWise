@@ -56,6 +56,14 @@ class AppServiceProvider extends ServiceProvider
                 ->by($ip)
                 ->response($this->rateLimitedResponse('Too many registration attempts. Please try again later.'));
         });
+
+        RateLimiter::for('public-api', function (Request $request): Limit {
+            $ip = $request->ip() ?? 'unknown';
+
+            return Limit::perMinute(120)
+                ->by($ip)
+                ->response($this->rateLimitedResponse('Too many requests. Please try again in a minute.'));
+        });
     }
 
     private function configureAuthorization(): void
