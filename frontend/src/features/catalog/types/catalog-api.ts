@@ -72,3 +72,16 @@ export interface ProductDetail extends ProductSummary {
 }
 
 export type ProductDetailResponse = ApiSuccessResponse<ProductDetail>;
+
+export interface ProductPriceHistoryPoint {
+  recorded_at: string;
+  price: MoneyValue;
+}
+
+export interface ProductPriceHistory {
+  currency: string;
+  points: ProductPriceHistoryPoint[];
+}
+
+export type ProductPriceHistoryResponse =
+  ApiSuccessResponse<ProductPriceHistory>;

@@ -3,6 +3,7 @@ import {
   getCatalogCategories,
   getCatalogFacets,
   getCatalogProduct,
+  getCatalogProductPriceHistory,
   getCatalogProducts,
 } from '@/features/catalog/api/catalog-api';
 
@@ -14,6 +15,8 @@ export const catalogKeys = {
   products: (params: string) =>
     [...catalogKeys.all, 'products', params] as const,
   product: (slug: string) => [...catalogKeys.all, 'product', slug] as const,
+  priceHistory: (slug: string) =>
+    [...catalogKeys.all, 'product', slug, 'price-history'] as const,
 };
 
 export function useCatalogCategories() {
@@ -27,6 +30,14 @@ export function useCatalogProduct(slug: string) {
   return useQuery({
     queryKey: catalogKeys.product(slug),
     queryFn: ({ signal }) => getCatalogProduct(slug, signal),
+    enabled: slug !== '',
+  });
+}
+
+export function useCatalogProductPriceHistory(slug: string) {
+  return useQuery({
+    queryKey: catalogKeys.priceHistory(slug),
+    queryFn: ({ signal }) => getCatalogProductPriceHistory(slug, signal),
     enabled: slug !== '',
   });
 }

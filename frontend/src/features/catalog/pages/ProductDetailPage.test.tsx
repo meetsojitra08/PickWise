@@ -12,6 +12,21 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+function mockProductEndpoints(historyPoints: unknown[] = []) {
+  return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+    const requestUrl =
+      typeof input === 'string'
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url;
+    if (requestUrl.includes('/price-history')) {
+      return jsonResponse({ data: { currency: 'INR', points: historyPoints } });
+    }
+    return jsonResponse({ data: product });
+  });
+}
+
 const product = {
   id: 14,
   name: 'Northstar Studio 14',
@@ -93,11 +108,18 @@ describe('ProductDetailRoute', () => {
   });
 
   it('renders product facts, gallery, ordered specs and a safe store link', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      jsonResponse({ data: product }),
-    );
+    mockProductEndpoints([
+      {
+        recorded_at: '2026-07-01',
+        price: { amount: '99999.00', currency: 'INR' },
+      },
+      {
+        recorded_at: '2026-10-01',
+        price: { amount: '89999.00', currency: 'INR' },
+      },
+    ]);
 
-    renderProductPage();
+    const { container } = renderProductPage();
 
     expect(
       await screen.findByRole('heading', { level: 1, name: product.name }),
@@ -115,6 +137,22 @@ describe('ProductDetailRoute', () => {
       'title',
       expect.stringContaining('4-star baseline and five assumed reviews'),
     );
+    expect(
+      screen.getByRole('heading', { name: 'Price history' }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText('2 recorded prices over time.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: /Price history from/ }),
+    ).toBeInTheDocument();
+    expect(container.querySelectorAll('circle.fill-accent')).toHaveLength(2);
+    expect(screen.getByText('Lowest')).toBeInTheDocument();
+    expect(screen.getByText('Highest')).toBeInTheDocument();
+    expect(
+      screen.getByRole('table', { name: 'Recorded prices and dates' }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('₹89,999').length).toBeGreaterThan(0);
 
     const storeLink = screen.getAllByRole('link', {
       name: /view on store/i,
@@ -137,8 +175,15 @@ describe('ProductDetailRoute', () => {
       availability: 'out_of_stock',
       availability_label: 'Out of Stock',
     };
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      jsonResponse({ data: minimalProduct }),
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) =>
+      (typeof input === 'string'
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url
+      ).includes('/price-history')
+        ? jsonResponse({ data: { currency: 'INR', points: [] } })
+        : jsonResponse({ data: minimalProduct }),
     );
 
     renderProductPage();
@@ -150,6 +195,11 @@ describe('ProductDetailRoute', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('Out of Stock')).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        'Price history is not available for this product yet.',
+      ),
+    ).toBeInTheDocument();
 
     await userEvent.click(
       screen.getByRole('button', { name: 'Add to wishlist' }),
@@ -171,6 +221,24 @@ describe('ProductDetailRoute', () => {
     expect(
       screen.getByRole('button', { name: 'Remove from comparison' }),
     ).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('renders a single price point without breaking the chart scale', async () => {
+    mockProductEndpoints([
+      {
+        recorded_at: '2026-10-01',
+        price: { amount: '89999.00', currency: 'INR' },
+      },
+    ]);
+
+    const { container } = renderProductPage();
+
+    expect(
+      await screen.findByText('One recorded price so far.'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Lowest')).toBeInTheDocument();
+    expect(screen.getByText('Highest')).toBeInTheDocument();
+    expect(container.querySelectorAll('circle.fill-accent')).toHaveLength(1);
   });
 
   it('shows the product-specific 404 state for unknown slugs', async () => {
