@@ -9,6 +9,7 @@ import {
 } from '@/features/auth/hooks/auth-context';
 import type { User } from '@/features/auth/types/auth';
 import { ProductDetailRoute } from '@/features/catalog/pages/ProductDetailPage';
+import { CompareProvider } from '@/features/compare/components/CompareProvider';
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -165,12 +166,14 @@ function renderProductPage(auth: AuthContextValue = guestAuth) {
   return render(
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={auth}>
-        <MemoryRouter initialEntries={['/products/northstar-studio-14']}>
-          <Routes>
-            <Route path="/products/:slug" element={<ProductDetailRoute />} />
-            <Route path="/login" element={<h1>Log in</h1>} />
-          </Routes>
-        </MemoryRouter>
+        <CompareProvider>
+          <MemoryRouter initialEntries={['/products/northstar-studio-14']}>
+            <Routes>
+              <Route path="/products/:slug" element={<ProductDetailRoute />} />
+              <Route path="/login" element={<h1>Log in</h1>} />
+            </Routes>
+          </MemoryRouter>
+        </CompareProvider>
       </AuthContext.Provider>
     </QueryClientProvider>,
   );
@@ -312,7 +315,9 @@ describe('ProductDetailRoute', () => {
     await waitFor(() => {
       expect(
         JSON.parse(window.localStorage.getItem('pickwise:compare') ?? '[]'),
-      ).toEqual([14]);
+      ).toEqual([
+        expect.objectContaining({ id: 14, name: 'Northstar Studio 14' }),
+      ]);
     });
     expect(
       screen.getByRole('button', { name: 'Remove from comparison' }),

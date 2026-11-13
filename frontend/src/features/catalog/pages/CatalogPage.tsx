@@ -24,6 +24,8 @@ import type {
   CatalogCategory,
   CatalogSpecFacet,
 } from '@/features/catalog/types/catalog-api';
+import { useCompare } from '@/features/compare/hooks/use-compare';
+import { useCompareToggle } from '@/features/compare/hooks/use-compare-toggle';
 import {
   useWishlist,
   useWishlistToggle,
@@ -61,6 +63,8 @@ export function CatalogPage() {
   const productsQuery = useCatalogProducts(requestParams, paramsKey);
   const wishlist = useWishlist();
   const { toggle: toggleWishlist, isToggling } = useWishlistToggle();
+  const compare = useCompare();
+  const { toggle: toggleCompare } = useCompareToggle();
   const category = searchParams.get('category') ?? '';
   const facetsQuery = useCatalogFacets(category);
   const categories = useMemo(
@@ -295,6 +299,9 @@ export function CatalogPage() {
                     onWishlistToggle={(item) =>
                       toggleWishlist(item, !wishlist.savedIds.has(item.id))
                     }
+                    isCompared={compare.selectedIds.has(product.id)}
+                    compareDisabled={compare.isFull}
+                    onCompareToggle={toggleCompare}
                   />
                 ))}
               </div>

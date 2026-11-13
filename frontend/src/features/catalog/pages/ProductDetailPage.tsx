@@ -10,19 +10,22 @@ import { ProductPriceHistory } from '@/features/catalog/components/ProductPriceH
 import { ProductSimilarProducts } from '@/features/catalog/components/ProductSimilarProducts';
 import { ProductSpecifications } from '@/features/catalog/components/ProductSpecifications';
 import { useCatalogProduct } from '@/features/catalog/hooks/use-catalog-data';
-import { useDeviceProductSelection } from '@/features/catalog/hooks/use-device-product-selection';
 import type { ProductDetail } from '@/features/catalog/types/catalog-api';
+import { useCompare } from '@/features/compare/hooks/use-compare';
+import { useCompareToggle } from '@/features/compare/hooks/use-compare-toggle';
 import { ProductReviews } from '@/features/reviews/components/ProductReviews';
 import {
   useWishlist,
   useWishlistToggle,
 } from '@/features/wishlist/hooks/use-wishlist';
 import { isApiError } from '@/lib/api-error';
+import { cn } from '@/lib/utils';
 
 function ProductDetailContent({ product }: { product: ProductDetail }) {
-  const selection = useDeviceProductSelection(product.id);
   const wishlist = useWishlist();
   const { toggle: toggleWishlist, isToggling } = useWishlistToggle();
+  const compare = useCompare();
+  const { toggle: toggleCompare } = useCompareToggle();
   const wishlistPending = wishlist.isFetching || isToggling(product.id);
   const images = product.images.length
     ? product.images
@@ -52,11 +55,12 @@ function ProductDetailContent({ product }: { product: ProductDetail }) {
           product={product}
           isWishlisted={wishlist.savedIds.has(product.id)}
           wishlistPending={wishlistPending}
-          isCompared={selection.isCompared}
+          isCompared={compare.selectedIds.has(product.id)}
+          compareDisabled={compare.isFull}
           onWishlistToggle={() =>
             toggleWishlist(product, !wishlist.savedIds.has(product.id))
           }
-          onCompareToggle={selection.toggleCompare}
+          onCompareToggle={() => toggleCompare(product)}
         />
       </div>
 
@@ -64,7 +68,14 @@ function ProductDetailContent({ product }: { product: ProductDetail }) {
       <ProductPriceHistory slug={product.slug} />
       <ProductReviews slug={product.slug} />
       <ProductSimilarProducts slug={product.slug} />
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
+      <div
+        className={cn(
+          'fixed inset-x-0 z-30 border-t border-border bg-card/95 p-3 backdrop-blur md:hidden',
+          compare.count > 0
+            ? 'bottom-[calc(7rem+env(safe-area-inset-bottom))]'
+            : 'bottom-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]',
+        )}
+      >
         <div className="mx-auto flex max-w-7xl items-center gap-3">
           <PriceTag
             price={product.price}

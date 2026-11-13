@@ -10,6 +10,7 @@ interface ProductFactsProps {
   isWishlisted: boolean;
   wishlistPending: boolean;
   isCompared: boolean;
+  compareDisabled: boolean;
   onWishlistToggle: () => void;
   onCompareToggle: () => void;
 }
@@ -25,6 +26,7 @@ export function ProductFacts({
   isWishlisted,
   wishlistPending,
   isCompared,
+  compareDisabled,
   onWishlistToggle,
   onCompareToggle,
 }: ProductFactsProps) {
@@ -111,6 +113,7 @@ export function ProductFacts({
           type="button"
           variant={isCompared ? 'secondary' : 'outline'}
           size="icon-lg"
+          disabled={compareDisabled && !isCompared}
           aria-label={
             isCompared ? 'Remove from comparison' : 'Add to comparison'
           }
