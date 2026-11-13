@@ -24,6 +24,10 @@ import type {
   CatalogCategory,
   CatalogSpecFacet,
 } from '@/features/catalog/types/catalog-api';
+import {
+  useWishlist,
+  useWishlistToggle,
+} from '@/features/wishlist/hooks/use-wishlist';
 
 function flattenCategories(categories: CatalogCategory[]): CatalogCategory[] {
   return categories.flatMap((category) => [
@@ -55,6 +59,8 @@ export function CatalogPage() {
     return result;
   }, [stableSearchParams]);
   const productsQuery = useCatalogProducts(requestParams, paramsKey);
+  const wishlist = useWishlist();
+  const { toggle: toggleWishlist, isToggling } = useWishlistToggle();
   const category = searchParams.get('category') ?? '';
   const facetsQuery = useCatalogFacets(category);
   const categories = useMemo(
@@ -279,7 +285,17 @@ export function CatalogPage() {
             <>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    isWishlisted={wishlist.savedIds.has(product.id)}
+                    wishlistPending={
+                      wishlist.isFetching || isToggling(product.id)
+                    }
+                    onWishlistToggle={(item) =>
+                      toggleWishlist(item, !wishlist.savedIds.has(item.id))
+                    }
+                  />
                 ))}
               </div>
               {lastPage > 1 ? (

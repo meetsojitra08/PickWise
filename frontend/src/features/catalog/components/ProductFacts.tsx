@@ -8,6 +8,7 @@ import type { ProductDetail } from '@/features/catalog/types/catalog-api';
 interface ProductFactsProps {
   product: ProductDetail;
   isWishlisted: boolean;
+  wishlistPending: boolean;
   isCompared: boolean;
   onWishlistToggle: () => void;
   onCompareToggle: () => void;
@@ -22,6 +23,7 @@ function availabilityVariant(product: ProductDetail) {
 export function ProductFacts({
   product,
   isWishlisted,
+  wishlistPending,
   isCompared,
   onWishlistToggle,
   onCompareToggle,
@@ -95,6 +97,7 @@ export function ProductFacts({
           type="button"
           variant={isWishlisted ? 'secondary' : 'outline'}
           size="icon-lg"
+          disabled={wishlistPending}
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           aria-pressed={isWishlisted}
           onClick={onWishlistToggle}
@@ -122,7 +125,7 @@ export function ProductFacts({
         </Button>
       </div>
       <p className="mt-3 hidden text-xs text-muted-foreground md:block">
-        Wishlist and comparison selections are saved on this device.
+        Wishlist saves to your account. Compare selections stay on this device.
       </p>
     </section>
   );

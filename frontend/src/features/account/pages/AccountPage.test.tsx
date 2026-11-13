@@ -73,9 +73,15 @@ describe('AccountPage', () => {
   it('renders all account tabs, respects ?tab=wishlist, and switches tabs cleanly', async () => {
     const user = userEvent.setup();
 
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-      jsonResponse({ data: baseUser }),
-    );
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(jsonResponse({ data: baseUser }))
+      .mockResolvedValueOnce(
+        jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 48, total: 0, last_page: 1 },
+          links: {},
+        }),
+      );
 
     renderAccountRoutes(['/account?tab=wishlist']);
 
@@ -100,7 +106,10 @@ describe('AccountPage', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Your wishlist is empty' }),
+      await screen.findByRole('heading', {
+        level: 2,
+        name: 'Your wishlist is empty',
+      }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Browse products' }),

@@ -13,10 +13,17 @@ import { useCatalogProduct } from '@/features/catalog/hooks/use-catalog-data';
 import { useDeviceProductSelection } from '@/features/catalog/hooks/use-device-product-selection';
 import type { ProductDetail } from '@/features/catalog/types/catalog-api';
 import { ProductReviews } from '@/features/reviews/components/ProductReviews';
+import {
+  useWishlist,
+  useWishlistToggle,
+} from '@/features/wishlist/hooks/use-wishlist';
 import { isApiError } from '@/lib/api-error';
 
 function ProductDetailContent({ product }: { product: ProductDetail }) {
   const selection = useDeviceProductSelection(product.id);
+  const wishlist = useWishlist();
+  const { toggle: toggleWishlist, isToggling } = useWishlistToggle();
+  const wishlistPending = wishlist.isFetching || isToggling(product.id);
   const images = product.images.length
     ? product.images
     : product.primary_image
@@ -43,9 +50,12 @@ function ProductDetailContent({ product }: { product: ProductDetail }) {
         <ProductGallery name={product.name} images={images} />
         <ProductFacts
           product={product}
-          isWishlisted={selection.isWishlisted}
+          isWishlisted={wishlist.savedIds.has(product.id)}
+          wishlistPending={wishlistPending}
           isCompared={selection.isCompared}
-          onWishlistToggle={selection.toggleWishlist}
+          onWishlistToggle={() =>
+            toggleWishlist(product, !wishlist.savedIds.has(product.id))
+          }
           onCompareToggle={selection.toggleCompare}
         />
       </div>

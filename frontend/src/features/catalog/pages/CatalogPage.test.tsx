@@ -9,7 +9,13 @@ const hooks = vi.hoisted(() => ({
   useCatalogProducts: vi.fn(),
 }));
 
+const wishlistHooks = vi.hoisted(() => ({
+  useWishlist: vi.fn(),
+  useWishlistToggle: vi.fn(),
+}));
+
 vi.mock('@/features/catalog/hooks/use-catalog-data', () => hooks);
+vi.mock('@/features/wishlist/hooks/use-wishlist', () => wishlistHooks);
 
 function LocationOutput() {
   const location = useLocation();
@@ -54,6 +60,14 @@ describe('CatalogPage', () => {
       },
       isPending: false,
       isError: false,
+    });
+    wishlistHooks.useWishlist.mockReturnValue({
+      savedIds: new Set<number>(),
+      isFetching: false,
+    });
+    wishlistHooks.useWishlistToggle.mockReturnValue({
+      toggle: vi.fn(),
+      isToggling: () => false,
     });
   });
 

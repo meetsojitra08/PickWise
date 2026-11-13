@@ -15,6 +15,7 @@ export interface ProductCardProps {
   to?: string;
   previousPrice?: MoneyValue | null;
   showSummary?: boolean;
+  showAvailability?: boolean;
   isWishlisted?: boolean;
   wishlistPending?: boolean;
   onWishlistToggle?: (product: ProductSummary) => void;
@@ -29,6 +30,7 @@ export function ProductCard({
   to,
   previousPrice = null,
   showSummary = true,
+  showAvailability = false,
   isWishlisted = false,
   wishlistPending = false,
   onWishlistToggle,
@@ -57,7 +59,12 @@ export function ProductCard({
             variant: 'warning' as const,
             label: product.availability_label || 'Low Stock',
           }
-        : null;
+        : showAvailability
+          ? {
+              variant: 'positive' as const,
+              label: product.availability_label || 'In Stock',
+            }
+          : null;
 
   return (
     <article className={cn('h-full', className)}>

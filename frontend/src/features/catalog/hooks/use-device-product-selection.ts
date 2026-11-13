@@ -28,19 +28,17 @@ function toggleSelection(storageKey: string, productId: number): boolean {
   return !selected;
 }
 
+/**
+ * Comparison selection lives on the device until saved comparisons arrive in
+ * P4-S6. Wishlist state is now owned by the account API.
+ */
 export function useDeviceProductSelection(productId: number) {
-  const [isWishlisted, setIsWishlisted] = useState(() =>
-    readSelection('pickwise:wishlist', productId),
-  );
   const [isCompared, setIsCompared] = useState(() =>
     readSelection('pickwise:compare', productId),
   );
 
   return {
-    isWishlisted,
     isCompared,
-    toggleWishlist: () =>
-      setIsWishlisted(toggleSelection('pickwise:wishlist', productId)),
     toggleCompare: () =>
       setIsCompared(toggleSelection('pickwise:compare', productId)),
   };
