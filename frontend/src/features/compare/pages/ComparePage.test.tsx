@@ -1,7 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  AuthContext,
+  type AuthContextValue,
+} from '@/features/auth/hooks/auth-context';
+import type { User } from '@/features/auth/types/auth';
 import type { ProductSummary } from '@/features/catalog/types/catalog';
 import { CompareProvider } from '@/features/compare/components/CompareProvider';
 import { COMPARE_STORAGE_KEY } from '@/features/compare/lib/compare-storage';
@@ -56,21 +62,77 @@ const matrix: CompareMatrixData = {
   ],
 };
 
-function renderPage(items: ProductSummary[]) {
+const guestAuth: AuthContextValue = {
+  user: null,
+  status: 'unauthenticated',
+  isLoading: false,
+  isAuthenticated: false,
+  isAdmin: false,
+  authError: null,
+  login: async () => {
+    throw new Error('Not implemented in this test.');
+  },
+  register: async () => {
+    throw new Error('Not implemented in this test.');
+  },
+  logout: async () => {},
+  refetchUser: async () => null,
+};
+
+const customer: User = {
+  id: 7,
+  name: 'Rohan Mehta',
+  email: 'rohan@example.com',
+  role: 'customer',
+  preferences: null,
+  is_active: true,
+  email_verified_at: null,
+  created_at: '2026-11-11T10:00:00Z',
+};
+
+const memberAuth: AuthContextValue = {
+  ...guestAuth,
+  user: customer,
+  status: 'authenticated',
+  isAuthenticated: true,
+};
+
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+function renderPage(
+  items: ProductSummary[],
+  auth: AuthContextValue = guestAuth,
+) {
   window.localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(items));
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
 
   return render(
-    <CompareProvider>
-      <MemoryRouter initialEntries={['/compare']}>
-        <ComparePage />
-      </MemoryRouter>
-    </CompareProvider>,
+    <QueryClientProvider client={queryClient}>
+      <AuthContext.Provider value={auth}>
+        <CompareProvider>
+          <MemoryRouter initialEntries={['/compare']}>
+            <ComparePage />
+          </MemoryRouter>
+        </CompareProvider>
+      </AuthContext.Provider>
+    </QueryClientProvider>,
   );
 }
 
 describe('ComparePage', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    document.cookie = 'XSRF-TOKEN=test-token; path=/';
     matrixHook.useCompareMatrix.mockReset();
   });
 
@@ -134,6 +196,84 @@ describe('ComparePage', () => {
       screen.getByRole('link', { name: 'MacBook Air' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Laptops · 1 spec compared')).toBeInTheDocument();
+  });
+
+  it('invites a guest to sign in before saving the comparison', () => {
+    matrixHook.useCompareMatrix.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { data: matrix },
+    });
+
+    renderPage([lenovo, macbook]);
+
+    expect(
+      screen.getByRole('link', { name: 'Sign in to save' }),
+    ).toHaveAttribute('href', '/login');
+  });
+
+  it('saves a named comparison for a signed-in shopper', async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async (input, init) => {
+        const url = String(input);
+        const method = init?.method ?? 'GET';
+
+        if (url === '/api/v1/comparisons' && method === 'POST') {
+          return jsonResponse({ data: { id: 5 } }, 201);
+        }
+
+        if (url.startsWith('/api/v1/comparisons?')) {
+          return jsonResponse({
+            data: [],
+            meta: {
+              current_page: 1,
+              per_page: 12,
+              total: 0,
+              last_page: 1,
+            },
+            links: {},
+          });
+        }
+
+        return jsonResponse({}, 404);
+      });
+
+    matrixHook.useCompareMatrix.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { data: matrix },
+    });
+
+    renderPage([lenovo, macbook], memberAuth);
+
+    await user.type(
+      screen.getByLabelText('Name this comparison'),
+      'Editing shortlist',
+    );
+    await user.click(screen.getByRole('button', { name: 'Save comparison' }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/v1/comparisons',
+        expect.objectContaining({ method: 'POST' }),
+      );
+    });
+
+    const postCall = fetchMock.mock.calls.find(
+      ([url, init]) => url === '/api/v1/comparisons' && init?.method === 'POST',
+    );
+
+    expect(JSON.parse(String(postCall?.[1]?.body))).toEqual({
+      name: 'Editing shortlist',
+      product_ids: [lenovo.id, macbook.id],
+    });
+    expect(
+      await screen.findByRole('link', {
+        name: 'View your saved comparisons',
+      }),
+    ).toHaveAttribute('href', '/account?tab=comparisons');
   });
 
   it('explains a cross-category comparison and can clear the tray', async () => {

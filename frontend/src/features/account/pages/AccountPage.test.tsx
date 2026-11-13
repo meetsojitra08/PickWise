@@ -81,6 +81,13 @@ describe('AccountPage', () => {
           meta: { current_page: 1, per_page: 48, total: 0, last_page: 1 },
           links: {},
         }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 12, total: 0, last_page: 1 },
+          links: {},
+        }),
       );
 
     renderAccountRoutes(['/account?tab=wishlist']);

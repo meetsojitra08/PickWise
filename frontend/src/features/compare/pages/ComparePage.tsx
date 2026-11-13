@@ -2,6 +2,7 @@ import { GitCompare } from 'lucide-react';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { CompareMatrix } from '@/features/compare/components/CompareMatrix';
 import { CompareMatrixSkeleton } from '@/features/compare/components/CompareMatrixSkeleton';
+import { SaveComparisonPanel } from '@/features/compare/components/SaveComparisonPanel';
 import { useCompare } from '@/features/compare/hooks/use-compare';
 import { useCompareMatrix } from '@/features/compare/hooks/use-compare-matrix';
 import { isApiError } from '@/lib/api-error';
@@ -88,7 +89,10 @@ export function ComparePage() {
           onRetry={() => void matrixQuery.refetch()}
         />
       ) : (
-        <CompareMatrix matrix={matrixQuery.data.data} />
+        <>
+          <SaveComparisonPanel productIds={productIds} />
+          <CompareMatrix matrix={matrixQuery.data.data} />
+        </>
       )}
     </section>
   );

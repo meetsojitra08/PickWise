@@ -140,6 +140,14 @@ class Product extends Model
     }
 
     /**
+     * @return HasMany<ComparisonItem, $this>
+     */
+    public function comparisonItems(): HasMany
+    {
+        return $this->hasMany(ComparisonItem::class);
+    }
+
+    /**
      * @param  Builder<self>  $query
      */
     public function scopePublished(Builder $query): void

@@ -14,6 +14,8 @@ export interface CompareContextValue {
   toggle: (product: ProductSummary) => CompareToggleResult;
   remove: (productId: number) => void;
   clear: () => void;
+  /** Replace the tray wholesale, used when reopening a saved comparison. */
+  replace: (products: ProductSummary[]) => void;
 }
 
 export const CompareContext = createContext<CompareContextValue | null>(null);

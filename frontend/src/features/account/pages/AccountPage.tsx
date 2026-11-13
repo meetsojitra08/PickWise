@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/features/auth/hooks/use-auth';
+import { SavedComparisonsTab } from '@/features/compare/components/SavedComparisonsTab';
 import { WishlistTab } from '@/features/wishlist/components/WishlistTab';
 import { AccountEmptyTab } from '../components/AccountEmptyTab';
 import { ChangePasswordForm } from '../components/ChangePasswordForm';
@@ -83,7 +84,7 @@ export function AccountPage() {
         </TabsContent>
 
         <TabsContent value="comparisons">
-          <AccountEmptyTab tab="comparisons" />
+          <SavedComparisonsTab />
         </TabsContent>
 
         <TabsContent value="conversations">

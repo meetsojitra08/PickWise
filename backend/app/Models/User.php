@@ -91,4 +91,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(WishlistItem::class);
     }
+
+    /**
+     * @return HasMany<Comparison, $this>
+     */
+    public function comparisons(): HasMany
+    {
+        return $this->hasMany(Comparison::class);
+    }
 }

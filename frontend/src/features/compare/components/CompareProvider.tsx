@@ -68,6 +68,10 @@ export function CompareProvider({ children }: { children: ReactNode }) {
     setItems([]);
   }, []);
 
+  const replace = useCallback((products: ProductSummary[]): void => {
+    setItems(products.slice(0, MAX_COMPARE_ITEMS));
+  }, []);
+
   const selectedIds = useMemo(
     () => new Set(items.map((item) => item.id)),
     [items],
@@ -83,8 +87,9 @@ export function CompareProvider({ children }: { children: ReactNode }) {
       toggle,
       remove,
       clear,
+      replace,
     }),
-    [items, selectedIds, toggle, remove, clear],
+    [items, selectedIds, toggle, remove, clear, replace],
   );
 
   return (
