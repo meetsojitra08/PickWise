@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P4, Wishlist & comparison
-**Current step:** P4-S5
-**Last updated:** 2026-11-13 (P4-S4)
+**Current step:** P4-S6
+**Last updated:** 2026-11-13 (P4-S5)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -58,7 +58,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P4-S2** FE: wishlist toggle (optimistic) and account wishlist tab · `feat(wishlist)`
 - [x] **P4-S3** Compare matrix endpoint (spec rows, per-row winner using `higher_is_better`) · `feat(compare)`
 - [x] **P4-S4** FE: `CompareTray` (2 to 4 items, persists across navigation) · `feat(compare)`
-- [ ] **P4-S5** FE: compare page, `CompareMatrix`, "differences only" toggle · `feat(compare)`
+- [x] **P4-S5** FE: compare page, `CompareMatrix`, "differences only" toggle · `feat(compare)`
 - [ ] **P4-S6** Saved comparisons: tables, endpoints, account tab, share link · `feat(compare)`
 
 ## P5: AI features (branch `phase/P5-ai`)
@@ -123,6 +123,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P4-S3 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (166 tests, 4705 assertions). `POST /api/v1/compare` is registered under the public 120/min throttle. This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
 - P4-S4 verification: frontend lint, typecheck, 96 tests, and production build pass. This was a frontend-only step, so backend checks were not run. `git diff --check` is clean.
 - P4-S4 note: the old id-only `pickwise:compare` value is ignored on read; the tray now stores the product summaries it renders, capped at four. Removing the last item clears the tray, and selecting a different category is blocked with a toast until the tray is cleared.
+- P4-S5 verification: frontend lint, typecheck, 111 tests, Prettier, and production build pass. This was a frontend-only step, so backend checks were not run. The first full test run flaked on the pre-existing `/admin` lazy-route test; that file passed in isolation and the full suite passed on the next run. `git diff --check` is clean.
+- P4-S5 note: the compare page reads the device-local tray, so refresh and login redirects keep the selection. Shareable saved comparisons stay in P4-S6 through the `share_token` flow rather than an id-only URL.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -134,6 +136,7 @@ One line per step on what you learned. Turns into interview material.
 |------|----------------|
 | P4-S3 | Winner logic needs three guards: ignore missing values, suppress ties, and skip text specs even if a direction is set — "higher is better" only makes sense for ordered values. |
 | P4-S4 | A compare tray needs state above the router outlet and a device fallback: context keeps it instant during navigation, localStorage keeps it across reloads and login redirects. |
+| P4-S5 | A comparison table needs two rules, not one: column order comes from the shopper's selection, and "different" must treat a missing value as a difference, not only unequal numbers. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

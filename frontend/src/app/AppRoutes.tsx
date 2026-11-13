@@ -35,6 +35,12 @@ const AccountPage = lazy(() =>
   })),
 );
 
+const ComparePage = lazy(() =>
+  import('@/features/compare/pages/ComparePage').then((module) => ({
+    default: module.ComparePage,
+  })),
+);
+
 const ProductDetailRoute = lazy(() =>
   import('@/features/catalog/pages/ProductDetailPage').then((module) => ({
     default: module.ProductDetailRoute,
@@ -49,15 +55,7 @@ export function AppRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<CatalogPage />} />
           <Route path="/products/:slug" element={<ProductDetailRoute />} />
-          <Route
-            path="/compare"
-            element={
-              <RoutePlaceholderPage
-                title="Compare products"
-                description="Side-by-side specification comparisons and AI verdicts arrive in Phases 4 and 5."
-              />
-            }
-          />
+          <Route path="/compare" element={<ComparePage />} />
           <Route
             path="/assistant"
             element={
