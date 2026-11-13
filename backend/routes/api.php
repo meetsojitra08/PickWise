@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Customer\AccountController;
 use App\Http\Controllers\Api\V1\Customer\ReviewController;
 use App\Http\Controllers\Api\V1\Customer\WishlistController;
 use App\Http\Controllers\Api\V1\Public\CategoryController;
+use App\Http\Controllers\Api\V1\Public\CompareController;
 use App\Http\Controllers\Api\V1\Public\HealthController;
 use App\Http\Controllers\Api\V1\Public\ProductController;
 use App\Http\Controllers\Api\V1\Public\ProductReviewController;
@@ -35,6 +36,8 @@ Route::middleware('throttle:public-api')->group(function (): void {
         ->name('api.v1.products.similar');
     Route::get('/products/{slug}/reviews', [ProductReviewController::class, 'index'])
         ->name('api.v1.products.reviews.index');
+    Route::post('/compare', CompareController::class)
+        ->name('api.v1.compare');
 });
 
 Route::post('/products/{slug}/reviews', [ProductReviewController::class, 'store'])
