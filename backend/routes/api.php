@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\AccountController;
+use App\Http\Controllers\Api\V1\Customer\ComparisonController;
 use App\Http\Controllers\Api\V1\Customer\ReviewController;
+use App\Http\Controllers\Api\V1\Customer\WishlistController;
 use App\Http\Controllers\Api\V1\Public\CategoryController;
+use App\Http\Controllers\Api\V1\Public\CompareController;
 use App\Http\Controllers\Api\V1\Public\HealthController;
 use App\Http\Controllers\Api\V1\Public\ProductController;
 use App\Http\Controllers\Api\V1\Public\ProductReviewController;
+use App\Http\Controllers\Api\V1\Public\SharedComparisonController;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -34,6 +38,11 @@ Route::middleware('throttle:public-api')->group(function (): void {
         ->name('api.v1.products.similar');
     Route::get('/products/{slug}/reviews', [ProductReviewController::class, 'index'])
         ->name('api.v1.products.reviews.index');
+    Route::post('/compare', CompareController::class)
+        ->name('api.v1.compare');
+    Route::get('/shared/comparisons/{token}', SharedComparisonController::class)
+        ->whereAlphaNumeric('token')
+        ->name('api.v1.shared-comparisons.show');
 });
 
 Route::post('/products/{slug}/reviews', [ProductReviewController::class, 'store'])
@@ -82,4 +91,40 @@ Route::prefix('account')
             ->name('api.v1.account.password.update');
         Route::put('/preferences', [AccountController::class, 'updatePreferences'])
             ->name('api.v1.account.preferences.update');
+    });
+
+Route::prefix('wishlist')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [WishlistController::class, 'index'])
+            ->name('api.v1.wishlist.index');
+        Route::post('/', [WishlistController::class, 'store'])
+            ->name('api.v1.wishlist.store');
+        Route::delete('/{productId}', [WishlistController::class, 'destroy'])
+            ->whereNumber('productId')
+            ->name('api.v1.wishlist.destroy');
+    });
+
+Route::prefix('comparisons')
+    ->middleware('auth:sanctum')
+    ->group(function (): void {
+        Route::get('/', [ComparisonController::class, 'index'])
+            ->name('api.v1.comparisons.index');
+        Route::post('/', [ComparisonController::class, 'store'])
+            ->name('api.v1.comparisons.store');
+        Route::get('/{comparison}', [ComparisonController::class, 'show'])
+            ->whereNumber('comparison')
+            ->name('api.v1.comparisons.show');
+        Route::patch('/{comparison}', [ComparisonController::class, 'update'])
+            ->whereNumber('comparison')
+            ->name('api.v1.comparisons.update');
+        Route::delete('/{comparison}', [ComparisonController::class, 'destroy'])
+            ->whereNumber('comparison')
+            ->name('api.v1.comparisons.destroy');
+        Route::post('/{comparison}/share', [ComparisonController::class, 'share'])
+            ->whereNumber('comparison')
+            ->name('api.v1.comparisons.share');
+        Route::delete('/{comparison}/share', [ComparisonController::class, 'unshare'])
+            ->whereNumber('comparison')
+            ->name('api.v1.comparisons.unshare');
     });

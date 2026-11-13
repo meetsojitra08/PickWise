@@ -76,6 +76,37 @@ Price history returns `{ "data": { "currency": "INR", "points": [{ "recorded_at"
 | POST | `/compare` | Public, no AI (no daily limit); body `{ product_ids: [2..4] }` returns spec matrix with per-row winner |
 | POST | `/compare/verdict` | Public, daily AI limit applied; AI explanation of strengths, weaknesses and verdict |
 
+**Compare matrix shape**
+```json
+{
+  "data": {
+    "category": { "id": 5, "name": "Laptops", "slug": "laptops" },
+    "products": [
+      { "id": 14, "name": "Lenovo Yoga Slim 7 Pro", "price": { "amount": "84999.00", "currency": "INR" } },
+      { "id": 22, "name": "Apple MacBook Air 13 M3", "price": { "amount": "89900.00", "currency": "INR" } }
+    ],
+    "rows": [
+      {
+        "key": "ram_gb",
+        "label": "RAM",
+        "unit": "GB",
+        "data_type": "number",
+        "higher_is_better": true,
+        "winner_product_id": 22,
+        "values": [
+          { "product_id": 14, "value": 16 },
+          { "product_id": 22, "value": 32 }
+        ]
+      }
+    ]
+  }
+}
+```
+- `products` are compact product summaries in the requested order.
+- `rows` contain only `is_comparable` specs with at least one value; `value` is `null` when a product does not list the spec.
+- `winner_product_id` is `null` for ties, missing direction, and text specs.
+- Comparing products from different categories returns `422 validation_failed` with `error.details.product_ids`.
+
 ## Assistant
 | Method | Path | Purpose |
 |--------|------|---------|

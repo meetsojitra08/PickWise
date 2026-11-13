@@ -132,6 +132,22 @@ class Product extends Model
     }
 
     /**
+     * @return HasMany<WishlistItem, $this>
+     */
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
+    }
+
+    /**
+     * @return HasMany<ComparisonItem, $this>
+     */
+    public function comparisonItems(): HasMany
+    {
+        return $this->hasMany(ComparisonItem::class);
+    }
+
+    /**
      * @param  Builder<self>  $query
      */
     public function scopePublished(Builder $query): void

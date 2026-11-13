@@ -2,12 +2,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   AuthContext,
   type AuthContextValue,
 } from '@/features/auth/hooks/auth-context';
+import type { User } from '@/features/auth/types/auth';
 import { ProductDetailRoute } from '@/features/catalog/pages/ProductDetailPage';
+import { CompareProvider } from '@/features/compare/components/CompareProvider';
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -31,6 +33,30 @@ const guestAuth: AuthContextValue = {
   },
   logout: async () => {},
   refetchUser: async () => null,
+};
+
+const customer: User = {
+  id: 7,
+  name: 'Rohan Mehta',
+  email: 'rohan@example.com',
+  role: 'customer',
+  preferences: null,
+  is_active: true,
+  email_verified_at: null,
+  created_at: '2026-11-11T10:00:00Z',
+};
+
+const authenticatedAuth: AuthContextValue = {
+  ...guestAuth,
+  user: customer,
+  status: 'authenticated',
+  isAuthenticated: true,
+};
+
+const emptyWishlistResponse = {
+  data: [],
+  meta: { current_page: 1, per_page: 48, total: 0, last_page: 1 },
+  links: {},
 };
 
 const emptyReviewsResponse = {
@@ -66,6 +92,9 @@ function mockProductEndpoints(
     }
     if (requestUrl.includes('/reviews')) {
       return jsonResponse(emptyReviewsResponse);
+    }
+    if (requestUrl.includes('/wishlist')) {
+      return jsonResponse(emptyWishlistResponse);
     }
     return jsonResponse({ data: product });
   });
@@ -130,18 +159,21 @@ const product = {
   created_at: null,
 };
 
-function renderProductPage() {
+function renderProductPage(auth: AuthContextValue = guestAuth) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={guestAuth}>
-        <MemoryRouter initialEntries={['/products/northstar-studio-14']}>
-          <Routes>
-            <Route path="/products/:slug" element={<ProductDetailRoute />} />
-          </Routes>
-        </MemoryRouter>
+      <AuthContext.Provider value={auth}>
+        <CompareProvider>
+          <MemoryRouter initialEntries={['/products/northstar-studio-14']}>
+            <Routes>
+              <Route path="/products/:slug" element={<ProductDetailRoute />} />
+              <Route path="/login" element={<h1>Log in</h1>} />
+            </Routes>
+          </MemoryRouter>
+        </CompareProvider>
       </AuthContext.Provider>
     </QueryClientProvider>,
   );
@@ -150,7 +182,14 @@ function renderProductPage() {
 describe('ProductDetailRoute', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    window.sessionStorage.clear();
+    document.cookie = 'XSRF-TOKEN=test-token; path=/';
     vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    document.cookie =
+      'XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
   });
 
   it('renders product facts, gallery, ordered specs and a safe store link', async () => {
@@ -227,7 +266,7 @@ describe('ProductDetailRoute', () => {
     ).toBeVisible();
   });
 
-  it('persists wishlist and compare selections and handles missing images and specs', async () => {
+  it('keeps compare selections on the device and sends guests to log in for the wishlist', async () => {
     const minimalProduct = {
       ...product,
       images: [],
@@ -271,25 +310,123 @@ describe('ProductDetailRoute', () => {
     ).toBeInTheDocument();
 
     await userEvent.click(
-      screen.getByRole('button', { name: 'Add to wishlist' }),
-    );
-    await userEvent.click(
       screen.getByRole('button', { name: 'Add to comparison' }),
     );
     await waitFor(() => {
       expect(
-        JSON.parse(window.localStorage.getItem('pickwise:wishlist') ?? '[]'),
-      ).toEqual([14]);
-      expect(
         JSON.parse(window.localStorage.getItem('pickwise:compare') ?? '[]'),
-      ).toEqual([14]);
+      ).toEqual([
+        expect.objectContaining({ id: 14, name: 'Northstar Studio 14' }),
+      ]);
     });
-    expect(
-      screen.getByRole('button', { name: 'Remove from wishlist' }),
-    ).toHaveAttribute('aria-pressed', 'true');
     expect(
       screen.getByRole('button', { name: 'Remove from comparison' }),
     ).toHaveAttribute('aria-pressed', 'true');
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Add to wishlist' }),
+    );
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Log in' }),
+    ).toBeInTheDocument();
+    expect(
+      JSON.parse(
+        window.sessionStorage.getItem('pickwise:pending-wishlist') ?? '[]',
+      ),
+    ).toEqual([expect.objectContaining({ id: 14 })]);
+  });
+
+  it('saves and removes an authenticated wishlist item with optimistic heart state', async () => {
+    let saved = false;
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+      const requestUrl =
+        typeof input === 'string'
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url;
+      const method = init?.method ?? 'GET';
+
+      if (requestUrl.includes('/wishlist/') && method === 'DELETE') {
+        saved = false;
+        return new Response(null, { status: 204 });
+      }
+      if (requestUrl.endsWith('/api/v1/wishlist') && method === 'POST') {
+        saved = true;
+        return jsonResponse(
+          {
+            data: { id: 1, product, created_at: '2026-11-12T10:00:00Z' },
+          },
+          201,
+        );
+      }
+      if (requestUrl.includes('/wishlist')) {
+        return jsonResponse({
+          data: saved
+            ? [{ id: 1, product, created_at: '2026-11-12T10:00:00Z' }]
+            : [],
+          meta: {
+            current_page: 1,
+            per_page: 48,
+            total: saved ? 1 : 0,
+            last_page: 1,
+          },
+          links: {},
+        });
+      }
+      if (requestUrl.includes('/price-history')) {
+        return jsonResponse({ data: { currency: 'INR', points: [] } });
+      }
+      if (requestUrl.includes('/similar')) {
+        return jsonResponse({ data: [] });
+      }
+      if (requestUrl.includes('/reviews')) {
+        return jsonResponse(emptyReviewsResponse);
+      }
+
+      return jsonResponse({ data: product });
+    });
+
+    renderProductPage(authenticatedAuth);
+
+    const addButton = await screen.findByRole('button', {
+      name: 'Add to wishlist',
+    });
+    await waitFor(() => expect(addButton).toBeEnabled());
+
+    await userEvent.click(addButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Remove from wishlist' }),
+      ).toHaveAttribute('aria-pressed', 'true');
+    });
+    await waitFor(() => {
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        '/api/v1/wishlist',
+        expect.objectContaining({ method: 'POST' }),
+      );
+    });
+
+    const removeButton = await screen.findByRole('button', {
+      name: 'Remove from wishlist',
+    });
+    await waitFor(() => expect(removeButton).toBeEnabled());
+    await userEvent.click(removeButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Add to wishlist' }),
+      ).toHaveAttribute('aria-pressed', 'false');
+    });
+    await waitFor(() => {
+      expect(globalThis.fetch).toHaveBeenCalledWith(
+        '/api/v1/wishlist/14',
+        expect.objectContaining({ method: 'DELETE' }),
+      );
+    });
   });
 
   it('renders a single price point without breaking the chart scale', async () => {

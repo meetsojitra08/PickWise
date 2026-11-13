@@ -130,7 +130,7 @@ Unique `(product_id, user_id)` where `user_id` is not null (one review per user 
 | generated_at | timestamp | |
 
 ### wishlist_items
-`id`, `user_id` FK cascade, `product_id` FK cascade, unique `(user_id, product_id)`.
+`id`, `user_id` FK cascade, `product_id` FK cascade, unique `(user_id, product_id)`, index `(product_id)`.
 
 ### comparisons / comparison_items
 `comparisons`: `id`, `user_id` FK cascade, `name` varchar, `ai_verdict` jsonb null, `share_token` char(32) unique null (null = private; set when the owner clicks Share, cleared to stop sharing).

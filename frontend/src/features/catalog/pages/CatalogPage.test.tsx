@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
+import { CompareProvider } from '@/features/compare/components/CompareProvider';
 
 const hooks = vi.hoisted(() => ({
   useCatalogCategories: vi.fn(),
@@ -9,7 +10,13 @@ const hooks = vi.hoisted(() => ({
   useCatalogProducts: vi.fn(),
 }));
 
+const wishlistHooks = vi.hoisted(() => ({
+  useWishlist: vi.fn(),
+  useWishlistToggle: vi.fn(),
+}));
+
 vi.mock('@/features/catalog/hooks/use-catalog-data', () => hooks);
+vi.mock('@/features/wishlist/hooks/use-wishlist', () => wishlistHooks);
 
 function LocationOutput() {
   const location = useLocation();
@@ -55,23 +62,33 @@ describe('CatalogPage', () => {
       isPending: false,
       isError: false,
     });
+    wishlistHooks.useWishlist.mockReturnValue({
+      savedIds: new Set<number>(),
+      isFetching: false,
+    });
+    wishlistHooks.useWishlistToggle.mockReturnValue({
+      toggle: vi.fn(),
+      isToggling: () => false,
+    });
   });
 
   it('writes search and category filters to the URL', () => {
     render(
-      <MemoryRouter initialEntries={['/products']}>
-        <Routes>
-          <Route
-            path="/products"
-            element={
-              <>
-                <CatalogPage />
-                <LocationOutput />
-              </>
-            }
-          />
-        </Routes>
-      </MemoryRouter>,
+      <CompareProvider>
+        <MemoryRouter initialEntries={['/products']}>
+          <Routes>
+            <Route
+              path="/products"
+              element={
+                <>
+                  <CatalogPage />
+                  <LocationOutput />
+                </>
+              }
+            />
+          </Routes>
+        </MemoryRouter>
+      </CompareProvider>,
     );
 
     fireEvent.change(
@@ -92,13 +109,15 @@ describe('CatalogPage', () => {
 
   it('restores query filters and shows the empty state', () => {
     render(
-      <MemoryRouter
-        initialEntries={['/products?category=laptops&price_max=80000']}
-      >
-        <Routes>
-          <Route path="/products" element={<CatalogPage />} />
-        </Routes>
-      </MemoryRouter>,
+      <CompareProvider>
+        <MemoryRouter
+          initialEntries={['/products?category=laptops&price_max=80000']}
+        >
+          <Routes>
+            <Route path="/products" element={<CatalogPage />} />
+          </Routes>
+        </MemoryRouter>
+      </CompareProvider>,
     );
 
     expect(

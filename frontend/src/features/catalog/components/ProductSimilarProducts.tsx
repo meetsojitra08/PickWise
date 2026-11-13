@@ -2,9 +2,19 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { ProductCard } from '@/components/shared/ProductCard';
 import { ProductCardSkeleton } from '@/components/shared/ProductCardSkeleton';
 import { useCatalogSimilarProducts } from '@/features/catalog/hooks/use-catalog-data';
+import { useCompare } from '@/features/compare/hooks/use-compare';
+import { useCompareToggle } from '@/features/compare/hooks/use-compare-toggle';
+import {
+  useWishlist,
+  useWishlistToggle,
+} from '@/features/wishlist/hooks/use-wishlist';
 
 export function ProductSimilarProducts({ slug }: { slug: string }) {
   const similarQuery = useCatalogSimilarProducts(slug);
+  const wishlist = useWishlist();
+  const { toggle: toggleWishlist, isToggling } = useWishlistToggle();
+  const compare = useCompare();
+  const { toggle: toggleCompare } = useCompareToggle();
 
   return (
     <section className="mt-12" aria-labelledby="similar-products-heading">
@@ -45,7 +55,20 @@ export function ProductSimilarProducts({ slug }: { slug: string }) {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {similarQuery.data.data.map((similarProduct) => (
-            <ProductCard key={similarProduct.id} product={similarProduct} />
+            <ProductCard
+              key={similarProduct.id}
+              product={similarProduct}
+              isWishlisted={wishlist.savedIds.has(similarProduct.id)}
+              wishlistPending={
+                wishlist.isFetching || isToggling(similarProduct.id)
+              }
+              onWishlistToggle={(item) =>
+                toggleWishlist(item, !wishlist.savedIds.has(item.id))
+              }
+              isCompared={compare.selectedIds.has(similarProduct.id)}
+              compareDisabled={compare.isFull}
+              onCompareToggle={toggleCompare}
+            />
           ))}
         </div>
       )}
