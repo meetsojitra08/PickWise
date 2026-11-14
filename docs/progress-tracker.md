@@ -1,8 +1,8 @@
 # Progress Tracker
 
-**Current phase:** P4, Wishlist & comparison
-**Current step:** P4-S6
-**Last updated:** 2026-11-13 (P4-S6)
+**Current phase:** P5, AI features
+**Current step:** P5-S1
+**Last updated:** 2026-11-14 (P5-S1)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -62,7 +62,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P4-S6** Saved comparisons: tables, endpoints, account tab, share link · `feat(compare)`
 
 ## P5: AI features (branch `phase/P5-ai`)
-- [ ] **P5-S1** `config/ai.php` and `GroqClient` (timeout, JSON reply, clear exceptions) · `feat(ai)`
+- [x] **P5-S1** `config/ai.php` and `GroqClient` (timeout, JSON reply, clear exceptions) · `feat(ai)`
 - [ ] **P5-S2** `FakeGroqClient` for tests · `test(ai)`
 - [ ] **P5-S3** `ai_usage_logs` table, daily limit middleware (Redis counter), `GET /assistant/quota` · `feat(ai)`
 - [ ] **P5-S4** Review summary: table, service, queued job on approval, endpoint · `feat(ai)`
@@ -127,6 +127,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P4-S5 note: the compare page reads the device-local tray, so refresh and login redirects keep the selection. Shareable saved comparisons stay in P4-S6 through the `share_token` flow rather than an id-only URL.
 - P4-S6 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (176 tests, 4845 assertions). Frontend lint, typecheck, 122 Vitest tests, and production build pass. `git diff --check` is clean. `npm run format:check` still flags pre-existing files because the checkout uses CRLF; the changed files pass Prettier with `--end-of-line auto`.
 - P4-S6 note: sharing is idempotent (`POST /comparisons/{id}/share` returns the existing token) and revoking clears `share_token`. Saved and shared detail views rebuild the live compare matrix, hide unpublished products, and report `unavailable_count`, so a saved comparison can shrink below two visible products instead of breaking.
+- P5-S1 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (184 tests, 4875 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
+- P5-S1 note: `GROQ_MODEL` deliberately has no default so a retired model id is never baked into code; a missing key or model fails before any HTTP call. The client asks Groq for a JSON object, retries connections, server errors, and invalid JSON once, then throws `AiUnavailableException` (`503 ai_unavailable`); a 4xx such as a bad key is not retried.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -140,6 +142,7 @@ One line per step on what you learned. Turns into interview material.
 | P4-S4 | A compare tray needs state above the router outlet and a device fallback: context keeps it instant during navigation, localStorage keeps it across reloads and login redirects. |
 | P4-S5 | A comparison table needs two rules, not one: column order comes from the shopper's selection, and "different" must treat a missing value as a difference, not only unequal numbers. |
 | P4-S6 | A share link needs a lifecycle, not just a column: minting the token must be idempotent, revocation must clear it, and the public view must rebuild live data so unpublished products cannot leak or break the page. |
+| P5-S1 | Keep the model id in config, not code, because providers retire model names; and retry only failures that can heal (connection, 5xx, bad JSON), not a 4xx auth error, so a broken key fails fast without doubling quota use. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
