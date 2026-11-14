@@ -76,6 +76,18 @@ class CatalogSeeder extends Seeder
 
                 app(ValueScoreCalculator::class)->recalculateCategory($category->id);
             }
+
+            $expectedSlugs = [];
+            foreach ($providers as $provider) {
+                foreach ($provider->products() as $productData) {
+                    $expectedSlugs[] = $productData['slug'];
+                }
+            }
+
+            Product::withTrashed()
+                ->whereIn('category_id', array_values(array_map(static fn (Category $c): int => $c->id, $categoriesBySlug)))
+                ->whereNotIn('slug', $expectedSlugs)
+                ->forceDelete();
         });
     }
 
