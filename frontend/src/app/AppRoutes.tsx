@@ -53,6 +53,12 @@ const ProductDetailRoute = lazy(() =>
   })),
 );
 
+const AssistantPage = lazy(() =>
+  import('@/features/assistant/pages/AssistantPage').then((module) => ({
+    default: module.AssistantPage,
+  })),
+);
+
 export function AppRoutes() {
   return (
     <Suspense fallback={<AuthGuardFallback />}>
@@ -66,15 +72,7 @@ export function AppRoutes() {
             path="/compare/shared/:token"
             element={<SharedComparisonPage />}
           />
-          <Route
-            path="/assistant"
-            element={
-              <RoutePlaceholderPage
-                title="Shopping assistant"
-                description="Budget-aware, database-grounded AI recommendations arrive in Phase 5."
-              />
-            }
-          />
+          <Route path="/assistant" element={<AssistantPage />} />
 
           <Route element={<RequireAuth />}>
             <Route path="/account" element={<AccountPage />} />

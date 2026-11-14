@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import { SiteFooter } from '@/components/shared/SiteFooter';
 import { SiteHeader } from '@/components/shared/SiteHeader';
 import { CompareProvider } from '@/features/compare/components/CompareProvider';
@@ -9,12 +9,15 @@ import { cn } from '@/lib/utils';
 
 function StorefrontLayout() {
   const { count } = useCompare();
+  const location = useLocation();
+  const isAssistant = location.pathname.startsWith('/assistant');
 
   return (
     <div
       className={cn(
         'flex min-h-screen flex-col bg-background text-foreground',
-        count > 0 && 'pb-32',
+        count > 0 && !isAssistant && 'pb-32',
+        isAssistant && 'h-screen overflow-hidden',
       )}
     >
       <WishlistIntentSync />
@@ -27,11 +30,18 @@ function StorefrontLayout() {
 
       <SiteHeader />
 
-      <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className={cn(
+          'flex-1 outline-none',
+          isAssistant && 'flex flex-col overflow-hidden',
+        )}
+      >
         <Outlet />
       </main>
 
-      <SiteFooter />
+      {!isAssistant && <SiteFooter />}
       <CompareTray />
     </div>
   );
