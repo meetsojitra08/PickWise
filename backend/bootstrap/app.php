@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Exceptions\ApiException;
 use App\Exceptions\ApiExceptionRenderer;
 use App\Http\Middleware\AssignRequestId;
+use App\Http\Middleware\EnsureAiQuota;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Support\RequestId;
 use Illuminate\Foundation\Application;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn (): ?string => null);
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
+            'ai-quota' => EnsureAiQuota::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

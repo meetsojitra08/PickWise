@@ -99,4 +99,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comparison::class);
     }
+
+    /**
+     * @return HasMany<AiUsageLog, $this>
+     */
+    public function aiUsageLogs(): HasMany
+    {
+        return $this->hasMany(AiUsageLog::class);
+    }
 }

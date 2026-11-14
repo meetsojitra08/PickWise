@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Assistant\QuotaController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\AccountController;
 use App\Http\Controllers\Api\V1\Customer\ComparisonController;
@@ -40,6 +41,8 @@ Route::middleware('throttle:public-api')->group(function (): void {
         ->name('api.v1.products.reviews.index');
     Route::post('/compare', CompareController::class)
         ->name('api.v1.compare');
+    Route::get('/assistant/quota', QuotaController::class)
+        ->name('api.v1.assistant.quota');
     Route::get('/shared/comparisons/{token}', SharedComparisonController::class)
         ->whereAlphaNumeric('token')
         ->name('api.v1.shared-comparisons.show');
