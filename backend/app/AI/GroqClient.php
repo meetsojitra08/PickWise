@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Http;
 use RuntimeException;
 use Throwable;
 
-final class GroqClient
+final class GroqClient implements GroqClientContract
 {
     private const CHAT_COMPLETIONS_PATH = '/chat/completions';
 

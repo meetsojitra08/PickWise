@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P5, AI features
-**Current step:** P5-S1
-**Last updated:** 2026-11-14 (P5-S1)
+**Current step:** P5-S2
+**Last updated:** 2026-11-14 (P5-S2)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -63,7 +63,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 
 ## P5: AI features (branch `phase/P5-ai`)
 - [x] **P5-S1** `config/ai.php` and `GroqClient` (timeout, JSON reply, clear exceptions) · `feat(ai)`
-- [ ] **P5-S2** `FakeGroqClient` for tests · `test(ai)`
+- [x] **P5-S2** `FakeGroqClient` for tests · `test(ai)`
 - [ ] **P5-S3** `ai_usage_logs` table, daily limit middleware (Redis counter), `GET /assistant/quota` · `feat(ai)`
 - [ ] **P5-S4** Review summary: table, service, queued job on approval, endpoint · `feat(ai)`
 - [ ] **P5-S5** FE: `ReviewSummaryCard` on product page · `feat(ai)`
@@ -129,6 +129,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P4-S6 note: sharing is idempotent (`POST /comparisons/{id}/share` returns the existing token) and revoking clears `share_token`. Saved and shared detail views rebuild the live compare matrix, hide unpublished products, and report `unavailable_count`, so a saved comparison can shrink below two visible products instead of breaking.
 - P5-S1 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (184 tests, 4875 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
 - P5-S1 note: `GROQ_MODEL` deliberately has no default so a retired model id is never baked into code; a missing key or model fails before any HTTP call. The client asks Groq for a JSON object, retries connections, server errors, and invalid JSON once, then throws `AiUnavailableException` (`503 ai_unavailable`); a 4xx such as a bad key is not retried.
+- P5-S2 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (189 tests, 4889 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
+- P5-S2 note: `GroqClient` keeps the HTTP logic but now implements `GroqClientContract`, which is bound in `AppServiceProvider`; `FakeGroqClient` lives in `tests/AI` and is installed per test with the `fakeGroqClient()` helper. The fake queues replies, records the prompts sent, fails loudly when no reply is prepared, and simulates production failures through `AiFailureReason` rather than raw strings.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -143,6 +145,7 @@ One line per step on what you learned. Turns into interview material.
 | P4-S5 | A comparison table needs two rules, not one: column order comes from the shopper's selection, and "different" must treat a missing value as a difference, not only unequal numbers. |
 | P4-S6 | A share link needs a lifecycle, not just a column: minting the token must be idempotent, revocation must clear it, and the public view must rebuild live data so unpublished products cannot leak or break the page. |
 | P5-S1 | Keep the model id in config, not code, because providers retire model names; and retry only failures that can heal (connection, 5xx, bad JSON), not a 4xx auth error, so a broken key fails fast without doubling quota use. |
+| P5-S2 | A fake is only useful if the real class is replaceable: extracting a small contract turned a `final` HTTP client into a seam tests can swap, while the fake throws the same `AiUnavailableException` reasons production would. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

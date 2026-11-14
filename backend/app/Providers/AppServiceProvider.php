@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\AI\GroqClient;
+use App\AI\GroqClientContract;
 use App\Enums\ApiErrorCode;
 use App\Http\Responses\ApiResponse;
 use App\Models\Comparison;
@@ -31,7 +33,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Features depend on the contract so tests can swap in a fake client.
+        $this->app->singleton(GroqClientContract::class, GroqClient::class);
     }
 
     /**
