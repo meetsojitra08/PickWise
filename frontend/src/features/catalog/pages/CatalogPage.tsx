@@ -270,7 +270,10 @@ export function CatalogPage() {
           aria-busy={productsQuery.isPending}
         >
           {productsQuery.isPending ? (
-            <ProductGridSkeleton count={8} />
+            <ProductGridSkeleton
+              count={9}
+              className="grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
+            />
           ) : productsQuery.isError ? (
             <EmptyState
               title="Products could not load"

@@ -21,7 +21,7 @@ export function WishlistTab() {
         count={3}
         showActions
         label="Loading your wishlist"
-        className="sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
+        className="gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
       />
     );
   }

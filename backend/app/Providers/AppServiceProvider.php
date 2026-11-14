@@ -18,6 +18,7 @@ use App\Policies\ComparisonPolicy;
 use App\Policies\ReviewPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WishlistItemPolicy;
+use App\Queries\Catalog\ActiveCategoryScope;
 use Closure;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\JsonResponse;
@@ -38,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Features depend on the contract so tests can swap in a fake client.
         $this->app->singleton(GroqClientContract::class, GroqClient::class);
+        $this->app->scoped(ActiveCategoryScope::class);
     }
 
     /**
