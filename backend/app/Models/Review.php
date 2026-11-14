@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ReviewStatus;
+use App\Observers\ReviewObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable(['product_id', 'user_id', 'author_name', 'rating', 'title', 'body'])]
+#[ObservedBy([ReviewObserver::class])]
 class Review extends Model
 {
     /**

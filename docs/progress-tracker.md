@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P5, AI features
-**Current step:** P5-S3
-**Last updated:** 2026-11-14 (P5-S3)
+**Current step:** P5-S4
+**Last updated:** 2026-11-14 (P5-S4)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -65,7 +65,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P5-S1** `config/ai.php` and `GroqClient` (timeout, JSON reply, clear exceptions) · `feat(ai)`
 - [x] **P5-S2** `FakeGroqClient` for tests · `test(ai)`
 - [x] **P5-S3** `ai_usage_logs` table, daily limit middleware (Redis counter), `GET /assistant/quota` · `feat(ai)`
-- [ ] **P5-S4** Review summary: table, service, queued job on approval, endpoint · `feat(ai)`
+- [x] **P5-S4** Review summary: table, service, queued job on approval, endpoint · `feat(ai)`
 - [ ] **P5-S5** FE: `ReviewSummaryCard` on product page · `feat(ai)`
 - [ ] **P5-S6** Assistant service: fetch products by budget/category, build prompt, parse JSON, check product ids, fallback · `feat(assistant)`
 - [ ] **P5-S7** Conversations and messages tables + endpoints · `feat(assistant)`
@@ -133,6 +133,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P5-S2 note: `GroqClient` keeps the HTTP logic but now implements `GroqClientContract`, which is bound in `AppServiceProvider`; `FakeGroqClient` lives in `tests/AI` and is installed per test with the `fakeGroqClient()` helper. The fake queues replies, records the prompts sent, fails loudly when no reply is prepared, and simulates production failures through `AiFailureReason` rather than raw strings.
 - P5-S3 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (201 tests, 4953 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
 - P5-S3 note: the counter lives in the default cache store (`CACHE_STORE=redis` in production) under `pickwise:ai:quota:{user|session|ip}:{date}` with a TTL to the next UTC midnight; the namespaced prefix follows `code-standards.md` rather than the shorter example in `ai-integration.md`. The `ai-quota` middleware only guards, while AI features call `AiQuotaService::consume()` after a usable reply, so provider failures and fallbacks do not spend a customer's quota. Rate-limited attempts are logged as `rate_limited`; successful and failed calls will log through the same `AiUsageLogger` in P5-S4/S6.
+- P5-S4 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (209 tests, 5010 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
+- P5-S4 note: `ReviewObserver` queues `GenerateReviewSummary` whenever the set of approved reviews changes, so a customer edit, a future admin moderation, or a deletion all refresh the summary without page requests. The job is unique per product until processing and runs after commit; it retries three times and the service leaves the previous row untouched on a provider or invalid-JSON failure. Product detail eager loads `reviewSummary` (one extra query, so the zero-lazy-load test now allows nine) and never calls Groq. Summary calls are logged with a null user. The optional admin regenerate endpoint is deferred to P7 because admin writes must go through `AuditLogger` (P7-S1).
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -149,6 +151,7 @@ One line per step on what you learned. Turns into interview material.
 | P5-S1 | Keep the model id in config, not code, because providers retire model names; and retry only failures that can heal (connection, 5xx, bad JSON), not a 4xx auth error, so a broken key fails fast without doubling quota use. |
 | P5-S2 | A fake is only useful if the real class is replaceable: extracting a small contract turned a `final` HTTP client into a seam tests can swap, while the fake throws the same `AiUnavailableException` reasons production would. |
 | P5-S3 | A daily limit should count successes, not attempts: guard in middleware, then increment only after a usable AI reply, so a provider outage does not burn the shopper's quota — and derive the cache key from the UTC date so a cleared Redis only restarts today's count. |
+| P5-S4 | Generation belongs in a job triggered by the approved-review set, not the page: an observer catches customer edits and future moderation, `ShouldBeUniqueUntilProcessing` drops duplicate approvals without losing one that arrives mid-run, and the read resource only loads the saved row. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
