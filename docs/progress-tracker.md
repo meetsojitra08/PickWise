@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P5, AI features
-**Current step:** P5-S7
-**Last updated:** 2026-11-14 (P5-S6)
+**Current step:** P5-S8
+**Last updated:** 2026-11-14 (P5-S7)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -68,7 +68,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P5-S4** Review summary: table, service, queued job on approval, endpoint · `feat(ai)`
 - [x] **P5-S5** FE: `ReviewSummaryCard` on product page · `feat(ai)`
 - [x] **P5-S6** Assistant service: fetch products by budget/category, build prompt, parse JSON, check product ids, fallback · `feat(assistant)`
-- [ ] **P5-S7** Conversations and messages tables + endpoints · `feat(assistant)`
+- [x] **P5-S7** Conversations and messages tables + endpoints · `feat(assistant)`
 - [ ] **P5-S8** FE: assistant page (thread, recommendation cards, loading, error, quota counter) · `feat(assistant)`
 - [ ] **P5-S9** FE: `VerdictPanel` component with all states · `feat(ui)`
 - [ ] **P5-S10** Compare explanation endpoint (strengths, weaknesses, verdict) · `feat(compare)`
@@ -139,6 +139,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P5-S5 note: the card reads the `review_summary` embedded in product detail, so the page makes no extra request and never calls Groq. It has three states: ready, pending (at least three approved reviews but no saved row yet: render nothing), and not-yet-eligible (fewer than three: show "Not enough reviews yet."). Eligibility uses `rating_count` (approved reviews only), while "Based on N reviews" uses the summary's own `reviews_count`, so it reports the reviews the model actually saw rather than a later rating total. The Marigold left rule and tinted surface match the planned Verdict panel; the shared panel can absorb them in P5-S9.
 - P5-S6 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (218 tests, 5077 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
 - P5-S6 note: `AssistantService` is HTTP-free and takes an `AssistantQuery` plus an optional `User` for usage logging; the conversation endpoint in P5-S7 will call `AiQuotaService::consume()` only after the service reports `AssistantReplyStatus::Ok`, so fallbacks never spend quota. Candidate selection reuses `ProductSearchQuery`, which keeps category visibility, keyword search, and money filters in one tested place. The prompt carries 12 database products and up to six specs each; replies may only recommend ids from that list and within budget, and any invalid-only recommendation set falls back to the catalog. An empty `recommendations` array is accepted so an off-topic reply can politely decline. Alternatives are computed in minor units (never floats) at up to 115% of budget and are returned only when no product fits.
+- P5-S7 verification: Pint, PHPStan level 6, and 223 Pest tests pass (5150 assertions; host PHP lacks phpredis so the two Redis tests remain container-only). Frontend typecheck and 128 Vitest tests pass. `git diff --check` is clean.
+- P5-S7 note: conversations support both signed-in customers (keyed by `user_id`) and guests (keyed by session or `X-Session-Key`). `POST .../messages` applies the 10/min rate limiter and `ai-quota` middleware, validates inputs, queries `AssistantService`, and increments the daily counter via `AiQuotaService::consume()` only when status is `Ok` (fallbacks never consume quota). Thread messages batch-load recommended product facts to prevent N+1 queries.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -158,6 +160,7 @@ One line per step on what you learned. Turns into interview material.
 | P5-S4 | Generation belongs in a job triggered by the approved-review set, not the page: an observer catches customer edits and future moderation, `ShouldBeUniqueUntilProcessing` drops duplicate approvals without losing one that arrives mid-run, and the read resource only loads the saved row. |
 | P5-S5 | An AI summary needs three UI states, not two: ready, pending (enough reviews but no saved row — render nothing), and not-yet-eligible (fewer than three reviews — say so). Separate `rating_count` for eligibility from `reviews_count` for attribution so the card never claims the model read reviews it did not. |
 | P5-S6 | Grounding is a two-way check: filter the budget in SQL before the prompt, then reject any returned id that was not in the list, so a model that ignores either rule still cannot show an over-budget or invented product. Keep the service HTTP-free and let the endpoint spend quota only on a usable reply. |
+| P5-S7 | When storing LLM conversations, decouple the quota consumption from the route guard: validate and guard upfront, run the grounded prompt, save the exchange, and only debit daily quota on status: ok so fallbacks and invalid generations stay free. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
