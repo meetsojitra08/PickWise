@@ -57,10 +57,13 @@ class ComparisonController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
+        $rawVerdict = $request->validated('ai_verdict');
+        $aiVerdict = is_array($rawVerdict) ? $rawVerdict : null;
         $comparison = $this->createComparison->execute(
             $user,
             (string) $request->validated('name'),
             $request->productIds(),
+            $aiVerdict,
         );
 
         return (new ComparisonDetailResource($this->viewBuilder->build($comparison)))

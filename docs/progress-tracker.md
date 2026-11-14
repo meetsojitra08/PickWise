@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P5, AI features
-**Current step:** P5-S10
-**Last updated:** 2026-11-15 (P5-S9)
+**Current step:** P5-S11
+**Last updated:** 2026-11-15 (P5-S10)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -71,7 +71,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P5-S7** Conversations and messages tables + endpoints · `feat(assistant)`
 - [x] **P5-S8** FE: assistant page (thread, recommendation cards, loading, error, quota counter) · `feat(assistant)`
 - [x] **P5-S9** FE: `VerdictPanel` component with all states · `feat(ui)`
-- [ ] **P5-S10** Compare explanation endpoint (strengths, weaknesses, verdict) · `feat(compare)`
+- [x] **P5-S10** Compare explanation endpoint (strengths, weaknesses, verdict) · `feat(compare)`
 - [ ] **P5-S11** FE: verdict on the compare page · `feat(compare)`
 
 ## P6: Personalisation & home (branch `phase/P6-personalisation`)
@@ -143,6 +143,10 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P5-S7 note: conversations support both signed-in customers (keyed by `user_id`) and guests (keyed by session or `X-Session-Key`). `POST .../messages` applies the 10/min rate limiter and `ai-quota` middleware, validates inputs, queries `AssistantService`, and increments the daily counter via `AiQuotaService::consume()` only when status is `Ok` (fallbacks never consume quota). Thread messages batch-load recommended product facts to prevent N+1 queries.
 - P5-S8 verification: frontend lint, typecheck, 136 Vitest tests, and production build pass. This was a frontend-only step, so backend checks were not run. `git diff --check` is clean.
 - P5-S8 note: `AssistantPage` wires a responsive two-pane layout (desktop sidebar / mobile drawer) with starter prompt suggestions, grounded recommendation cards (with Marigold accent rule, database product details, "Why it fits", and "Trade-offs"), fallback alert when status is `fallback`, over-budget alternatives banner, a daily quota meter, and a one-click "Compare these" action that loads the picks into the compare tray.
+- P5-S9 verification: frontend lint, typecheck, 146 Vitest tests, and production build pass. `git diff --check` is clean.
+- P5-S9 note: `VerdictPanel` implements the signature Pickwise decision UI with Marigold left rule, subtle tinted surface, diamond mark, segmented fit meter, why it fits and trade-offs lists, responsive multi-product grid for comparisons, and support for all states (idle, loading, ready, fallback, error with retry, and daily quota exceeded).
+- P5-S10 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (239 tests, 5225 assertions). Frontend typecheck, 146 Vitest tests, and production build pass. `git diff --check` is clean.
+- P5-S10 note: `POST /compare/verdict` accepts 2 to 4 products from the same category, evaluates them using Groq with database grounding (ratings, prices, comparable specs), and returns a plain-language verdict along with strengths and weaknesses for each product. Unknown product IDs in LLM output are rejected. Daily quota is guarded via `ai-quota:compare` and consumed only on a successful generation. Optional `priority` customizes recommendations, and `comparison_id` saves the verdict to an owned comparison.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -164,6 +168,8 @@ One line per step on what you learned. Turns into interview material.
 | P5-S6 | Grounding is a two-way check: filter the budget in SQL before the prompt, then reject any returned id that was not in the list, so a model that ignores either rule still cannot show an over-budget or invented product. Keep the service HTTP-free and let the endpoint spend quota only on a usable reply. |
 | P5-S7 | When storing LLM conversations, decouple the quota consumption from the route guard: validate and guard upfront, run the grounded prompt, save the exchange, and only debit daily quota on status: ok so fallbacks and invalid generations stay free. |
 | P5-S8 | Decouple mutation variables from closure state: when starting a new chat on the first message, mutating with an explicit `{ conversationId, payload }` avoids race conditions against React's state setter, while optimistic thread updates keep chat interaction instant. |
+| P5-S9 | A signature decision panel works across multiple surfaces (assistant recommendation, review summary, and comparison matrix) when its contract separates global headline / fit from optional multi-product breakdowns with strengths and weaknesses. |
+| P5-S10 | Grounding a multi-item comparison requires two guards: pass only database-verified specs to the prompt, and filter the model output so any hallucinated or unselected product ids are discarded before the verdict payload is returned. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

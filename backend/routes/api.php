@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\Customer\ReviewController;
 use App\Http\Controllers\Api\V1\Customer\WishlistController;
 use App\Http\Controllers\Api\V1\Public\CategoryController;
 use App\Http\Controllers\Api\V1\Public\CompareController;
+use App\Http\Controllers\Api\V1\Public\CompareVerdictController;
 use App\Http\Controllers\Api\V1\Public\HealthController;
 use App\Http\Controllers\Api\V1\Public\ProductController;
 use App\Http\Controllers\Api\V1\Public\ProductReviewController;
@@ -49,6 +50,10 @@ Route::middleware('throttle:public-api')->group(function (): void {
         ->whereAlphaNumeric('token')
         ->name('api.v1.shared-comparisons.show');
 });
+
+Route::post('/compare/verdict', CompareVerdictController::class)
+    ->middleware(['throttle:verdict', 'ai-quota:compare'])
+    ->name('api.v1.compare.verdict');
 
 Route::post('/products/{slug}/reviews', [ProductReviewController::class, 'store'])
     ->middleware(['auth:sanctum', 'throttle:review-create'])

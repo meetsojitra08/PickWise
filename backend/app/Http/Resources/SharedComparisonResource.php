@@ -26,6 +26,7 @@ class SharedComparisonResource extends JsonResource
         return [
             'name' => $view->comparison->name,
             'unavailable_count' => $view->unavailableCount,
+            'ai_verdict' => $view->comparison->ai_verdict,
             'matrix' => $view->matrix !== null
                 ? new CompareMatrixResource($view->matrix)
                 : null,

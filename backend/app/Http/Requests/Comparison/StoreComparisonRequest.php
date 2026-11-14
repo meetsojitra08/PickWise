@@ -40,6 +40,7 @@ class StoreComparisonRequest extends FormRequest
                     ->where('is_published', true)
                     ->whereNull('deleted_at'),
             ],
+            'ai_verdict' => ['sometimes', 'nullable', 'array'],
         ];
     }
 

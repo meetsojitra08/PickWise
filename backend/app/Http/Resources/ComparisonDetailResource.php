@@ -32,6 +32,7 @@ class ComparisonDetailResource extends JsonResource
             'item_count' => $view->products->count(),
             'unavailable_count' => $view->unavailableCount,
             'items' => ProductSummaryResource::collection($view->products),
+            'ai_verdict' => $comparison->ai_verdict,
             'matrix' => $view->matrix !== null
                 ? new CompareMatrixResource($view->matrix)
                 : null,

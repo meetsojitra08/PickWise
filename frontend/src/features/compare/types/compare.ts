@@ -34,3 +34,30 @@ export interface CompareMatrixData {
 }
 
 export type CompareMatrixResponse = ApiSuccessResponse<CompareMatrixData>;
+
+export interface CompareVerdictProduct {
+  product_id: number;
+  name: string;
+  strengths: string[];
+  weaknesses: string[];
+}
+
+export interface CompareVerdictData {
+  verdict: string;
+  products: CompareVerdictProduct[];
+  quota: {
+    limit: number;
+    used: number;
+    remaining: number;
+    resets_at: string;
+  };
+  comparison_id?: number | null;
+}
+
+export type CompareVerdictResponse = ApiSuccessResponse<CompareVerdictData>;
+
+export interface CompareVerdictRequestPayload {
+  product_ids: number[];
+  priority?: string | null;
+  comparison_id?: number | null;
+}

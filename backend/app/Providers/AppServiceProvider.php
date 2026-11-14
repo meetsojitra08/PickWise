@@ -94,6 +94,15 @@ class AppServiceProvider extends ServiceProvider
                 ->by((string) $identifier)
                 ->response($this->rateLimitedResponse('Too many assistant requests. Please try again in a minute.'));
         });
+
+        RateLimiter::for('verdict', function (Request $request): Limit {
+            $identifier = $request->user()?->getAuthIdentifier() ?? $request->ip() ?? 'unknown';
+            $perMinute = (int) config('ai.rate_limit_per_minute', 60);
+
+            return Limit::perMinute($perMinute)
+                ->by((string) $identifier)
+                ->response($this->rateLimitedResponse('Too many verdict requests. Please try again in a minute.'));
+        });
     }
 
     private function configureAuthorization(): void
