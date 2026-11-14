@@ -17,6 +17,17 @@ export interface Review {
   created_at: string | null;
 }
 
+export type ReviewSentiment = 'positive' | 'mixed' | 'negative';
+
+export interface ReviewSummary {
+  summary: string;
+  pros: string[];
+  cons: string[];
+  sentiment: ReviewSentiment;
+  reviews_count: number;
+  generated_at: string;
+}
+
 export type RatingDistribution = Record<1 | 2 | 3 | 4 | 5, number>;
 
 export interface ProductReviewsMeta extends PaginationMeta {

@@ -4,6 +4,7 @@ import type {
   MoneyValue,
 } from '@/types/api';
 import type { ProductSummary } from '@/features/catalog/types/catalog';
+import type { ReviewSummary } from '@/features/reviews/types/reviews';
 
 export interface CatalogCategory {
   id: number;
@@ -70,6 +71,7 @@ export interface ProductDetail extends ProductSummary {
   store_url: string | null;
   images: ProductDetailImage[];
   specs: ProductDetailSpec[];
+  review_summary: ReviewSummary | null;
 }
 
 export type ProductDetailResponse = ApiSuccessResponse<ProductDetail>;
