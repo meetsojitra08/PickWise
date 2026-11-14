@@ -19,12 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 export type VerdictStatus =
-  | 'idle'
-  | 'loading'
-  | 'ready'
-  | 'fallback'
-  | 'error'
-  | 'quota_exceeded';
+  'idle' | 'loading' | 'ready' | 'fallback' | 'error' | 'quota_exceeded';
 
 export interface VerdictProductItem {
   id: number | string;
@@ -250,7 +245,8 @@ export function VerdictPanel({
 }: VerdictPanelProps) {
   // Extract values, favoring explicit props over data object fields
   const title = titleProp ?? data?.title ?? 'Verdict';
-  const headline = headlineProp ?? data?.headline ?? data?.verdict ?? verdictProp;
+  const headline =
+    headlineProp ?? data?.headline ?? data?.verdict ?? verdictProp;
   const verdictText = verdictProp ?? data?.verdict;
   const fitScore = fitScoreProp ?? data?.fitScore;
   const fitLabel = fitLabelProp ?? data?.fitLabel ?? 'Fit';
@@ -282,7 +278,11 @@ export function VerdictPanel({
               </span>
             )}
           </div>
-          <CardTitle className="mt-2 text-lg font-semibold text-foreground">
+          <CardTitle
+            role="heading"
+            aria-level={3}
+            className="mt-2 text-lg font-semibold text-foreground"
+          >
             {idleTitle}
           </CardTitle>
           <CardDescription className="max-w-2xl text-sm text-muted-foreground">
@@ -290,16 +290,19 @@ export function VerdictPanel({
           </CardDescription>
         </CardHeader>
 
-        {onGenerate && (
-          <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6 pt-0">
-            <Button
-              type="button"
-              onClick={onGenerate}
-              className="gap-2 font-medium"
-            >
-              <AiMark className="size-3.5 text-primary-foreground" />
-              {generateLabel}
-            </Button>
+        {(onGenerate || actions) && (
+          <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6 pt-0 space-y-3">
+            {actions}
+            {onGenerate && (
+              <Button
+                type="button"
+                onClick={onGenerate}
+                className="gap-2 font-medium"
+              >
+                <AiMark className="size-3.5 text-primary-foreground" />
+                {generateLabel}
+              </Button>
+            )}
           </CardContent>
         )}
       </Card>
@@ -379,7 +382,11 @@ export function VerdictPanel({
               </span>
             )}
           </div>
-          <CardTitle className="mt-2 text-base font-semibold text-foreground">
+          <CardTitle
+            role="heading"
+            aria-level={3}
+            className="mt-2 text-base font-semibold text-foreground"
+          >
             {fallbackMessage}
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
@@ -423,7 +430,11 @@ export function VerdictPanel({
               Verdict error
             </Badge>
           </div>
-          <CardTitle className="mt-2 text-base font-semibold text-foreground">
+          <CardTitle
+            role="heading"
+            aria-level={3}
+            className="mt-2 text-base font-semibold text-foreground"
+          >
             Could not generate verdict
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground">
@@ -465,7 +476,11 @@ export function VerdictPanel({
               Daily limit reached
             </Badge>
           </div>
-          <CardTitle className="mt-2 text-base font-semibold text-foreground">
+          <CardTitle
+            role="heading"
+            aria-level={3}
+            className="mt-2 text-base font-semibold text-foreground"
+          >
             Daily AI quota reached
           </CardTitle>
           <CardDescription className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
@@ -559,17 +574,11 @@ export function VerdictPanel({
                 )}
 
                 {product.strengths && product.strengths.length > 0 && (
-                  <ProsList
-                    items={product.strengths}
-                    title="Strengths"
-                  />
+                  <ProsList items={product.strengths} title="Strengths" />
                 )}
 
                 {product.weaknesses && product.weaknesses.length > 0 && (
-                  <ConsList
-                    items={product.weaknesses}
-                    title="Weaknesses"
-                  />
+                  <ConsList items={product.weaknesses} title="Weaknesses" />
                 )}
               </div>
             ))}

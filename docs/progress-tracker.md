@@ -1,8 +1,8 @@
 # Progress Tracker
 
-**Current phase:** P5, AI features
-**Current step:** P5-S11
-**Last updated:** 2026-11-15 (P5-S10)
+**Current phase:** P6, Personalisation & home
+**Current step:** P6-S1
+**Last updated:** 2026-11-15 (P5-S11)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -72,7 +72,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P5-S8** FE: assistant page (thread, recommendation cards, loading, error, quota counter) · `feat(assistant)`
 - [x] **P5-S9** FE: `VerdictPanel` component with all states · `feat(ui)`
 - [x] **P5-S10** Compare explanation endpoint (strengths, weaknesses, verdict) · `feat(compare)`
-- [ ] **P5-S11** FE: verdict on the compare page · `feat(compare)`
+- [x] **P5-S11** FE: verdict on the compare page · `feat(compare)`
 
 ## P6: Personalisation & home (branch `phase/P6-personalisation`)
 - [ ] **P6-S1** Home hero connected to the assistant, with example prompts · `feat(ui)`

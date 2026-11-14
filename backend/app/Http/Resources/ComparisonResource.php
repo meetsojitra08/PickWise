@@ -39,6 +39,7 @@ class ComparisonResource extends JsonResource
             'item_count' => $products->count(),
             'unavailable_count' => max(0, $savedItemCount - $products->count()),
             'items' => ProductSummaryResource::collection($products),
+            'ai_verdict' => $this->ai_verdict,
             'created_at' => $this->created_at?->toIso8601ZuluString(),
             'updated_at' => $this->updated_at?->toIso8601ZuluString(),
         ];

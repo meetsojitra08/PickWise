@@ -1,6 +1,7 @@
 import { GitCompare } from 'lucide-react';
 import { useParams } from 'react-router';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { VerdictPanel } from '@/components/shared/VerdictPanel';
 import { CompareMatrix } from '@/features/compare/components/CompareMatrix';
 import { CompareMatrixSkeleton } from '@/features/compare/components/CompareMatrixSkeleton';
 import { useSharedComparison } from '@/features/compare/hooks/use-saved-comparisons';
@@ -65,6 +66,28 @@ export function SharedComparisonPage() {
               no longer available and hidden from this comparison.
             </p>
           ) : null}
+          {comparison.data.data.ai_verdict && (
+            <div className="mb-8">
+              <VerdictPanel
+                status="ready"
+                title="AI Verdict"
+                headline={comparison.data.data.ai_verdict.verdict}
+                data={{
+                  title: 'AI Verdict',
+                  headline: comparison.data.data.ai_verdict.verdict,
+                  products: comparison.data.data.ai_verdict.products.map(
+                    (p) => ({
+                      id: p.product_id,
+                      name: p.name,
+                      strengths: p.strengths,
+                      weaknesses: p.weaknesses,
+                    }),
+                  ),
+                }}
+                sourceNote="Saved comparison verdict"
+              />
+            </div>
+          )}
           <CompareMatrix matrix={comparison.data.data.matrix} />
         </>
       )}
