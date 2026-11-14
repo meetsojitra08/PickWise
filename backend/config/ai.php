@@ -35,4 +35,15 @@ return [
         'guest' => (int) env('AI_DAILY_QUOTA_GUEST', 5),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Assistant throttle rate limit
+    |--------------------------------------------------------------------------
+    |
+    | Maximum messages allowed per minute before throttling kicks in.
+    |
+    */
+
+    'rate_limit_per_minute' => (int) env('AI_RATE_LIMIT_PER_MINUTE', 60),
+
 ];

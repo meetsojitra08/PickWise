@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P5, AI features
-**Current step:** P5-S9
-**Last updated:** 2026-11-14 (P5-S8)
+**Current step:** P5-S10
+**Last updated:** 2026-11-15 (P5-S9)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -70,7 +70,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P5-S6** Assistant service: fetch products by budget/category, build prompt, parse JSON, check product ids, fallback · `feat(assistant)`
 - [x] **P5-S7** Conversations and messages tables + endpoints · `feat(assistant)`
 - [x] **P5-S8** FE: assistant page (thread, recommendation cards, loading, error, quota counter) · `feat(assistant)`
-- [ ] **P5-S9** FE: `VerdictPanel` component with all states · `feat(ui)`
+- [x] **P5-S9** FE: `VerdictPanel` component with all states · `feat(ui)`
 - [ ] **P5-S10** Compare explanation endpoint (strengths, weaknesses, verdict) · `feat(compare)`
 - [ ] **P5-S11** FE: verdict on the compare page · `feat(compare)`
 

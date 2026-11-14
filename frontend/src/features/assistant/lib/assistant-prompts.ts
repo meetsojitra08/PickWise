@@ -12,7 +12,7 @@ export const STARTER_PROMPT_SUGGESTIONS: readonly PromptSuggestion[] = [
   },
   {
     text: 'Noise-cancelling wireless headphones for travel',
-    category: 'audio',
+    category: 'headphones',
     budget: undefined,
   },
   {

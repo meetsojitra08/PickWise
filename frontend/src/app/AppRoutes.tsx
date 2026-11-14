@@ -59,6 +59,12 @@ const AssistantPage = lazy(() =>
   })),
 );
 
+const VerdictPreviewPage = lazy(() =>
+  import('@/app/pages/VerdictPreviewPage').then((module) => ({
+    default: module.VerdictPreviewPage,
+  })),
+);
+
 export function AppRoutes() {
   return (
     <Suspense fallback={<AuthGuardFallback />}>
@@ -73,6 +79,7 @@ export function AppRoutes() {
             element={<SharedComparisonPage />}
           />
           <Route path="/assistant" element={<AssistantPage />} />
+          <Route path="/preview/verdict" element={<VerdictPreviewPage />} />
 
           <Route element={<RequireAuth />}>
             <Route path="/account" element={<AccountPage />} />

@@ -88,8 +88,9 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('assistant', function (Request $request): Limit {
             $identifier = $request->user()?->getAuthIdentifier() ?? $request->ip() ?? 'unknown';
+            $perMinute = (int) config('ai.rate_limit_per_minute', 60);
 
-            return Limit::perMinute(10)
+            return Limit::perMinute($perMinute)
                 ->by((string) $identifier)
                 ->response($this->rateLimitedResponse('Too many assistant requests. Please try again in a minute.'));
         });
