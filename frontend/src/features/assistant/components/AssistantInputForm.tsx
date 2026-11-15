@@ -39,6 +39,25 @@ export function AssistantInputForm({
     initialBudget !== undefined ? String(initialBudget) : '',
   );
 
+  const [prevInitialPrompt, setPrevInitialPrompt] = useState(initialPrompt);
+  if (initialPrompt !== prevInitialPrompt) {
+    setPrevInitialPrompt(initialPrompt);
+    setMessage(initialPrompt);
+  }
+
+  const [prevInitialCategory, setPrevInitialCategory] =
+    useState(initialCategory);
+  if (initialCategory !== prevInitialCategory) {
+    setPrevInitialCategory(initialCategory);
+    setCategory(initialCategory);
+  }
+
+  const [prevInitialBudget, setPrevInitialBudget] = useState(initialBudget);
+  if (initialBudget !== prevInitialBudget) {
+    setPrevInitialBudget(initialBudget);
+    setBudgetMax(initialBudget !== undefined ? String(initialBudget) : '');
+  }
+
   const { data: categoriesResponse } = useCatalogCategories();
   const flatCategories = categoriesResponse
     ? flattenCategories(categoriesResponse.data)

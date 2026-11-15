@@ -21,3 +21,19 @@ export const STARTER_PROMPT_SUGGESTIONS: readonly PromptSuggestion[] = [
     budget: 40000,
   },
 ];
+
+export function buildAssistantPromptUrl(suggestion: {
+  text: string;
+  category?: string;
+  budget?: number;
+}): string {
+  const params = new URLSearchParams();
+  params.set('q', suggestion.text);
+  if (suggestion.category) {
+    params.set('category', suggestion.category);
+  }
+  if (suggestion.budget !== undefined && suggestion.budget !== null) {
+    params.set('budget_max', String(suggestion.budget));
+  }
+  return `/assistant?${params.toString()}`;
+}

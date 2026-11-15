@@ -1,5 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { History, Sparkles } from 'lucide-react';
+import { useSearchParams } from 'react-router';
 import { QuotaMeter } from '@/components/shared/QuotaMeter';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +31,21 @@ export function AssistantPage() {
   const [lastFailedPayload, setLastFailedPayload] =
     useState<SendMessagePayload | null>(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const promptParam = searchParams.get('q') || searchParams.get('prompt') || '';
+  const categoryParam = searchParams.get('category') || '';
+  const budgetParam =
+    searchParams.get('budget_max') || searchParams.get('budget') || '';
+  const initialPromptProcessedRef = useRef(false);
+
+  // Preserve initial URL parameters before search params are cleared
+  const [initialPromptText] = useState(() => promptParam);
+  const [initialCategoryVal] = useState(() => categoryParam);
+  const [initialBudgetVal] = useState(() => {
+    const p = budgetParam.trim();
+    return p !== '' && !Number.isNaN(Number(p)) ? Number(p) : undefined;
+  });
 
   const { data: quota, isLoading: isQuotaLoading } = useAiQuota();
   const { data: conversationsResponse, isLoading: isConversationsLoading } =
@@ -87,6 +103,45 @@ export function AssistantPage() {
     },
     [handleSendMessage],
   );
+
+  useEffect(() => {
+    if (initialPromptProcessedRef.current) return;
+    const trimmedPrompt = initialPromptText.trim();
+    if (trimmedPrompt.length < 2) return;
+
+    // Wait until quota check resolves before deciding whether to auto-send
+    if (isQuotaLoading) return;
+
+    if (promptParam || categoryParam || budgetParam) {
+      setSearchParams({}, { replace: true });
+    }
+
+    if (quota && quota.remaining <= 0) {
+      return;
+    }
+
+    initialPromptProcessedRef.current = true;
+
+    queueMicrotask(() => {
+      void handleSendMessage({
+        message: trimmedPrompt,
+        category:
+          initialCategoryVal.trim() !== '' ? initialCategoryVal.trim() : null,
+        budget_max: initialBudgetVal ?? null,
+      });
+    });
+  }, [
+    initialPromptText,
+    initialCategoryVal,
+    initialBudgetVal,
+    promptParam,
+    categoryParam,
+    budgetParam,
+    quota,
+    isQuotaLoading,
+    handleSendMessage,
+    setSearchParams,
+  ]);
 
   const handleNewConversation = useCallback(() => {
     setActiveConversationId(null);
@@ -204,6 +259,11 @@ export function AssistantPage() {
                 onSubmit={(payload) => void handleSendMessage(payload)}
                 isPending={isSending}
                 isQuotaExhausted={isQuotaExhausted}
+                initialPrompt={
+                  quota && quota.remaining <= 0 ? initialPromptText : ''
+                }
+                initialCategory={initialCategoryVal}
+                initialBudget={initialBudgetVal}
               />
             </div>
           </div>
