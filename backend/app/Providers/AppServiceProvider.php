@@ -4,22 +4,28 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\AI\GroqClient;
+use App\AI\GroqClientContract;
 use App\Enums\ApiErrorCode;
 use App\Http\Responses\ApiResponse;
+use App\Models\AiConversation;
 use App\Models\Comparison;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\WishlistItem;
+use App\Policies\AiConversationPolicy;
 use App\Policies\ComparisonPolicy;
 use App\Policies\ReviewPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WishlistItemPolicy;
+use App\Queries\Catalog\ActiveCategoryScope;
 use Closure;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +37,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Features depend on the contract so tests can swap in a fake client.
+        $this->app->singleton(GroqClientContract::class, GroqClient::class);
+        $this->app->scoped(ActiveCategoryScope::class);
     }
 
     /**
@@ -39,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Route::model('conversation', AiConversation::class);
         $this->configureRateLimiting();
         $this->configureAuthorization();
     }
@@ -78,6 +87,24 @@ class AppServiceProvider extends ServiceProvider
                 ->by((string) $userId)
                 ->response($this->rateLimitedResponse('You have submitted too many reviews. Please try again later.'));
         });
+
+        RateLimiter::for('assistant', function (Request $request): Limit {
+            $identifier = $request->user()?->getAuthIdentifier() ?? $request->ip() ?? 'unknown';
+            $perMinute = (int) config('ai.rate_limit_per_minute', 60);
+
+            return Limit::perMinute($perMinute)
+                ->by((string) $identifier)
+                ->response($this->rateLimitedResponse('Too many assistant requests. Please try again in a minute.'));
+        });
+
+        RateLimiter::for('verdict', function (Request $request): Limit {
+            $identifier = $request->user()?->getAuthIdentifier() ?? $request->ip() ?? 'unknown';
+            $perMinute = (int) config('ai.rate_limit_per_minute', 60);
+
+            return Limit::perMinute($perMinute)
+                ->by((string) $identifier)
+                ->response($this->rateLimitedResponse('Too many verdict requests. Please try again in a minute.'));
+        });
     }
 
     private function configureAuthorization(): void
@@ -86,6 +113,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Review::class, ReviewPolicy::class);
         Gate::policy(WishlistItem::class, WishlistItemPolicy::class);
         Gate::policy(Comparison::class, ComparisonPolicy::class);
+        Gate::policy(AiConversation::class, AiConversationPolicy::class);
 
         Gate::define(
             'access-admin',

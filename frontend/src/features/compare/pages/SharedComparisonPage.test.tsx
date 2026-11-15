@@ -172,4 +172,47 @@ describe('SharedComparisonPage', () => {
       }),
     ).toBeInTheDocument();
   });
+
+  it('renders saved AI verdict above matrix when available in shared comparison', () => {
+    sharedHook.useSharedComparison.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: {
+        data: {
+          name: 'Editing shortlist',
+          unavailable_count: 0,
+          ai_verdict: {
+            verdict: 'MacBook Air is the top choice for battery life.',
+            products: [
+              {
+                product_id: 14,
+                name: 'Lenovo Yoga',
+                strengths: ['Great display flexibility'],
+                weaknesses: ['Lower battery life'],
+              },
+              {
+                product_id: 22,
+                name: 'MacBook Air',
+                strengths: ['Class leading endurance'],
+                weaknesses: ['Higher price tag'],
+              },
+            ],
+            generated_at: '2026-11-14T10:00:00Z',
+          },
+          matrix,
+        },
+      },
+    });
+
+    renderPage();
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'MacBook Air is the top choice for battery life.',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Great display flexibility')).toBeInTheDocument();
+    expect(screen.getByText('Class leading endurance')).toBeInTheDocument();
+    expect(screen.getByText('Saved comparison verdict')).toBeInTheDocument();
+  });
 });

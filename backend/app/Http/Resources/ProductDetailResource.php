@@ -62,6 +62,12 @@ class ProductDetailResource extends JsonResource
                 'specs',
                 fn (): AnonymousResourceCollection => ProductSpecResource::collection($this->specs),
             ),
+            'review_summary' => $this->whenLoaded(
+                'reviewSummary',
+                fn (): ?ReviewSummaryResource => $this->reviewSummary !== null
+                    ? new ReviewSummaryResource($this->reviewSummary)
+                    : null,
+            ),
             'created_at' => $this->created_at?->toIso8601ZuluString(),
             'updated_at' => $this->updated_at?->toIso8601ZuluString(),
         ];

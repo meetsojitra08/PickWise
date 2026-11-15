@@ -14,6 +14,7 @@ import type { ProductDetail } from '@/features/catalog/types/catalog-api';
 import { useCompare } from '@/features/compare/hooks/use-compare';
 import { useCompareToggle } from '@/features/compare/hooks/use-compare-toggle';
 import { ProductReviews } from '@/features/reviews/components/ProductReviews';
+import { ReviewSummaryCard } from '@/features/reviews/components/ReviewSummaryCard';
 import {
   useWishlist,
   useWishlistToggle,
@@ -64,6 +65,10 @@ function ProductDetailContent({ product }: { product: ProductDetail }) {
         />
       </div>
 
+      <ReviewSummaryCard
+        summary={product.review_summary}
+        approvedReviewCount={product.rating_count}
+      />
       <ProductSpecifications specs={product.specs} />
       <ProductPriceHistory slug={product.slug} />
       <ProductReviews slug={product.slug} />

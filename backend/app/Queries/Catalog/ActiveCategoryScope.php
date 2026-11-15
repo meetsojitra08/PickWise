@@ -13,6 +13,11 @@ use Illuminate\Database\Eloquent\Collection;
 final class ActiveCategoryScope
 {
     /**
+     * @var array{by_slug: array<string, Category>, children_by_parent: array<int, list<int>>}|null
+     */
+    private ?array $cachedGraph = null;
+
+    /**
      * Return all active category IDs whose entire ancestor chain is also active.
      *
      * @return list<int>
@@ -51,10 +56,22 @@ final class ActiveCategoryScope
     }
 
     /**
+     * Flush in-memory graph cache.
+     */
+    public function flush(): void
+    {
+        $this->cachedGraph = null;
+    }
+
+    /**
      * @return array{by_slug: array<string, Category>, children_by_parent: array<int, list<int>>}
      */
     private function loadGraph(): array
     {
+        if ($this->cachedGraph !== null) {
+            return $this->cachedGraph;
+        }
+
         /** @var Collection<int, Category> $activeCategories */
         $activeCategories = Category::query()
             ->active()
@@ -72,7 +89,7 @@ final class ActiveCategoryScope
             $childrenByParent[$parentKey][] = $category->id;
         }
 
-        return [
+        return $this->cachedGraph = [
             'by_slug' => $bySlug,
             'children_by_parent' => $childrenByParent,
         ];

@@ -33,6 +33,8 @@ final class UpdateComparison
                         array_keys($productIds),
                     ),
                 );
+
+                $comparison->update(['ai_verdict' => null]);
             }
 
             return $comparison->refresh();

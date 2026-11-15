@@ -1,6 +1,7 @@
 import type {
   ComparisonListResponse,
   ComparisonResponse,
+  SavedComparisonVerdict,
   ShareTokenResponse,
   SharedComparisonResponse,
   UpdateComparisonPayload,
@@ -16,10 +17,15 @@ export function getComparisons(page: number, signal?: AbortSignal) {
   });
 }
 
-export function createComparison(name: string, productIds: number[]) {
+export function createComparison(
+  name: string,
+  productIds: number[],
+  aiVerdict?: SavedComparisonVerdict | null,
+) {
   return apiClient.post<ComparisonResponse>('/comparisons', {
     name,
     product_ids: productIds,
+    ...(aiVerdict ? { ai_verdict: aiVerdict } : {}),
   });
 }
 

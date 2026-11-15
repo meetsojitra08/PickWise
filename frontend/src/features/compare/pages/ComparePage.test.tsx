@@ -334,4 +334,218 @@ describe('ComparePage', () => {
 
     expect(refetch).toHaveBeenCalledTimes(1);
   });
+
+  it('renders AI verdict panel above matrix and generates verdict on demand', async () => {
+    const user = userEvent.setup();
+    matrixHook.useCompareMatrix.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { data: matrix },
+    });
+
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async (input, init) => {
+        const url = String(input);
+        const method = init?.method ?? 'GET';
+
+        if (url === '/api/v1/compare/verdict' && method === 'POST') {
+          return jsonResponse({
+            data: {
+              verdict: 'MacBook Air is more power-efficient.',
+              products: [
+                {
+                  product_id: lenovo.id,
+                  name: 'Lenovo Yoga',
+                  strengths: ['Touchscreen'],
+                  weaknesses: ['Battery'],
+                },
+                {
+                  product_id: macbook.id,
+                  name: 'MacBook Air',
+                  strengths: ['Silent'],
+                  weaknesses: ['Price'],
+                },
+              ],
+              quota: {
+                limit: 5,
+                used: 1,
+                remaining: 4,
+                resets_at: '2026-11-16T00:00:00Z',
+              },
+            },
+          });
+        }
+
+        return jsonResponse({}, 404);
+      });
+
+    renderPage([lenovo, macbook]);
+
+    // Verdict idle panel is shown above matrix
+    expect(
+      screen.getByRole('heading', {
+        name: 'Get an AI verdict on this comparison',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Laptops · 1 spec compared')).toBeInTheDocument();
+
+    // Trigger verdict generation
+    await user.click(screen.getByRole('button', { name: 'Get AI verdict' }));
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'MacBook Air is more power-efficient.',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Touchscreen')).toBeInTheDocument();
+    expect(screen.getByText('Silent')).toBeInTheDocument();
+
+    // The spec matrix is still there and interactive
+    expect(screen.getByText('Laptops · 1 spec compared')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/v1/compare/verdict',
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('leaves the spec matrix fully usable when AI verdict encounters an error', async () => {
+    const user = userEvent.setup();
+    matrixHook.useCompareMatrix.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { data: matrix },
+    });
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+      const url = String(input);
+      const method = init?.method ?? 'GET';
+
+      if (url === '/api/v1/compare/verdict' && method === 'POST') {
+        return jsonResponse(
+          {
+            error: {
+              status: 503,
+              code: 'ai_unavailable',
+              message: 'Groq provider unavailable.',
+            },
+          },
+          503,
+        );
+      }
+
+      return jsonResponse({}, 404);
+    });
+
+    renderPage([lenovo, macbook]);
+
+    await user.click(screen.getByRole('button', { name: 'Get AI verdict' }));
+
+    // Verdict shows error
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Could not generate verdict',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+
+    // Matrix remains fully usable
+    expect(screen.getByText('Laptops · 1 spec compared')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Lenovo Yoga' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'MacBook Air' }),
+    ).toBeInTheDocument();
+  });
+
+  it('includes generated AI verdict when saving a comparison', async () => {
+    const user = userEvent.setup();
+    matrixHook.useCompareMatrix.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { data: matrix },
+    });
+
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async (input, init) => {
+        const url = String(input);
+        const method = init?.method ?? 'GET';
+
+        if (url === '/api/v1/compare/verdict' && method === 'POST') {
+          return jsonResponse({
+            data: {
+              verdict: 'Lenovo is cheaper, Apple has better battery.',
+              products: [
+                {
+                  product_id: lenovo.id,
+                  name: 'Lenovo Yoga',
+                  strengths: ['Price'],
+                  weaknesses: ['Battery'],
+                },
+                {
+                  product_id: macbook.id,
+                  name: 'MacBook Air',
+                  strengths: ['Battery'],
+                  weaknesses: ['Price'],
+                },
+              ],
+              quota: {
+                limit: 5,
+                used: 1,
+                remaining: 4,
+                resets_at: '2026-11-16T00:00:00Z',
+              },
+            },
+          });
+        }
+
+        if (url === '/api/v1/comparisons' && method === 'POST') {
+          return jsonResponse({ data: { id: 8 } }, 201);
+        }
+
+        if (url.startsWith('/api/v1/comparisons?')) {
+          return jsonResponse({
+            data: [],
+            meta: { current_page: 1, per_page: 12, total: 0, last_page: 1 },
+            links: {},
+          });
+        }
+
+        return jsonResponse({}, 404);
+      });
+
+    renderPage([lenovo, macbook], memberAuth);
+
+    // First generate verdict
+    await user.click(screen.getByRole('button', { name: 'Get AI verdict' }));
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Lenovo is cheaper, Apple has better battery.',
+      }),
+    ).toBeInTheDocument();
+
+    // Now save comparison
+    await user.type(
+      screen.getByLabelText('Name this comparison'),
+      'My shortlisted laptops',
+    );
+    await user.click(screen.getByRole('button', { name: 'Save comparison' }));
+
+    await waitFor(() => {
+      const saveCall = fetchMock.mock.calls.find(
+        ([url, init]) =>
+          url === '/api/v1/comparisons' && init?.method === 'POST',
+      );
+      expect(saveCall).toBeDefined();
+      const body = JSON.parse(String(saveCall?.[1]?.body));
+      expect(body.name).toBe('My shortlisted laptops');
+      expect(body.product_ids).toEqual([lenovo.id, macbook.id]);
+      expect(body.ai_verdict).toBeDefined();
+      expect(body.ai_verdict.verdict).toBe(
+        'Lenovo is cheaper, Apple has better battery.',
+      );
+    });
+  });
 });

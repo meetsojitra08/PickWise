@@ -18,6 +18,7 @@ import {
 import type {
   ComparisonListResponse,
   SavedComparison,
+  SavedComparisonVerdict,
 } from '@/features/compare/types/saved-comparison';
 
 export const comparisonKeys = {
@@ -92,10 +93,12 @@ export function useCreateComparison() {
     mutationFn: ({
       name,
       productIds,
+      aiVerdict,
     }: {
       name: string;
       productIds: number[];
-    }) => createComparison(name, productIds),
+      aiVerdict?: SavedComparisonVerdict | null;
+    }) => createComparison(name, productIds, aiVerdict),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: comparisonKeys.list });
     },

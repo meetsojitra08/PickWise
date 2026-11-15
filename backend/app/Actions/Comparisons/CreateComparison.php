@@ -14,11 +14,15 @@ final class CreateComparison
      * Save a named comparison with its products in the shopper's chosen order.
      *
      * @param  list<int>  $productIds
+     * @param  array<string, mixed>|null  $aiVerdict
      */
-    public function execute(User $user, string $name, array $productIds): Comparison
+    public function execute(User $user, string $name, array $productIds, ?array $aiVerdict = null): Comparison
     {
-        return DB::transaction(function () use ($user, $name, $productIds): Comparison {
-            $comparison = $user->comparisons()->create(['name' => $name]);
+        return DB::transaction(function () use ($user, $name, $productIds, $aiVerdict): Comparison {
+            $comparison = $user->comparisons()->create([
+                'name' => $name,
+                'ai_verdict' => $aiVerdict,
+            ]);
 
             $comparison->items()->createMany(
                 array_map(

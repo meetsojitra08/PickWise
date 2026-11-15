@@ -49,7 +49,12 @@ export function SavedComparisonCard({
     }
 
     replace(comparison.items);
-    navigate('/compare');
+    navigate('/compare', {
+      state: {
+        comparisonId: comparison.id,
+        initialVerdict: comparison.ai_verdict ?? null,
+      },
+    });
   }
 
   function handleDelete(): void {

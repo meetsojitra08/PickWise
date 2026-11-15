@@ -1,8 +1,8 @@
 # Progress Tracker
 
-**Current phase:** P4, Wishlist & comparison
-**Current step:** P4-S6
-**Last updated:** 2026-11-13 (P4-S6)
+**Current phase:** P6, Personalisation & home
+**Current step:** P6-S1
+**Last updated:** 2026-11-15 (P5-S11)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -62,17 +62,17 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P4-S6** Saved comparisons: tables, endpoints, account tab, share link · `feat(compare)`
 
 ## P5: AI features (branch `phase/P5-ai`)
-- [ ] **P5-S1** `config/ai.php` and `GroqClient` (timeout, JSON reply, clear exceptions) · `feat(ai)`
-- [ ] **P5-S2** `FakeGroqClient` for tests · `test(ai)`
-- [ ] **P5-S3** `ai_usage_logs` table, daily limit middleware (Redis counter), `GET /assistant/quota` · `feat(ai)`
-- [ ] **P5-S4** Review summary: table, service, queued job on approval, endpoint · `feat(ai)`
-- [ ] **P5-S5** FE: `ReviewSummaryCard` on product page · `feat(ai)`
-- [ ] **P5-S6** Assistant service: fetch products by budget/category, build prompt, parse JSON, check product ids, fallback · `feat(assistant)`
-- [ ] **P5-S7** Conversations and messages tables + endpoints · `feat(assistant)`
-- [ ] **P5-S8** FE: assistant page (thread, recommendation cards, loading, error, quota counter) · `feat(assistant)`
-- [ ] **P5-S9** FE: `VerdictPanel` component with all states · `feat(ui)`
-- [ ] **P5-S10** Compare explanation endpoint (strengths, weaknesses, verdict) · `feat(compare)`
-- [ ] **P5-S11** FE: verdict on the compare page · `feat(compare)`
+- [x] **P5-S1** `config/ai.php` and `GroqClient` (timeout, JSON reply, clear exceptions) · `feat(ai)`
+- [x] **P5-S2** `FakeGroqClient` for tests · `test(ai)`
+- [x] **P5-S3** `ai_usage_logs` table, daily limit middleware (Redis counter), `GET /assistant/quota` · `feat(ai)`
+- [x] **P5-S4** Review summary: table, service, queued job on approval, endpoint · `feat(ai)`
+- [x] **P5-S5** FE: `ReviewSummaryCard` on product page · `feat(ai)`
+- [x] **P5-S6** Assistant service: fetch products by budget/category, build prompt, parse JSON, check product ids, fallback · `feat(assistant)`
+- [x] **P5-S7** Conversations and messages tables + endpoints · `feat(assistant)`
+- [x] **P5-S8** FE: assistant page (thread, recommendation cards, loading, error, quota counter) · `feat(assistant)`
+- [x] **P5-S9** FE: `VerdictPanel` component with all states · `feat(ui)`
+- [x] **P5-S10** Compare explanation endpoint (strengths, weaknesses, verdict) · `feat(compare)`
+- [x] **P5-S11** FE: verdict on the compare page · `feat(compare)`
 
 ## P6: Personalisation & home (branch `phase/P6-personalisation`)
 - [ ] **P6-S1** Home hero connected to the assistant, with example prompts · `feat(ui)`
@@ -127,6 +127,26 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P4-S5 note: the compare page reads the device-local tray, so refresh and login redirects keep the selection. Shareable saved comparisons stay in P4-S6 through the `share_token` flow rather than an id-only URL.
 - P4-S6 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (176 tests, 4845 assertions). Frontend lint, typecheck, 122 Vitest tests, and production build pass. `git diff --check` is clean. `npm run format:check` still flags pre-existing files because the checkout uses CRLF; the changed files pass Prettier with `--end-of-line auto`.
 - P4-S6 note: sharing is idempotent (`POST /comparisons/{id}/share` returns the existing token) and revoking clears `share_token`. Saved and shared detail views rebuild the live compare matrix, hide unpublished products, and report `unavailable_count`, so a saved comparison can shrink below two visible products instead of breaking.
+- P5-S1 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (184 tests, 4875 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
+- P5-S1 note: `GROQ_MODEL` deliberately has no default so a retired model id is never baked into code; a missing key or model fails before any HTTP call. The client asks Groq for a JSON object, retries connections, server errors, and invalid JSON once, then throws `AiUnavailableException` (`503 ai_unavailable`); a 4xx such as a bad key is not retried.
+- P5-S2 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (189 tests, 4889 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
+- P5-S2 note: `GroqClient` keeps the HTTP logic but now implements `GroqClientContract`, which is bound in `AppServiceProvider`; `FakeGroqClient` lives in `tests/AI` and is installed per test with the `fakeGroqClient()` helper. The fake queues replies, records the prompts sent, fails loudly when no reply is prepared, and simulates production failures through `AiFailureReason` rather than raw strings.
+- P5-S3 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (201 tests, 4953 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
+- P5-S3 note: the counter lives in the default cache store (`CACHE_STORE=redis` in production) under `pickwise:ai:quota:{user|session|ip}:{date}` with a TTL to the next UTC midnight; the namespaced prefix follows `code-standards.md` rather than the shorter example in `ai-integration.md`. The `ai-quota` middleware only guards, while AI features call `AiQuotaService::consume()` after a usable reply, so provider failures and fallbacks do not spend a customer's quota. Rate-limited attempts are logged as `rate_limited`; successful and failed calls will log through the same `AiUsageLogger` in P5-S4/S6.
+- P5-S4 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (209 tests, 5010 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
+- P5-S4 note: `ReviewObserver` queues `GenerateReviewSummary` whenever the set of approved reviews changes, so a customer edit, a future admin moderation, or a deletion all refresh the summary without page requests. The job is unique per product until processing and runs after commit; it retries three times and the service leaves the previous row untouched on a provider or invalid-JSON failure. Product detail eager loads `reviewSummary` (one extra query, so the zero-lazy-load test now allows nine) and never calls Groq. Summary calls are logged with a null user. The optional admin regenerate endpoint is deferred to P7 because admin writes must go through `AuditLogger` (P7-S1).
+- P5-S5 verification: frontend lint, typecheck, 128 Vitest tests, and production build pass. This was a frontend-only step, so backend checks were not run. `git diff --check` is clean.
+- P5-S5 note: the card reads the `review_summary` embedded in product detail, so the page makes no extra request and never calls Groq. It has three states: ready, pending (at least three approved reviews but no saved row yet: render nothing), and not-yet-eligible (fewer than three: show "Not enough reviews yet."). Eligibility uses `rating_count` (approved reviews only), while "Based on N reviews" uses the summary's own `reviews_count`, so it reports the reviews the model actually saw rather than a later rating total. The Marigold left rule and tinted surface match the planned Verdict panel; the shared panel can absorb them in P5-S9.
+- P5-S6 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (218 tests, 5077 assertions). This was a backend-only step, so frontend checks were not run. `git diff --check` is clean.
+- P5-S6 note: `AssistantService` is HTTP-free and takes an `AssistantQuery` plus an optional `User` for usage logging; the conversation endpoint in P5-S7 will call `AiQuotaService::consume()` only after the service reports `AssistantReplyStatus::Ok`, so fallbacks never spend quota. Candidate selection reuses `ProductSearchQuery`, which keeps category visibility, keyword search, and money filters in one tested place. The prompt carries 12 database products and up to six specs each; replies may only recommend ids from that list and within budget, and any invalid-only recommendation set falls back to the catalog. An empty `recommendations` array is accepted so an off-topic reply can politely decline. Alternatives are computed in minor units (never floats) at up to 115% of budget and are returned only when no product fits.
+- P5-S7 verification: Pint, PHPStan level 6, and 223 Pest tests pass (5150 assertions; host PHP lacks phpredis so the two Redis tests remain container-only). Frontend typecheck and 128 Vitest tests pass. `git diff --check` is clean.
+- P5-S7 note: conversations support both signed-in customers (keyed by `user_id`) and guests (keyed by session or `X-Session-Key`). `POST .../messages` applies the 10/min rate limiter and `ai-quota` middleware, validates inputs, queries `AssistantService`, and increments the daily counter via `AiQuotaService::consume()` only when status is `Ok` (fallbacks never consume quota). Thread messages batch-load recommended product facts to prevent N+1 queries.
+- P5-S8 verification: frontend lint, typecheck, 136 Vitest tests, and production build pass. This was a frontend-only step, so backend checks were not run. `git diff --check` is clean.
+- P5-S8 note: `AssistantPage` wires a responsive two-pane layout (desktop sidebar / mobile drawer) with starter prompt suggestions, grounded recommendation cards (with Marigold accent rule, database product details, "Why it fits", and "Trade-offs"), fallback alert when status is `fallback`, over-budget alternatives banner, a daily quota meter, and a one-click "Compare these" action that loads the picks into the compare tray.
+- P5-S9 verification: frontend lint, typecheck, 146 Vitest tests, and production build pass. `git diff --check` is clean.
+- P5-S9 note: `VerdictPanel` implements the signature Pickwise decision UI with Marigold left rule, subtle tinted surface, diamond mark, segmented fit meter, why it fits and trade-offs lists, responsive multi-product grid for comparisons, and support for all states (idle, loading, ready, fallback, error with retry, and daily quota exceeded).
+- P5-S10 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (239 tests, 5225 assertions). Frontend typecheck, 146 Vitest tests, and production build pass. `git diff --check` is clean.
+- P5-S10 note: `POST /compare/verdict` accepts 2 to 4 products from the same category, evaluates them using Groq with database grounding (ratings, prices, comparable specs), and returns a plain-language verdict along with strengths and weaknesses for each product. Unknown product IDs in LLM output are rejected. Daily quota is guarded via `ai-quota:compare` and consumed only on a successful generation. Optional `priority` customizes recommendations, and `comparison_id` saves the verdict to an owned comparison.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -140,6 +160,16 @@ One line per step on what you learned. Turns into interview material.
 | P4-S4 | A compare tray needs state above the router outlet and a device fallback: context keeps it instant during navigation, localStorage keeps it across reloads and login redirects. |
 | P4-S5 | A comparison table needs two rules, not one: column order comes from the shopper's selection, and "different" must treat a missing value as a difference, not only unequal numbers. |
 | P4-S6 | A share link needs a lifecycle, not just a column: minting the token must be idempotent, revocation must clear it, and the public view must rebuild live data so unpublished products cannot leak or break the page. |
+| P5-S1 | Keep the model id in config, not code, because providers retire model names; and retry only failures that can heal (connection, 5xx, bad JSON), not a 4xx auth error, so a broken key fails fast without doubling quota use. |
+| P5-S2 | A fake is only useful if the real class is replaceable: extracting a small contract turned a `final` HTTP client into a seam tests can swap, while the fake throws the same `AiUnavailableException` reasons production would. |
+| P5-S3 | A daily limit should count successes, not attempts: guard in middleware, then increment only after a usable AI reply, so a provider outage does not burn the shopper's quota — and derive the cache key from the UTC date so a cleared Redis only restarts today's count. |
+| P5-S4 | Generation belongs in a job triggered by the approved-review set, not the page: an observer catches customer edits and future moderation, `ShouldBeUniqueUntilProcessing` drops duplicate approvals without losing one that arrives mid-run, and the read resource only loads the saved row. |
+| P5-S5 | An AI summary needs three UI states, not two: ready, pending (enough reviews but no saved row — render nothing), and not-yet-eligible (fewer than three reviews — say so). Separate `rating_count` for eligibility from `reviews_count` for attribution so the card never claims the model read reviews it did not. |
+| P5-S6 | Grounding is a two-way check: filter the budget in SQL before the prompt, then reject any returned id that was not in the list, so a model that ignores either rule still cannot show an over-budget or invented product. Keep the service HTTP-free and let the endpoint spend quota only on a usable reply. |
+| P5-S7 | When storing LLM conversations, decouple the quota consumption from the route guard: validate and guard upfront, run the grounded prompt, save the exchange, and only debit daily quota on status: ok so fallbacks and invalid generations stay free. |
+| P5-S8 | Decouple mutation variables from closure state: when starting a new chat on the first message, mutating with an explicit `{ conversationId, payload }` avoids race conditions against React's state setter, while optimistic thread updates keep chat interaction instant. |
+| P5-S9 | A signature decision panel works across multiple surfaces (assistant recommendation, review summary, and comparison matrix) when its contract separates global headline / fit from optional multi-product breakdowns with strengths and weaknesses. |
+| P5-S10 | Grounding a multi-item comparison requires two guards: pass only database-verified specs to the prompt, and filter the model output so any hallucinated or unselected product ids are discarded before the verdict payload is returned. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

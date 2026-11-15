@@ -1,0 +1,214 @@
+import { useCallback, useState } from 'react';
+import { History, Sparkles } from 'lucide-react';
+import { QuotaMeter } from '@/components/shared/QuotaMeter';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import {
+  useAiQuota,
+  useConversation,
+  useConversations,
+  useCreateConversation,
+  useDeleteConversation,
+  useSendMessage,
+} from '../hooks/use-assistant';
+import type { SendMessagePayload } from '../types/assistant';
+import { AssistantConversationList } from '../components/AssistantConversationList';
+import { AssistantInputForm } from '../components/AssistantInputForm';
+import type { PromptSuggestion } from '../lib/assistant-prompts';
+import { AssistantThread } from '../components/AssistantThread';
+
+export function AssistantPage() {
+  const [activeConversationId, setActiveConversationId] = useState<
+    number | null
+  >(null);
+  const [lastFailedPayload, setLastFailedPayload] =
+    useState<SendMessagePayload | null>(null);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  const { data: quota, isLoading: isQuotaLoading } = useAiQuota();
+  const { data: conversationsResponse, isLoading: isConversationsLoading } =
+    useConversations();
+  const conversations = conversationsResponse?.data ?? [];
+
+  const { data: activeConversation, isLoading: isConversationLoading } =
+    useConversation(activeConversationId);
+
+  const createConversationMutation = useCreateConversation();
+  const deleteConversationMutation = useDeleteConversation();
+  const sendMessageMutation = useSendMessage();
+
+  const isSending =
+    sendMessageMutation.isPending || createConversationMutation.isPending;
+  const isQuotaExhausted = quota ? quota.remaining <= 0 : false;
+
+  const handleSendMessage = useCallback(
+    async (payload: SendMessagePayload) => {
+      setLastFailedPayload(null);
+      try {
+        let conversationId = activeConversationId;
+
+        // If no conversation is active, create one first using a summary title from the message
+        if (conversationId === null) {
+          const generatedTitle =
+            payload.message.length > 40
+              ? `${payload.message.slice(0, 37)}...`
+              : payload.message;
+          const newConv = await createConversationMutation.mutateAsync({
+            title: generatedTitle,
+          });
+          conversationId = newConv.id;
+          setActiveConversationId(newConv.id);
+        }
+
+        await sendMessageMutation.mutateAsync({
+          conversationId,
+          payload,
+        });
+      } catch {
+        setLastFailedPayload(payload);
+      }
+    },
+    [activeConversationId, createConversationMutation, sendMessageMutation],
+  );
+
+  const handlePromptSelect = useCallback(
+    (suggestion: PromptSuggestion) => {
+      void handleSendMessage({
+        message: suggestion.text,
+        category: suggestion.category ?? null,
+        budget_max: suggestion.budget ?? null,
+      });
+    },
+    [handleSendMessage],
+  );
+
+  const handleNewConversation = useCallback(() => {
+    setActiveConversationId(null);
+    setLastFailedPayload(null);
+    setMobileDrawerOpen(false);
+  }, []);
+
+  const handleDeleteConversation = useCallback(
+    async (id: number) => {
+      await deleteConversationMutation.mutateAsync(id);
+      if (activeConversationId === id) {
+        setActiveConversationId(null);
+      }
+    },
+    [activeConversationId, deleteConversationMutation],
+  );
+
+  const handleSelectConversation = useCallback((id: number) => {
+    setActiveConversationId(id);
+    setLastFailedPayload(null);
+    setMobileDrawerOpen(false);
+  }, []);
+
+  return (
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      {/* Top Bar with Assistant Brand & Quota */}
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/80 bg-card px-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-2xs">
+            <Sparkles className="size-4" />
+          </div>
+          <div>
+            <h1 className="font-heading text-sm font-bold tracking-tight text-foreground sm:text-base">
+              Shopping Assistant
+            </h1>
+            <p className="hidden text-[11px] text-muted-foreground sm:block">
+              Personalized recommendations grounded in real catalog products and
+              verified specs
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Mobile conversation history button */}
+          <Sheet open={mobileDrawerOpen} onOpenChange={setMobileDrawerOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 rounded-full text-xs md:hidden"
+              >
+                <History className="size-3.5" />
+                <span>History</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-80 p-4">
+              <SheetHeader className="text-left pb-3">
+                <SheetTitle className="font-heading text-base font-bold">
+                  Conversations
+                </SheetTitle>
+              </SheetHeader>
+              <AssistantConversationList
+                conversations={conversations}
+                activeConversationId={activeConversationId}
+                onSelectConversation={handleSelectConversation}
+                onNewConversation={handleNewConversation}
+                onDeleteConversation={handleDeleteConversation}
+                isLoading={isConversationsLoading}
+              />
+            </SheetContent>
+          </Sheet>
+
+          <QuotaMeter quota={quota} isLoading={isQuotaLoading} />
+        </div>
+      </header>
+
+      {/* Main Two-Pane Workspace */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Desktop Sidebar: Chat History */}
+        <div className="hidden w-72 shrink-0 border-r border-border/80 bg-card/60 p-3.5 md:flex md:flex-col overflow-hidden">
+          <AssistantConversationList
+            conversations={conversations}
+            activeConversationId={activeConversationId}
+            onSelectConversation={handleSelectConversation}
+            onNewConversation={handleNewConversation}
+            onDeleteConversation={handleDeleteConversation}
+            isLoading={isConversationsLoading}
+          />
+        </div>
+
+        {/* Right Main Column: Thread + Floating/Docked Input Bar */}
+        <div className="flex flex-1 flex-col overflow-hidden bg-background">
+          <AssistantThread
+            messages={activeConversation?.messages ?? []}
+            isLoadingConversation={isConversationLoading}
+            isSendingMessage={isSending}
+            sendError={
+              sendMessageMutation.error ??
+              createConversationMutation.error ??
+              null
+            }
+            onRetry={
+              lastFailedPayload
+                ? () => void handleSendMessage(lastFailedPayload)
+                : undefined
+            }
+            onSelectPrompt={handlePromptSelect}
+            className="flex-1"
+          />
+
+          {/* Bottom Docked Input Form */}
+          <div className="shrink-0 border-t border-border/70 bg-card/80 backdrop-blur-md px-4 py-3 sm:px-6">
+            <div className="mx-auto w-full max-w-4xl">
+              <AssistantInputForm
+                onSubmit={(payload) => void handleSendMessage(payload)}
+                isPending={isSending}
+                isQuotaExhausted={isQuotaExhausted}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

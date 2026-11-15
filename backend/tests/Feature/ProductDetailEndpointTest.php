@@ -197,6 +197,7 @@ test('product detail endpoint returns full resource payload with ordered gallery
                         'higher_is_better' => null,
                     ],
                 ],
+                'review_summary' => null,
                 'created_at' => '2026-11-10T14:15:00Z',
                 'updated_at' => '2026-11-10T14:15:00Z',
             ],
@@ -302,7 +303,7 @@ test('product detail endpoint executes with zero lazy loading and constant query
             ->assertJsonCount(4, 'data.images')
             ->assertJsonCount(8, 'data.specs');
 
-        expect(count(DB::getQueryLog()))->toBeLessThanOrEqual(8);
+        expect(count(DB::getQueryLog()))->toBeLessThanOrEqual(9);
     } finally {
         DB::disableQueryLog();
         Model::preventLazyLoading($wasPreventingLazyLoading);

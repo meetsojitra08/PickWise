@@ -8,13 +8,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { useCreateComparison } from '@/features/compare/hooks/use-saved-comparisons';
+import type { SavedComparisonVerdict } from '@/features/compare/types/saved-comparison';
 import { isApiError } from '@/lib/api-error';
 
 interface SaveComparisonPanelProps {
   productIds: number[];
+  aiVerdict?: SavedComparisonVerdict | null;
+  onSaved?: (comparisonId: number) => void;
 }
 
-export function SaveComparisonPanel({ productIds }: SaveComparisonPanelProps) {
+export function SaveComparisonPanel({
+  productIds,
+  aiVerdict,
+  onSaved,
+}: SaveComparisonPanelProps) {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
   const [name, setName] = useState('');
@@ -50,11 +57,14 @@ export function SaveComparisonPanel({ productIds }: SaveComparisonPanelProps) {
     }
 
     saveComparison.mutate(
-      { name: trimmedName, productIds },
+      { name: trimmedName, productIds, aiVerdict },
       {
-        onSuccess: () => {
+        onSuccess: (response) => {
           setName('');
           toast.success('Comparison saved.');
+          if (response?.data?.id) {
+            onSaved?.(response.data.id);
+          }
         },
       },
     );

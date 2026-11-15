@@ -156,6 +156,15 @@ const product = {
       higher_is_better: null,
     },
   ],
+  review_summary: {
+    summary:
+      'Buyers value the quiet fans and bright screen, but note it runs warm under load.',
+    pros: ['Quiet fans', 'Bright screen'],
+    cons: ['Runs warm under load'],
+    sentiment: 'positive',
+    reviews_count: 18,
+    generated_at: '2026-11-14T09:00:00Z',
+  },
   created_at: null,
 };
 
@@ -213,6 +222,14 @@ describe('ProductDetailRoute', () => {
       screen.getByAltText('Northstar Studio laptop, front view'),
     ).toBeVisible();
     expect(screen.getByText('In Stock')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'What buyers say' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Based on 18 approved reviews.'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('What people like')).toBeInTheDocument();
+    expect(screen.getByText('What people dislike')).toBeInTheDocument();
     expect(screen.getByText('Memory')).toBeInTheDocument();
     expect(screen.getByText('32')).toBeInTheDocument();
     expect(screen.getByText('GB')).toBeInTheDocument();

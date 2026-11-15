@@ -99,4 +99,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comparison::class);
     }
+
+    /**
+     * @return HasMany<AiUsageLog, $this>
+     */
+    public function aiUsageLogs(): HasMany
+    {
+        return $this->hasMany(AiUsageLog::class);
+    }
+
+    /**
+     * @return HasMany<AiConversation, $this>
+     */
+    public function aiConversations(): HasMany
+    {
+        return $this->hasMany(AiConversation::class)->latest('last_message_at');
+    }
 }

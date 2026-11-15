@@ -1,4 +1,8 @@
-import type { CompareMatrixResponse } from '@/features/compare/types/compare';
+import type {
+  CompareMatrixResponse,
+  CompareVerdictRequestPayload,
+  CompareVerdictResponse,
+} from '@/features/compare/types/compare';
 import { apiClient } from '@/lib/api-client';
 
 /**
@@ -11,4 +15,17 @@ export function postCompareMatrix(productIds: number[], signal?: AbortSignal) {
     { product_ids: productIds },
     { signal },
   );
+}
+
+/**
+ * Request an AI verdict explaining strengths, weaknesses, and a recommendation
+ * across two to four compared products.
+ */
+export function postCompareVerdict(
+  payload: CompareVerdictRequestPayload,
+  signal?: AbortSignal,
+) {
+  return apiClient.post<CompareVerdictResponse>('/compare/verdict', payload, {
+    signal,
+  });
 }

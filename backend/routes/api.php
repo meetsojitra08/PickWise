@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Assistant\ConversationController;
+use App\Http\Controllers\Api\V1\Assistant\MessageController;
+use App\Http\Controllers\Api\V1\Assistant\QuotaController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Customer\AccountController;
 use App\Http\Controllers\Api\V1\Customer\ComparisonController;
@@ -9,6 +12,7 @@ use App\Http\Controllers\Api\V1\Customer\ReviewController;
 use App\Http\Controllers\Api\V1\Customer\WishlistController;
 use App\Http\Controllers\Api\V1\Public\CategoryController;
 use App\Http\Controllers\Api\V1\Public\CompareController;
+use App\Http\Controllers\Api\V1\Public\CompareVerdictController;
 use App\Http\Controllers\Api\V1\Public\HealthController;
 use App\Http\Controllers\Api\V1\Public\ProductController;
 use App\Http\Controllers\Api\V1\Public\ProductReviewController;
@@ -40,10 +44,16 @@ Route::middleware('throttle:public-api')->group(function (): void {
         ->name('api.v1.products.reviews.index');
     Route::post('/compare', CompareController::class)
         ->name('api.v1.compare');
+    Route::get('/assistant/quota', QuotaController::class)
+        ->name('api.v1.assistant.quota');
     Route::get('/shared/comparisons/{token}', SharedComparisonController::class)
         ->whereAlphaNumeric('token')
         ->name('api.v1.shared-comparisons.show');
 });
+
+Route::post('/compare/verdict', CompareVerdictController::class)
+    ->middleware(['throttle:verdict', 'ai-quota:compare'])
+    ->name('api.v1.compare.verdict');
 
 Route::post('/products/{slug}/reviews', [ProductReviewController::class, 'store'])
     ->middleware(['auth:sanctum', 'throttle:review-create'])
@@ -127,4 +137,24 @@ Route::prefix('comparisons')
         Route::delete('/{comparison}/share', [ComparisonController::class, 'unshare'])
             ->whereNumber('comparison')
             ->name('api.v1.comparisons.unshare');
+    });
+
+Route::prefix('assistant')
+    ->middleware('throttle:assistant')
+    ->group(function (): void {
+        Route::get('/conversations', [ConversationController::class, 'index'])
+            ->name('api.v1.assistant.conversations.index');
+        Route::post('/conversations', [ConversationController::class, 'store'])
+            ->name('api.v1.assistant.conversations.store');
+        Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])
+            ->whereNumber('conversation')
+            ->name('api.v1.assistant.conversations.show');
+        Route::delete('/conversations/{conversation}', [ConversationController::class, 'destroy'])
+            ->whereNumber('conversation')
+            ->name('api.v1.assistant.conversations.destroy');
+
+        Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store'])
+            ->whereNumber('conversation')
+            ->middleware('ai-quota:assistant')
+            ->name('api.v1.assistant.messages.store');
     });

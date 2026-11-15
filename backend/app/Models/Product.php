@@ -132,6 +132,14 @@ class Product extends Model
     }
 
     /**
+     * @return HasOne<ReviewSummary, $this>
+     */
+    public function reviewSummary(): HasOne
+    {
+        return $this->hasOne(ReviewSummary::class);
+    }
+
+    /**
      * @return HasMany<WishlistItem, $this>
      */
     public function wishlistItems(): HasMany

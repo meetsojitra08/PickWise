@@ -40,6 +40,7 @@ final class ProductDetailQuery
                 'brand',
                 'primaryImage',
                 'images',
+                'reviewSummary',
                 'specs' => static function (HasMany $query): void {
                     /** @var HasMany<ProductSpec, Product> $query */
                     $query->join('spec_definitions', 'spec_definitions.id', '=', 'product_specs.spec_definition_id')

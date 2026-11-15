@@ -1,10 +1,16 @@
+import { useState } from 'react';
 import { GitCompare } from 'lucide-react';
+import { Link, useLocation } from 'react-router';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { AiMark } from '@/components/shared/VerdictPanel';
+import { Button } from '@/components/ui/button';
 import { CompareMatrix } from '@/features/compare/components/CompareMatrix';
 import { CompareMatrixSkeleton } from '@/features/compare/components/CompareMatrixSkeleton';
+import { CompareVerdictSection } from '@/features/compare/components/CompareVerdictSection';
 import { SaveComparisonPanel } from '@/features/compare/components/SaveComparisonPanel';
 import { useCompare } from '@/features/compare/hooks/use-compare';
 import { useCompareMatrix } from '@/features/compare/hooks/use-compare-matrix';
+import type { SavedComparisonVerdict } from '@/features/compare/types/saved-comparison';
 import { isApiError } from '@/lib/api-error';
 
 interface ComparisonErrorStateProps {
@@ -45,17 +51,41 @@ function ComparisonErrorState({
 }
 
 export function ComparePage() {
+  const location = useLocation();
+  const locationState = location.state as {
+    comparisonId?: number;
+    initialVerdict?: SavedComparisonVerdict | null;
+  } | null;
+
   const { items, canCompare, clear } = useCompare();
   const productIds = items.map((item) => item.id);
   const matrixQuery = useCompareMatrix(productIds);
 
+  const [activeVerdict, setActiveVerdict] =
+    useState<SavedComparisonVerdict | null>(
+      locationState?.initialVerdict ?? null,
+    );
+  const [savedComparisonId, setSavedComparisonId] = useState<number | null>(
+    locationState?.comparisonId ?? null,
+  );
+
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
       <header className="mb-8 flex flex-col gap-2 border-b border-border pb-6">
-        <p className="text-sm font-medium text-primary">Compare</p>
-        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          Compare products side by side
-        </h1>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-primary">Compare</p>
+            <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              Compare products side by side
+            </h1>
+          </div>
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <Link to="/preview/verdict">
+              <AiMark className="size-3.5" />
+              Preview Verdict Panel
+            </Link>
+          </Button>
+        </div>
         <p className="max-w-2xl text-sm text-muted-foreground">
           See where two to four products differ on price, specs and ratings,
           then choose with confidence.
@@ -90,7 +120,17 @@ export function ComparePage() {
         />
       ) : (
         <>
-          <SaveComparisonPanel productIds={productIds} />
+          <SaveComparisonPanel
+            productIds={productIds}
+            aiVerdict={activeVerdict}
+            onSaved={(id) => setSavedComparisonId(id)}
+          />
+          <CompareVerdictSection
+            productIds={productIds}
+            initialVerdict={locationState?.initialVerdict}
+            comparisonId={savedComparisonId}
+            onVerdictChange={setActiveVerdict}
+          />
           <CompareMatrix matrix={matrixQuery.data.data} />
         </>
       )}
