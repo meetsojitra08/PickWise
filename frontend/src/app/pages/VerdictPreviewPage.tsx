@@ -50,7 +50,10 @@ export function VerdictPreviewPage() {
       {/* Main Single Product / Primary Verdict */}
       <div className="space-y-4">
         <h2 className="font-heading text-lg font-semibold text-foreground">
-          Current State: <span className="text-primary capitalize">{status.replace('_', ' ')}</span>
+          Current State:{' '}
+          <span className="text-primary capitalize">
+            {status.replace('_', ' ')}
+          </span>
         </h2>
 
         <VerdictPanel
@@ -62,9 +65,7 @@ export function VerdictPreviewPage() {
             '32GB RAM handles 4K timelines without throttling',
             'Colour-accurate OLED display with 100% DCI-P3 coverage',
           ]}
-          tradeoffs={[
-            'Fans get loud under sustained heavy export loads',
-          ]}
+          tradeoffs={['Fans get loud under sustained heavy export loads']}
           sourceNote="Based on 214 verified reviews"
           onGenerate={() => setStatus('loading')}
           onRetry={() => setStatus('ready')}
@@ -81,7 +82,8 @@ export function VerdictPreviewPage() {
               Multi-Product Compare Breakdown (Ready State)
             </h2>
             <p className="text-xs text-muted-foreground">
-              Used when 2 to 4 products are compared side-by-side in Phase 5 Step 11.
+              Used when 2 to 4 products are compared side-by-side in Phase 5
+              Step 11.
             </p>
           </div>
 

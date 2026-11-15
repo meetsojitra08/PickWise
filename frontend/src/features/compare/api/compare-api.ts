@@ -25,9 +25,7 @@ export function postCompareVerdict(
   payload: CompareVerdictRequestPayload,
   signal?: AbortSignal,
 ) {
-  return apiClient.post<CompareVerdictResponse>(
-    '/compare/verdict',
-    payload,
-    { signal },
-  );
+  return apiClient.post<CompareVerdictResponse>('/compare/verdict', payload, {
+    signal,
+  });
 }

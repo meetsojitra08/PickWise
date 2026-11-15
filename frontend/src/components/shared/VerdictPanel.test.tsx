@@ -23,7 +23,9 @@ describe('VerdictPanel', () => {
       );
 
       // Section and heading
-      expect(screen.getByRole('region', { name: /ai verdict/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('region', { name: /ai verdict/i }),
+      ).toBeInTheDocument();
       expect(screen.getByText('Verdict')).toBeInTheDocument();
       expect(
         screen.getByText('Best for video editing under ₹90,000'),
@@ -81,9 +83,7 @@ describe('VerdictPanel', () => {
         ),
       ).toBeInTheDocument();
       expect(screen.getByText('Exceptional cooling')).toBeInTheDocument();
-      expect(
-        screen.getByText('Higher power consumption'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Higher power consumption')).toBeInTheDocument();
       expect(screen.getByText('Compared on 12 benchmarks')).toBeInTheDocument();
     });
 
@@ -108,7 +108,10 @@ describe('VerdictPanel', () => {
               name: 'Dell XPS 14',
               fitScore: 86,
               highlight: 'Best creative display',
-              strengths: ['3.2K OLED 120Hz display', 'Dedicated Nvidia graphics'],
+              strengths: [
+                '3.2K OLED 120Hz display',
+                'Dedicated Nvidia graphics',
+              ],
               weaknesses: ['Heavier chassis', 'Shorter battery life'],
             },
           ]}
@@ -132,9 +135,7 @@ describe('VerdictPanel', () => {
       // Product 2
       expect(screen.getByText('Dell XPS 14')).toBeInTheDocument();
       expect(screen.getByText('Best creative display')).toBeInTheDocument();
-      expect(
-        screen.getByText('3.2K OLED 120Hz display'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('3.2K OLED 120Hz display')).toBeInTheDocument();
       expect(screen.getByText('Heavier chassis')).toBeInTheDocument();
     });
 

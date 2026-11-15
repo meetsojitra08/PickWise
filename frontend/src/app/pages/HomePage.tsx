@@ -74,7 +74,8 @@ const CATEGORY_TILES: CategoryTile[] = [
   {
     title: 'Smartphones',
     slug: 'smartphones',
-    description: 'Camera flagships, compact kings & battery endurance champions.',
+    description:
+      'Camera flagships, compact kings & battery endurance champions.',
     icon: Smartphone,
     badge: '10 verified models',
     highlights: ['5x Periscope Zoom', 'Dynamic AMOLED 2X', '5,500mAh silicon'],
@@ -93,7 +94,8 @@ const CATEGORY_TILES: CategoryTile[] = [
   {
     title: 'Monitors & Displays',
     slug: 'monitors',
-    description: 'Color-accurate creator panels & ultra-fast OLED gaming displays.',
+    description:
+      'Color-accurate creator panels & ultra-fast OLED gaming displays.',
     icon: Monitor,
     badge: '10 verified models',
     highlights: ['4K IPS Black', '240Hz QD-OLED', '99% DCI-P3 calibrated'],
@@ -114,7 +116,11 @@ const CATEGORY_TILES: CategoryTile[] = [
     description: 'Health diagnostic wearables, dual-engine chips & sports GPS.',
     icon: Watch,
     badge: '10 verified models',
-    highlights: ['Dual-engine chips', 'Medical-grade ECG', 'Dual-frequency GPS'],
+    highlights: [
+      'Dual-engine chips',
+      'Medical-grade ECG',
+      'Dual-frequency GPS',
+    ],
     sampleModels: 'Apple Watch Series 10, Galaxy Watch 7, OnePlus Watch 2R',
   },
 ];
@@ -178,14 +184,17 @@ const COMPARISON_ROWS = [
   },
   {
     feature: 'Hard Budget Adherence',
-    traditional: 'Pushes users to upsell; suggests products ₹20k–₹50k over budget',
-    pickwise: 'Strict budget ceiling. Alternatives over budget are flagged honestly.',
+    traditional:
+      'Pushes users to upsell; suggests products ₹20k–₹50k over budget',
+    pickwise:
+      'Strict budget ceiling. Alternatives over budget are flagged honestly.',
     pickwiseWins: true,
   },
   {
     feature: 'Spec Normalization',
     traditional: 'Inconsistent manufacturer jargon across 40 browser tabs',
-    pickwise: 'Standardized 30+ spec schema with unit conversions & percentile math.',
+    pickwise:
+      'Standardized 30+ spec schema with unit conversions & percentile math.',
     pickwiseWins: true,
   },
   {
@@ -197,7 +206,8 @@ const COMPARISON_ROWS = [
   {
     feature: 'Customer Review Audit',
     traditional: 'Bot-polluted star averages and paid unboxer testimonials',
-    pickwise: 'AI-synthesized sentiment themes: verified pros vs real trade-offs.',
+    pickwise:
+      'AI-synthesized sentiment themes: verified pros vs real trade-offs.',
     pickwiseWins: true,
   },
 ];
@@ -525,7 +535,10 @@ export function HomePage() {
                           </div>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-muted-foreground">
+                      <Badge
+                        variant="outline"
+                        className="text-muted-foreground"
+                      >
                         86% Fit
                       </Badge>
                     </div>
@@ -544,7 +557,10 @@ export function HomePage() {
                           </div>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-muted-foreground">
+                      <Badge
+                        variant="outline"
+                        className="text-muted-foreground"
+                      >
                         83% Fit
                       </Badge>
                     </div>
@@ -702,7 +718,11 @@ export function HomePage() {
               <div key={stat.label} className="flex flex-col p-6 sm:p-7">
                 <div className="flex items-center gap-3">
                   <span className="flex size-10 items-center justify-center rounded-control bg-primary/10 text-primary">
-                    <Icon className="size-5" strokeWidth={1.5} aria-hidden="true" />
+                    <Icon
+                      className="size-5"
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                    />
                   </span>
                   <div className="font-heading text-3xl font-extrabold tracking-tight text-foreground tabular-nums">
                     {stat.value}
@@ -768,7 +788,11 @@ export function HomePage() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <span className="flex size-11 items-center justify-center rounded-control bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                      <Icon className="size-5" strokeWidth={1.5} aria-hidden="true" />
+                      <Icon
+                        className="size-5"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
                     </span>
                     <Badge variant="outline" className="text-xs font-normal">
                       {cat.badge}
@@ -826,7 +850,11 @@ export function HomePage() {
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-accent-foreground uppercase">
-              <Flame className="size-4 text-accent" strokeWidth={1.5} aria-hidden="true" />
+              <Flame
+                className="size-4 text-accent"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
               <span>Algorithmic Value Benchmark</span>
             </div>
             <h2
@@ -885,7 +913,9 @@ export function HomePage() {
                   key={product.id}
                   product={product}
                   isWishlisted={wishlist.savedIds.has(product.id)}
-                  wishlistPending={wishlist.isFetching || isToggling(product.id)}
+                  wishlistPending={
+                    wishlist.isFetching || isToggling(product.id)
+                  }
                   onWishlistToggle={(item) =>
                     toggleWishlist(item, !wishlist.savedIds.has(item.id))
                   }
@@ -899,7 +929,12 @@ export function HomePage() {
         </div>
 
         <div className="mt-8 flex justify-center">
-          <Button asChild variant="outline" size="lg" className="rounded-control">
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="rounded-control"
+          >
             <Link to="/products">
               Explore all 60 value-ranked products
               <ArrowRight
@@ -940,7 +975,11 @@ export function HomePage() {
           <Card className="flex flex-col justify-between rounded-card border-border/80 bg-card p-6 shadow-xs">
             <div>
               <div className="flex size-12 items-center justify-center rounded-control bg-accent/15 text-accent-foreground">
-                <TrendingUp className="size-6" strokeWidth={1.5} aria-hidden="true" />
+                <TrendingUp
+                  className="size-6"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
               </div>
               <h3 className="mt-5 font-heading text-2xl font-bold text-foreground">
                 Algorithmic Value Score
@@ -996,15 +1035,19 @@ export function HomePage() {
           <Card className="flex flex-col justify-between rounded-card border-border/80 bg-card p-6 shadow-xs">
             <div>
               <div className="flex size-12 items-center justify-center rounded-control bg-primary/10 text-primary">
-                <Columns3 className="size-6" strokeWidth={1.5} aria-hidden="true" />
+                <Columns3
+                  className="size-6"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
               </div>
               <h3 className="mt-5 font-heading text-2xl font-bold text-foreground">
                 Side-by-Side Spec Matrix
               </h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                Line up 2 to 4 products in a unified, side-by-side grid. Pickwise
-                computes which model wins each individual row (RAM, battery life,
-                display resolution, weight).
+                Line up 2 to 4 products in a unified, side-by-side grid.
+                Pickwise computes which model wins each individual row (RAM,
+                battery life, display resolution, weight).
               </p>
 
               {/* Visual spec row preview */}
@@ -1068,7 +1111,9 @@ export function HomePage() {
                 </div>
                 <div className="flex items-center gap-1.5 text-primary font-medium">
                   <Sparkles className="size-3 text-accent" />
-                  <span>Found 2 exact matches in budget · Zero over-budget</span>
+                  <span>
+                    Found 2 exact matches in budget · Zero over-budget
+                  </span>
                 </div>
               </div>
             </div>
@@ -1096,7 +1141,11 @@ export function HomePage() {
       >
         <div className="text-center">
           <div className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider text-primary uppercase">
-            <ShieldCheck className="size-4" strokeWidth={1.5} aria-hidden="true" />
+            <ShieldCheck
+              className="size-4"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
             <span>The Anti-Noise Difference</span>
           </div>
           <h2
@@ -1122,7 +1171,10 @@ export function HomePage() {
                   <th scope="col" className="px-6 py-4 text-muted-foreground">
                     Traditional Search & Marketplaces
                   </th>
-                  <th scope="col" className="bg-primary/10 px-6 py-4 text-primary">
+                  <th
+                    scope="col"
+                    className="bg-primary/10 px-6 py-4 text-primary"
+                  >
                     Pickwise Decision Tool
                   </th>
                 </tr>
@@ -1203,7 +1255,11 @@ export function HomePage() {
                       STEP {s.step}
                     </span>
                     <span className="flex size-9 items-center justify-center rounded-control bg-primary/10 text-primary">
-                      <Icon className="size-4" strokeWidth={1.5} aria-hidden="true" />
+                      <Icon
+                        className="size-4"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
                     </span>
                   </div>
                   <h3 className="mt-4 font-heading text-lg font-bold text-foreground">
@@ -1247,8 +1303,8 @@ export function HomePage() {
           </h2>
 
           <p className="mx-auto mt-4 max-w-xl text-base sm:text-lg text-muted-foreground">
-            Explore audited devices across 6 categories, line up your top choices
-            in the spec matrix, and get honest AI verdicts today.
+            Explore audited devices across 6 categories, line up your top
+            choices in the spec matrix, and get honest AI verdicts today.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
