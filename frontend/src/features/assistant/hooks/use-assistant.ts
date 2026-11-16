@@ -1,4 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type InfiniteData,
+} from '@tanstack/react-query';
+import { useAuth } from '@/features/auth/hooks/use-auth';
+import type { ApiPaginatedResponse } from '@/types/api';
 import {
   createConversation,
   deleteConversation,
@@ -9,6 +17,7 @@ import {
 } from '../api/assistant-api';
 import type {
   AiConversationDetail,
+  AiConversationSummary,
   AiQuota,
   AssistantMessage,
   CreateConversationPayload,
@@ -19,6 +28,8 @@ export const assistantKeys = {
   all: ['assistant'] as const,
   quota: () => [...assistantKeys.all, 'quota'] as const,
   conversations: () => [...assistantKeys.all, 'conversations'] as const,
+  conversationsInfinite: () =>
+    [...assistantKeys.all, 'conversations', 'infinite'] as const,
   conversation: (id: number | null) =>
     [...assistantKeys.all, 'conversation', id] as const,
 };
@@ -39,6 +50,29 @@ export function useConversations(params?: {
     queryKey: assistantKeys.conversations(),
     queryFn: ({ signal }) => getConversations(params, signal),
   });
+}
+
+export function useInfiniteConversations(pageSize = 12) {
+  const { isAuthenticated } = useAuth();
+  const query = useInfiniteQuery({
+    queryKey: assistantKeys.conversationsInfinite(),
+    queryFn: ({ pageParam, signal }) =>
+      getConversations({ page: pageParam, per_page: pageSize }, signal),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.meta.current_page < lastPage.meta.last_page
+        ? lastPage.meta.current_page + 1
+        : undefined,
+    enabled: isAuthenticated,
+  });
+
+  return {
+    ...query,
+    items:
+      query.data?.pages.flatMap((page) => page.data) ??
+      ([] as AiConversationSummary[]),
+    total: query.data?.pages[0]?.meta.total ?? 0,
+  };
 }
 
 export function useConversation(conversationId: number | null) {
@@ -81,6 +115,45 @@ export function useDeleteConversation() {
       queryClient.removeQueries({
         queryKey: assistantKeys.conversation(conversationId),
       });
+
+      queryClient.setQueryData<ApiPaginatedResponse<AiConversationSummary>>(
+        assistantKeys.conversations(),
+        (current) => {
+          if (!current) {
+            return current;
+          }
+
+          return {
+            ...current,
+            data: current.data.filter((item) => item.id !== conversationId),
+            meta: {
+              ...current.meta,
+              total: Math.max(0, current.meta.total - 1),
+            },
+          };
+        },
+      );
+
+      queryClient.setQueryData<
+        InfiniteData<ApiPaginatedResponse<AiConversationSummary>>
+      >(assistantKeys.conversationsInfinite(), (current) => {
+        if (!current) {
+          return current;
+        }
+
+        return {
+          ...current,
+          pages: current.pages.map((page) => ({
+            ...page,
+            data: page.data.filter((item) => item.id !== conversationId),
+            meta: {
+              ...page.meta,
+              total: Math.max(0, page.meta.total - 1),
+            },
+          })),
+        };
+      });
+
       void queryClient.invalidateQueries({
         queryKey: assistantKeys.conversations(),
       });

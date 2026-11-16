@@ -1107,4 +1107,125 @@ describe('AssistantPage', () => {
       expect(budgetInput).toHaveValue(45000);
     });
   });
+
+  it('reopens a past conversation when the URL contains conversation parameter', async () => {
+    const user = userEvent.setup();
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse({
+          data: {
+            id: 1,
+            name: 'Sarah Customer',
+            email: 'sarah@example.com',
+            role: 'customer',
+            is_active: true,
+            preferences: null,
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 0,
+            remaining: 30,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({
+          data: [{ id: 2, name: 'Laptops', slug: 'laptops', children: [] }],
+        });
+      }
+
+      if (
+        url === '/api/v1/assistant/conversations' ||
+        url.startsWith('/api/v1/assistant/conversations?')
+      ) {
+        return jsonResponse({
+          data: [
+            {
+              id: 42,
+              title: 'Past Laptop Search',
+              last_message_at: '2026-11-15T12:00:00Z',
+              created_at: '2026-11-15T12:00:00Z',
+              updated_at: '2026-11-15T12:00:00Z',
+              messages_count: 2,
+            },
+          ],
+          meta: { current_page: 1, per_page: 20, total: 1, last_page: 1 },
+          links: {},
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations/42')) {
+        return jsonResponse({
+          data: {
+            id: 42,
+            title: 'Past Laptop Search',
+            last_message_at: '2026-11-15T12:00:00Z',
+            created_at: '2026-11-15T12:00:00Z',
+            updated_at: '2026-11-15T12:00:00Z',
+            messages: [
+              {
+                id: 1,
+                role: 'user',
+                content: 'Find me a video editing laptop',
+                recommendations: [],
+                alternatives: [],
+                status: 'ok',
+                created_at: '2026-11-15T12:00:00Z',
+              },
+              {
+                id: 2,
+                role: 'assistant',
+                content: 'Here is a powerful creator laptop for video editing.',
+                recommendations: [
+                  {
+                    product_id: mockProductA.id,
+                    product: mockProductA,
+                    reason: 'Top color accuracy and CPU.',
+                    tradeoffs: ['6-hour battery'],
+                  },
+                ],
+                alternatives: [],
+                status: 'ok',
+                created_at: '2026-11-15T12:00:05Z',
+              },
+            ],
+          },
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage(['/assistant?conversation=42']);
+
+    // Messages and recommended products from past conversation #42 should render
+    expect(
+      await screen.findByText('Find me a video editing laptop'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Here is a powerful creator laptop for video editing.'),
+    ).toBeInTheDocument();
+    expect(screen.getByText(mockProductA.name)).toBeInTheDocument();
+
+    // Clicking New chat clears active conversation and resets to empty state suggestions
+    const newChatBtn = screen.getByRole('button', { name: 'New chat' });
+    await user.click(newChatBtn);
+
+    expect(
+      await screen.findByRole('heading', {
+        level: 2,
+        name: 'Welcome, Sarah!',
+      }),
+    ).toBeInTheDocument();
+  });
 });

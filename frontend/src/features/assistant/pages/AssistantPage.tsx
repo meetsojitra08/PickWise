@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { History, Sparkles } from 'lucide-react';
 import { useSearchParams } from 'react-router';
+import { toast } from 'sonner';
 import { QuotaMeter } from '@/components/shared/QuotaMeter';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,21 +27,34 @@ import type { PromptSuggestion } from '../lib/assistant-prompts';
 import { AssistantThread } from '../components/AssistantThread';
 
 export function AssistantPage() {
-  const [activeConversationId, setActiveConversationId] = useState<
-    number | null
-  >(null);
-  const [lastFailedPayload, setLastFailedPayload] =
-    useState<SendMessagePayload | null>(null);
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-
-  const { user } = useAuth();
-
   const [searchParams, setSearchParams] = useSearchParams();
+  const conversationParam =
+    searchParams.get('conversation') ||
+    searchParams.get('conversation_id') ||
+    searchParams.get('c');
   const promptParam = searchParams.get('q') || searchParams.get('prompt') || '';
   const categoryParam = searchParams.get('category') || '';
   const budgetParam =
     searchParams.get('budget_max') || searchParams.get('budget') || '';
   const initialPromptProcessedRef = useRef(false);
+
+  function parseConversationId(val: string | null): number | null {
+    if (!val) return null;
+    const parsed = Number(val);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }
+
+  const initialConversationId = parseConversationId(conversationParam);
+
+  const [activeConversationId, setActiveConversationId] = useState<
+    number | null
+  >(() => initialConversationId);
+  const lastConversationParamRef = useRef<string | null>(conversationParam);
+  const [lastFailedPayload, setLastFailedPayload] =
+    useState<SendMessagePayload | null>(null);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  const { user } = useAuth();
 
   // Preserve initial URL parameters before search params are cleared
   const [initialPromptText] = useState(() => promptParam);
@@ -78,8 +92,36 @@ export function AssistantPage() {
     useConversations();
   const conversations = conversationsResponse?.data ?? [];
 
-  const { data: activeConversation, isLoading: isConversationLoading } =
-    useConversation(activeConversationId);
+  const {
+    data: activeConversation,
+    isLoading: isConversationLoading,
+    isError: isConversationError,
+  } = useConversation(activeConversationId);
+
+  useEffect(() => {
+    if (conversationParam !== lastConversationParamRef.current) {
+      lastConversationParamRef.current = conversationParam;
+      const parsed = parseConversationId(conversationParam);
+      setActiveConversationId(parsed);
+      setLastFailedPayload(null);
+    }
+  }, [conversationParam]);
+
+  const conversationErrorHandledRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (
+      isConversationError &&
+      activeConversationId !== null &&
+      conversationErrorHandledRef.current !== activeConversationId
+    ) {
+      conversationErrorHandledRef.current = activeConversationId;
+      toast.error('This conversation could not be loaded or no longer exists.');
+      queueMicrotask(() => {
+        setActiveConversationId(null);
+      });
+    }
+  }, [isConversationError, activeConversationId]);
 
   const createConversationMutation = useCreateConversation();
   const deleteConversationMutation = useDeleteConversation();
@@ -139,7 +181,18 @@ export function AssistantPage() {
     if (isQuotaLoading) return;
 
     if (promptParam || categoryParam || budgetParam) {
-      setSearchParams({}, { replace: true });
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete('q');
+          next.delete('prompt');
+          next.delete('category');
+          next.delete('budget_max');
+          next.delete('budget');
+          return next;
+        },
+        { replace: true },
+      );
     }
 
     if (quota && quota.remaining <= 0) {
@@ -173,7 +226,17 @@ export function AssistantPage() {
     setActiveConversationId(null);
     setLastFailedPayload(null);
     setMobileDrawerOpen(false);
-  }, []);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete('conversation');
+        next.delete('conversation_id');
+        next.delete('c');
+        return next;
+      },
+      { replace: true },
+    );
+  }, [setSearchParams]);
 
   const handleDeleteConversation = useCallback(
     async (id: number) => {

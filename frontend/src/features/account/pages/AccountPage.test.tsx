@@ -88,6 +88,13 @@ describe('AccountPage', () => {
           meta: { current_page: 1, per_page: 12, total: 0, last_page: 1 },
           links: {},
         }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 12, total: 0, last_page: 1 },
+          links: {},
+        }),
       );
 
     renderAccountRoutes(['/account?tab=wishlist']);
@@ -136,7 +143,7 @@ describe('AccountPage', () => {
       within(tablist).getByRole('tab', { name: 'Conversations' }),
     );
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         level: 2,
         name: 'No assistant conversations yet',
       }),

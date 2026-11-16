@@ -3,8 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import { SavedComparisonsTab } from '@/features/compare/components/SavedComparisonsTab';
 import { WishlistTab } from '@/features/wishlist/components/WishlistTab';
-import { AccountEmptyTab } from '../components/AccountEmptyTab';
 import { ChangePasswordForm } from '../components/ChangePasswordForm';
+import { ConversationsTab } from '../components/ConversationsTab';
 import { PreferencesForm } from '../components/PreferencesForm';
 import { ProfileForm } from '../components/ProfileForm';
 import {
@@ -88,7 +88,7 @@ export function AccountPage() {
         </TabsContent>
 
         <TabsContent value="conversations">
-          <AccountEmptyTab tab="conversations" />
+          <ConversationsTab />
         </TabsContent>
 
         <TabsContent value="preferences">
