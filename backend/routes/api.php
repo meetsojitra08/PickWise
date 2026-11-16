@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Admin\AdminBrandController;
 use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
+use App\Http\Controllers\Api\V1\Admin\AdminProductController;
 use App\Http\Controllers\Api\V1\Admin\AdminSpecDefinitionController;
 use App\Http\Controllers\Api\V1\Assistant\ConversationController;
 use App\Http\Controllers\Api\V1\Assistant\MessageController;
@@ -172,4 +174,11 @@ Route::prefix('admin')
         Route::apiResource('categories.specs', AdminSpecDefinitionController::class)
             ->scoped()
             ->names('api.v1.admin.categories.specs');
+        Route::apiResource('brands', AdminBrandController::class)
+            ->names('api.v1.admin.brands');
+        Route::patch('products/bulk-status', [AdminProductController::class, 'bulkStatus'])
+            ->name('api.v1.admin.products.bulk-status');
+        Route::apiResource('products', AdminProductController::class)
+            ->withTrashed()
+            ->names('api.v1.admin.products');
     });
