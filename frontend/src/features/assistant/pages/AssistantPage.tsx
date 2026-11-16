@@ -1,5 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { History, Sparkles } from 'lucide-react';
+import { useSearchParams } from 'react-router';
+import { toast } from 'sonner';
 import { QuotaMeter } from '@/components/shared/QuotaMeter';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import {
   useAiQuota,
   useConversation,
@@ -24,20 +27,101 @@ import type { PromptSuggestion } from '../lib/assistant-prompts';
 import { AssistantThread } from '../components/AssistantThread';
 
 export function AssistantPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const conversationParam =
+    searchParams.get('conversation') ||
+    searchParams.get('conversation_id') ||
+    searchParams.get('c');
+  const promptParam = searchParams.get('q') || searchParams.get('prompt') || '';
+  const categoryParam = searchParams.get('category') || '';
+  const budgetParam =
+    searchParams.get('budget_max') || searchParams.get('budget') || '';
+  const initialPromptProcessedRef = useRef(false);
+
+  function parseConversationId(val: string | null): number | null {
+    if (!val) return null;
+    const parsed = Number(val);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }
+
+  const initialConversationId = parseConversationId(conversationParam);
+
   const [activeConversationId, setActiveConversationId] = useState<
     number | null
-  >(null);
+  >(() => initialConversationId);
+  const lastConversationParamRef = useRef<string | null>(conversationParam);
   const [lastFailedPayload, setLastFailedPayload] =
     useState<SendMessagePayload | null>(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  const { user } = useAuth();
+
+  // Preserve initial URL parameters before search params are cleared
+  const [initialPromptText] = useState(() => promptParam);
+  const [initialCategoryVal] = useState(() => categoryParam);
+  const [initialBudgetVal] = useState(() => {
+    const p = budgetParam.trim();
+    return p !== '' && !Number.isNaN(Number(p)) ? Number(p) : undefined;
+  });
+
+  const userCategoryPreference =
+    user?.preferences?.favourite_categories &&
+    user.preferences.favourite_categories.length > 0
+      ? user.preferences.favourite_categories[0]
+      : '';
+
+  const userBudgetPreference =
+    user?.preferences?.budget_default && user.preferences.budget_default > 0
+      ? user.preferences.budget_default
+      : undefined;
+
+  const resolvedCategory =
+    initialCategoryVal.trim() !== ''
+      ? initialCategoryVal.trim()
+      : userCategoryPreference;
+
+  const resolvedBudget =
+    initialBudgetVal !== undefined ? initialBudgetVal : userBudgetPreference;
+
+  const isUsingSavedPreferences =
+    (initialCategoryVal.trim() === '' && Boolean(userCategoryPreference)) ||
+    (initialBudgetVal === undefined && userBudgetPreference !== undefined);
 
   const { data: quota, isLoading: isQuotaLoading } = useAiQuota();
   const { data: conversationsResponse, isLoading: isConversationsLoading } =
     useConversations();
   const conversations = conversationsResponse?.data ?? [];
 
-  const { data: activeConversation, isLoading: isConversationLoading } =
-    useConversation(activeConversationId);
+  const {
+    data: activeConversation,
+    isLoading: isConversationLoading,
+    isError: isConversationError,
+  } = useConversation(activeConversationId);
+
+  useEffect(() => {
+    if (conversationParam !== lastConversationParamRef.current) {
+      lastConversationParamRef.current = conversationParam;
+      const parsed = parseConversationId(conversationParam);
+      setActiveConversationId(parsed);
+      setLastFailedPayload(null);
+    }
+  }, [conversationParam]);
+
+  const conversationErrorHandledRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (
+      isConversationError &&
+      activeConversationId !== null &&
+      conversationErrorHandledRef.current !== activeConversationId
+    ) {
+      conversationErrorHandledRef.current = activeConversationId;
+      toast.error('This conversation could not be loaded or no longer exists.');
+      queueMicrotask(() => {
+        setActiveConversationId(null);
+      });
+    }
+  }, [isConversationError, activeConversationId]);
 
   const createConversationMutation = useCreateConversation();
   const deleteConversationMutation = useDeleteConversation();
@@ -88,11 +172,71 @@ export function AssistantPage() {
     [handleSendMessage],
   );
 
+  useEffect(() => {
+    if (initialPromptProcessedRef.current) return;
+    const trimmedPrompt = initialPromptText.trim();
+    if (trimmedPrompt.length < 2) return;
+
+    // Wait until quota check resolves before deciding whether to auto-send
+    if (isQuotaLoading) return;
+
+    if (promptParam || categoryParam || budgetParam) {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete('q');
+          next.delete('prompt');
+          next.delete('category');
+          next.delete('budget_max');
+          next.delete('budget');
+          return next;
+        },
+        { replace: true },
+      );
+    }
+
+    if (quota && quota.remaining <= 0) {
+      return;
+    }
+
+    initialPromptProcessedRef.current = true;
+
+    queueMicrotask(() => {
+      void handleSendMessage({
+        message: trimmedPrompt,
+        category:
+          resolvedCategory.trim() !== '' ? resolvedCategory.trim() : null,
+        budget_max: resolvedBudget ?? null,
+      });
+    });
+  }, [
+    initialPromptText,
+    resolvedCategory,
+    resolvedBudget,
+    promptParam,
+    categoryParam,
+    budgetParam,
+    quota,
+    isQuotaLoading,
+    handleSendMessage,
+    setSearchParams,
+  ]);
+
   const handleNewConversation = useCallback(() => {
     setActiveConversationId(null);
     setLastFailedPayload(null);
     setMobileDrawerOpen(false);
-  }, []);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete('conversation');
+        next.delete('conversation_id');
+        next.delete('c');
+        return next;
+      },
+      { replace: true },
+    );
+  }, [setSearchParams]);
 
   const handleDeleteConversation = useCallback(
     async (id: number) => {
@@ -204,6 +348,12 @@ export function AssistantPage() {
                 onSubmit={(payload) => void handleSendMessage(payload)}
                 isPending={isSending}
                 isQuotaExhausted={isQuotaExhausted}
+                initialPrompt={
+                  quota && quota.remaining <= 0 ? initialPromptText : ''
+                }
+                initialCategory={resolvedCategory}
+                initialBudget={resolvedBudget}
+                hasPreferencesApplied={isUsingSavedPreferences}
               />
             </div>
           </div>

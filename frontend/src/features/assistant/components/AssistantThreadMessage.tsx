@@ -40,12 +40,14 @@ export function AssistantThreadMessage({
   }
 
   const isFallback = message.status === 'fallback';
-  const hasRecommendations = message.recommendations.length > 0;
-  const hasAlternatives = message.alternatives.length > 0;
+  const recommendations = message.recommendations ?? [];
+  const alternatives = message.alternatives ?? [];
+  const hasRecommendations = recommendations.length > 0;
+  const hasAlternatives = alternatives.length > 0;
 
   // Extract products eligible for comparison
   const comparableProducts = (
-    hasRecommendations ? message.recommendations : message.alternatives
+    hasRecommendations ? recommendations : alternatives
   )
     .map((item) => item.product)
     .filter((p): p is ProductSummary => p !== null);

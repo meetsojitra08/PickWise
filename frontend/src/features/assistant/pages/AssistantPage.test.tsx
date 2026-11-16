@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router';
@@ -695,5 +695,537 @@ describe('AssistantPage', () => {
 
     // Verify successful response
     expect(await screen.findByText('Success after retry!')).toBeInTheDocument();
+  });
+
+  it('automatically creates conversation and sends message when mounted with query parameters', async () => {
+    let capturedPayload: unknown = null;
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+      const url = String(input);
+      const method = init?.method ?? 'GET';
+
+      if (url.includes('/sanctum/csrf-cookie')) {
+        return new Response(null, { status: 204 });
+      }
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse(
+          { error: { code: 'unauthenticated', message: 'Unauthenticated.' } },
+          401,
+        );
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 5,
+            used: 1,
+            remaining: 4,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({
+          data: [{ id: 2, name: 'Laptops', slug: 'laptops', children: [] }],
+        });
+      }
+
+      if (url.includes('/messages') && method === 'POST') {
+        capturedPayload = JSON.parse(String(init?.body));
+        return jsonResponse(
+          {
+            data: {
+              id: 601,
+              role: 'assistant',
+              content: 'Auto-executed recommendation from Home hero!',
+              recommendations: [
+                {
+                  product_id: mockProductA.id,
+                  product: mockProductA,
+                  reason: '32GB RAM and colour accurate OLED panel.',
+                  tradeoffs: ['Fans get loud during 4K render exports.'],
+                },
+              ],
+              alternatives: [],
+              status: 'ok',
+              created_at: '2026-11-14T18:00:00Z',
+            },
+          },
+          201,
+        );
+      }
+
+      if (
+        url.includes('/api/v1/assistant/conversations') &&
+        method === 'POST'
+      ) {
+        return jsonResponse(
+          {
+            data: {
+              id: 501,
+              title: 'Laptop for video editing under ₹90,000',
+              messages: [],
+            },
+          },
+          201,
+        );
+      }
+
+      if (url.includes('/conversations/501') && method === 'GET') {
+        return jsonResponse({
+          data: {
+            id: 501,
+            title: 'Laptop for video editing under ₹90,000',
+            messages: [
+              {
+                id: 601,
+                role: 'assistant',
+                content: 'Auto-executed recommendation from Home hero!',
+                recommendations: [
+                  {
+                    product_id: mockProductA.id,
+                    product: mockProductA,
+                    reason: '32GB RAM and colour accurate OLED panel.',
+                    tradeoffs: ['Fans get loud during 4K render exports.'],
+                  },
+                ],
+                alternatives: [],
+                status: 'ok',
+                created_at: '2026-11-14T18:00:00Z',
+              },
+            ],
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations') && method === 'GET') {
+        return jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 20, total: 0, last_page: 1 },
+          links: {},
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage([
+      '/assistant?q=Laptop+for+video+editing+under+%E2%82%B990%2C000&category=laptops&budget_max=90000',
+    ]);
+
+    // Should automatically render the AI response without manual user input
+    expect(
+      await screen.findByText('Auto-executed recommendation from Home hero!'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Aurora 14 Creator Laptop')).toBeInTheDocument();
+
+    expect(capturedPayload).toEqual({
+      message: 'Laptop for video editing under ₹90,000',
+      category: 'laptops',
+      budget_max: 90000,
+    });
+  });
+
+  it('prefills form with query without auto-sending when quota is exhausted', async () => {
+    let messagePostAttempted = false;
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+      const url = String(input);
+      const method = init?.method ?? 'GET';
+
+      if (url.includes('/sanctum/csrf-cookie')) {
+        return new Response(null, { status: 204 });
+      }
+
+      if (url.includes('/messages') && method === 'POST') {
+        messagePostAttempted = true;
+      }
+      if (
+        url.includes('/api/v1/assistant/conversations') &&
+        method === 'POST'
+      ) {
+        messagePostAttempted = true;
+      }
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse(
+          { error: { code: 'unauthenticated', message: 'Unauthenticated.' } },
+          401,
+        );
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 30,
+            remaining: 0,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({ data: [] });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations')) {
+        return jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 20, total: 0, last_page: 1 },
+          links: {},
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage(['/assistant?q=Laptop+for+gaming']);
+
+    // Check quota alert is shown
+    expect(
+      await screen.findByText(
+        "You've used today's AI answers. Browse and filter products in the meantime.",
+      ),
+    ).toBeInTheDocument();
+
+    // Check textarea is prefilled with the query from URL
+    const messageInput = screen.getByLabelText('Message to assistant');
+    expect(messageInput).toHaveValue('Laptop for gaming');
+    expect(messagePostAttempted).toBe(false);
+  });
+
+  it('visibly pre-fills saved user preferences (budget and category) and allows clearing them', async () => {
+    const user = userEvent.setup();
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse({
+          data: {
+            id: 1,
+            name: 'Sarah Customer',
+            email: 'sarah@example.com',
+            role: 'customer',
+            is_active: true,
+            email_verified_at: '2026-11-10T00:00:00Z',
+            created_at: '2026-11-10T00:00:00Z',
+            preferences: {
+              budget_default: 75000,
+              favourite_categories: ['laptops', 'monitors'],
+              priorities: ['battery life', 'weight'],
+            },
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 5,
+            remaining: 25,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({
+          data: [
+            { id: 2, name: 'Laptops', slug: 'laptops', children: [] },
+            { id: 3, name: 'Monitors', slug: 'monitors', children: [] },
+          ],
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations')) {
+        return jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 20, total: 0, last_page: 1 },
+          links: {},
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage();
+
+    // Verify category select is pre-filled with the favourite category
+    const categorySelect = screen.getByLabelText('Filter by category');
+    const budgetInput = screen.getByLabelText('Maximum budget in rupees');
+
+    await waitFor(() => {
+      expect(categorySelect).toHaveValue('laptops');
+      expect(budgetInput).toHaveValue(75000);
+      expect(screen.getByTestId('saved-preferences-badge')).toHaveTextContent(
+        'Saved preferences applied',
+      );
+    });
+
+    // Verify "Clear filters" button is visible
+    const clearButton = screen.getByRole('button', { name: 'Clear filters' });
+    expect(clearButton).toBeInTheDocument();
+
+    // Click "Clear filters"
+    await user.click(clearButton);
+
+    // Verify inputs are cleared
+    expect(categorySelect).toHaveValue('');
+    expect(budgetInput).toHaveValue(null);
+    expect(
+      screen.queryByTestId('saved-preferences-badge'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('gracefully ignores removed category in user preferences while keeping budget', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse({
+          data: {
+            id: 1,
+            name: 'Sarah Customer',
+            email: 'sarah@example.com',
+            role: 'customer',
+            is_active: true,
+            email_verified_at: '2026-11-10T00:00:00Z',
+            created_at: '2026-11-10T00:00:00Z',
+            preferences: {
+              budget_default: 60000,
+              favourite_categories: ['defunct-category-slug'],
+              priorities: ['durability'],
+            },
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 0,
+            remaining: 30,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({
+          data: [{ id: 2, name: 'Laptops', slug: 'laptops', children: [] }],
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations')) {
+        return jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 20, total: 0, last_page: 1 },
+          links: {},
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage();
+
+    const categorySelect = screen.getByLabelText('Filter by category');
+    const budgetInput = screen.getByLabelText('Maximum budget in rupees');
+
+    // Defunct category slug is not in active categories, so category select resets to '' while budget is preserved
+    await waitFor(() => {
+      expect(budgetInput).toHaveValue(60000);
+      expect(categorySelect).toHaveValue('');
+    });
+  });
+
+  it('explicit URL parameters take precedence over saved user preferences', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse({
+          data: {
+            id: 1,
+            name: 'Sarah Customer',
+            email: 'sarah@example.com',
+            role: 'customer',
+            is_active: true,
+            preferences: {
+              budget_default: 80000,
+              favourite_categories: ['laptops'],
+            },
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 0,
+            remaining: 30,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({
+          data: [
+            { id: 2, name: 'Laptops', slug: 'laptops', children: [] },
+            { id: 3, name: 'Monitors', slug: 'monitors', children: [] },
+          ],
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations')) {
+        return jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 20, total: 0, last_page: 1 },
+          links: {},
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    // Mount with explicit URL params for monitors at 45000
+    renderAssistantPage(['/assistant?category=monitors&budget_max=45000']);
+
+    const categorySelect = screen.getByLabelText('Filter by category');
+    const budgetInput = screen.getByLabelText('Maximum budget in rupees');
+
+    await waitFor(() => {
+      expect(categorySelect).toHaveValue('monitors');
+      expect(budgetInput).toHaveValue(45000);
+    });
+  });
+
+  it('reopens a past conversation when the URL contains conversation parameter', async () => {
+    const user = userEvent.setup();
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse({
+          data: {
+            id: 1,
+            name: 'Sarah Customer',
+            email: 'sarah@example.com',
+            role: 'customer',
+            is_active: true,
+            preferences: null,
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 0,
+            remaining: 30,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({
+          data: [{ id: 2, name: 'Laptops', slug: 'laptops', children: [] }],
+        });
+      }
+
+      if (
+        url === '/api/v1/assistant/conversations' ||
+        url.startsWith('/api/v1/assistant/conversations?')
+      ) {
+        return jsonResponse({
+          data: [
+            {
+              id: 42,
+              title: 'Past Laptop Search',
+              last_message_at: '2026-11-15T12:00:00Z',
+              created_at: '2026-11-15T12:00:00Z',
+              updated_at: '2026-11-15T12:00:00Z',
+              messages_count: 2,
+            },
+          ],
+          meta: { current_page: 1, per_page: 20, total: 1, last_page: 1 },
+          links: {},
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations/42')) {
+        return jsonResponse({
+          data: {
+            id: 42,
+            title: 'Past Laptop Search',
+            last_message_at: '2026-11-15T12:00:00Z',
+            created_at: '2026-11-15T12:00:00Z',
+            updated_at: '2026-11-15T12:00:00Z',
+            messages: [
+              {
+                id: 1,
+                role: 'user',
+                content: 'Find me a video editing laptop',
+                recommendations: [],
+                alternatives: [],
+                status: 'ok',
+                created_at: '2026-11-15T12:00:00Z',
+              },
+              {
+                id: 2,
+                role: 'assistant',
+                content: 'Here is a powerful creator laptop for video editing.',
+                recommendations: [
+                  {
+                    product_id: mockProductA.id,
+                    product: mockProductA,
+                    reason: 'Top color accuracy and CPU.',
+                    tradeoffs: ['6-hour battery'],
+                  },
+                ],
+                alternatives: [],
+                status: 'ok',
+                created_at: '2026-11-15T12:00:05Z',
+              },
+            ],
+          },
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage(['/assistant?conversation=42']);
+
+    // Messages and recommended products from past conversation #42 should render
+    expect(
+      await screen.findByText('Find me a video editing laptop'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Here is a powerful creator laptop for video editing.'),
+    ).toBeInTheDocument();
+    expect(screen.getByText(mockProductA.name)).toBeInTheDocument();
+
+    // Clicking New chat clears active conversation and resets to empty state suggestions
+    const newChatBtn = screen.getByRole('button', { name: 'New chat' });
+    await user.click(newChatBtn);
+
+    expect(
+      await screen.findByRole('heading', {
+        level: 2,
+        name: 'Welcome, Sarah!',
+      }),
+    ).toBeInTheDocument();
   });
 });

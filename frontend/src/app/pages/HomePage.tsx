@@ -47,6 +47,10 @@ import {
   useWishlist,
   useWishlistToggle,
 } from '@/features/wishlist/hooks/use-wishlist';
+import {
+  STARTER_PROMPT_SUGGESTIONS,
+  buildAssistantPromptUrl,
+} from '@/features/assistant/lib/assistant-prompts';
 import { cn } from '@/lib/utils';
 
 interface CategoryTile {
@@ -122,29 +126,6 @@ const CATEGORY_TILES: CategoryTile[] = [
       'Dual-frequency GPS',
     ],
     sampleModels: 'Apple Watch Series 10, Galaxy Watch 7, OnePlus Watch 2R',
-  },
-];
-
-const QUICK_PROMPTS = [
-  {
-    label: 'MacBook Air M3 vs Dell XPS 13',
-    query: 'MacBook Air M3 vs Dell XPS 13',
-    target: 'compare',
-  },
-  {
-    label: 'Phone with periscope zoom under ₹65,000',
-    query: 'Phone with periscope zoom under 65000',
-    target: 'assistant',
-  },
-  {
-    label: '4K monitor with USB-C 90W PD',
-    query: '4K monitor USB-C 90W',
-    target: 'products',
-  },
-  {
-    label: 'Wireless mechanical keyboard for Mac',
-    query: 'Mechanical keyboard wireless mac',
-    target: 'products',
   },
 ];
 
@@ -263,17 +244,8 @@ export function HomePage() {
   const compare = useCompare();
   const { toggle: toggleCompare } = useCompareToggle();
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  const handleAssistantSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const query = searchQuery.trim();
-    if (query) {
-      navigate(`/products?q=${encodeURIComponent(query)}`);
-    } else {
-      navigate('/products');
-    }
-  };
-
-  const handleAskAssistant = () => {
     const query = searchQuery.trim();
     if (query) {
       navigate(`/assistant?q=${encodeURIComponent(query)}`);
@@ -282,13 +254,12 @@ export function HomePage() {
     }
   };
 
-  const handlePromptClick = (prompt: (typeof QUICK_PROMPTS)[number]) => {
-    if (prompt.target === 'assistant') {
-      navigate(`/assistant?q=${encodeURIComponent(prompt.query)}`);
-    } else if (prompt.target === 'compare') {
-      navigate(`/compare`);
+  const handleCatalogSearch = () => {
+    const query = searchQuery.trim();
+    if (query) {
+      navigate(`/products?q=${encodeURIComponent(query)}`);
     } else {
-      navigate(`/products?q=${encodeURIComponent(prompt.query)}`);
+      navigate('/products');
     }
   };
 
@@ -336,19 +307,20 @@ export function HomePage() {
             {/* Modern Command Search Bar */}
             <div className="mt-10 w-full max-w-2xl">
               <form
-                onSubmit={handleSearchSubmit}
-                action="/products"
+                onSubmit={handleAssistantSubmit}
+                action="/assistant"
                 method="get"
                 role="search"
+                aria-label="Shopping assistant search"
                 className="relative flex items-center rounded-surface border border-border/80 bg-card p-1.5 shadow-float transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
               >
-                <Search
-                  className="ml-3.5 size-5 shrink-0 text-muted-foreground"
+                <Sparkles
+                  className="ml-3.5 size-5 shrink-0 text-accent"
                   strokeWidth={1.5}
                   aria-hidden="true"
                 />
                 <label htmlFor="home-search" className="sr-only">
-                  Search products
+                  Search with shopping assistant
                 </label>
                 <Input
                   id="home-search"
@@ -362,24 +334,26 @@ export function HomePage() {
                 <div className="flex items-center gap-1.5 pr-1">
                   <Button
                     type="button"
-                    onClick={handleAskAssistant}
-                    variant="outline"
+                    onClick={handleCatalogSearch}
+                    variant="ghost"
                     size="sm"
-                    className="hidden gap-1.5 rounded-control text-xs sm:inline-flex"
+                    className="hidden gap-1.5 rounded-control text-xs sm:inline-flex text-muted-foreground hover:text-foreground"
+                    title="Search catalog by keyword"
                   >
-                    <Sparkles
-                      className="size-3.5 text-accent"
-                      strokeWidth={1.5}
-                      aria-hidden="true"
-                    />
-                    Ask AI
+                    <Search className="size-3.5" aria-hidden="true" />
+                    Catalog
                   </Button>
                   <Button
                     type="submit"
                     size="default"
                     className="gap-2 rounded-control"
                   >
-                    <span>Search</span>
+                    <Sparkles
+                      className="size-4 text-accent"
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                    />
+                    <span>Ask Assistant</span>
                     <ArrowRight
                       className="size-4"
                       strokeWidth={1.5}
@@ -392,14 +366,14 @@ export function HomePage() {
               {/* Quick prompt suggestions */}
               <div className="mt-3.5 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">Try asking:</span>
-                {QUICK_PROMPTS.map((prompt) => (
+                {STARTER_PROMPT_SUGGESTIONS.map((prompt) => (
                   <button
-                    key={prompt.label}
+                    key={prompt.text}
                     type="button"
-                    onClick={() => handlePromptClick(prompt)}
-                    className="rounded-full border border-border/70 bg-card/60 px-3 py-1 transition-colors hover:border-primary/40 hover:bg-card hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring"
+                    onClick={() => navigate(buildAssistantPromptUrl(prompt))}
+                    className="rounded-full border border-border/70 bg-card/60 px-3 py-1 transition-colors hover:border-primary/40 hover:bg-card hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring cursor-pointer"
                   >
-                    {prompt.label}
+                    {prompt.text}
                   </button>
                 ))}
               </div>
