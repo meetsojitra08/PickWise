@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
 use App\Http\Controllers\Api\V1\Admin\AdminProductController;
 use App\Http\Controllers\Api\V1\Admin\AdminProductImageController;
 use App\Http\Controllers\Api\V1\Admin\AdminSpecDefinitionController;
+use App\Http\Controllers\Api\V1\Admin\AdminUserController;
 use App\Http\Controllers\Api\V1\Assistant\ConversationController;
 use App\Http\Controllers\Api\V1\Assistant\MessageController;
 use App\Http\Controllers\Api\V1\Assistant\QuotaController;
@@ -189,4 +190,9 @@ Route::prefix('admin')
         Route::apiResource('products', AdminProductController::class)
             ->withTrashed()
             ->names('api.v1.admin.products');
+        Route::get('users', [AdminUserController::class, 'index'])
+            ->name('api.v1.admin.users.index');
+        Route::patch('users/{user}', [AdminUserController::class, 'update'])
+            ->whereNumber('user')
+            ->name('api.v1.admin.users.update');
     });

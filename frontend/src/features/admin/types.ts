@@ -255,3 +255,29 @@ export interface AdminBulkStatusPayload {
   product_ids: number[];
   is_published: boolean;
 }
+
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  role: 'customer' | 'admin';
+  is_active: boolean;
+  reviews_count: number;
+  preferences?: Record<string, unknown> | null;
+  email_verified_at?: string | null;
+  created_at: string;
+}
+
+export interface AdminUserFilters {
+  search?: string;
+  role?: 'customer' | 'admin';
+  is_active?: boolean;
+  sort?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface UpdateAdminUserPayload {
+  is_active?: boolean;
+  role?: 'customer' | 'admin';
+}

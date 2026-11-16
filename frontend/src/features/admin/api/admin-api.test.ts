@@ -9,9 +9,11 @@ import {
   getAdminProduct,
   getAdminProductImages,
   getAdminProducts,
+  getAdminUsers,
   reorderAdminProductImages,
   updateAdminProduct,
   updateAdminProductImage,
+  updateAdminUser,
   uploadAdminProductImage,
 } from './admin-api';
 
@@ -259,5 +261,61 @@ describe('Admin Product & Brand API', () => {
       signal: undefined,
     });
     expect(result).toEqual(mockBrands);
+  });
+
+  it('queries users with filters via GET', async () => {
+    const mockUsers = {
+      data: [
+        {
+          id: 1,
+          name: 'Jane Doe',
+          email: 'jane@example.com',
+          role: 'admin',
+          is_active: true,
+          reviews_count: 3,
+          created_at: '2026-11-01T00:00:00Z',
+        },
+      ],
+      meta: { current_page: 1, last_page: 1, total: 1, per_page: 25 },
+    };
+
+    const getSpy = vi.spyOn(apiClient, 'get').mockResolvedValueOnce(mockUsers);
+
+    const result = await getAdminUsers({
+      search: 'Jane',
+      role: 'admin',
+      is_active: true,
+    });
+
+    expect(getSpy).toHaveBeenCalledWith(
+      '/admin/users?search=Jane&role=admin&is_active=1',
+      { signal: undefined },
+    );
+    expect(result).toEqual(mockUsers);
+  });
+
+  it('updates user status and role via PATCH', async () => {
+    const mockUpdated = {
+      data: {
+        id: 5,
+        name: 'Bob',
+        email: 'bob@example.com',
+        role: 'customer',
+        is_active: false,
+        reviews_count: 0,
+        created_at: '2026-11-01T00:00:00Z',
+      },
+    };
+
+    const patchSpy = vi
+      .spyOn(apiClient, 'patch')
+      .mockResolvedValueOnce(mockUpdated);
+
+    const result = await updateAdminUser(5, { is_active: false });
+
+    expect(patchSpy).toHaveBeenCalledWith('/admin/users/5', {
+      is_active: false,
+    });
+    expect(result).toEqual(mockUpdated);
   });
 });

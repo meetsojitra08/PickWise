@@ -7,6 +7,7 @@ use App\Exceptions\ApiExceptionRenderer;
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\EnsureAiQuota;
 use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Support\RequestId;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -29,7 +30,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
             'ai-quota' => EnsureAiQuota::class,
+            'active' => EnsureUserIsActive::class,
         ]);
+        $middleware->appendToGroup('api', EnsureUserIsActive::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

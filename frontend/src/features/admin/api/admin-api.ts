@@ -16,6 +16,9 @@ import type {
   AdminProductImageUpdatePayload,
   AdminSpecDefinition,
   AdminSpecDefinitionFormData,
+  AdminUser,
+  AdminUserFilters,
+  UpdateAdminUserPayload,
 } from '../types';
 
 export const adminKeys = {
@@ -36,6 +39,9 @@ export const adminKeys = {
   brands: () => [...adminKeys.all, 'brands'] as const,
   brandList: (filters?: Record<string, unknown>) =>
     [...adminKeys.brands(), 'list', filters] as const,
+  users: () => [...adminKeys.all, 'users'] as const,
+  userList: (filters?: Record<string, unknown>) =>
+    [...adminKeys.users(), 'list', filters] as const,
 };
 
 export async function getAdminDashboard(
@@ -376,4 +382,52 @@ export function useAdminBrands(filters?: AdminBrandFilters) {
     queryKey: adminKeys.brandList(filters as Record<string, unknown>),
     queryFn: ({ signal }) => getAdminBrands(filters, signal),
   });
+}
+
+export async function getAdminUsers(
+  filters?: AdminUserFilters,
+  signal?: AbortSignal,
+): Promise<ApiPaginatedResponse<AdminUser>> {
+  const params = new URLSearchParams();
+
+  if (filters?.search) {
+    params.set('search', filters.search);
+  }
+  if (filters?.role) {
+    params.set('role', filters.role);
+  }
+  if (typeof filters?.is_active === 'boolean') {
+    params.set('is_active', filters.is_active ? '1' : '0');
+  }
+  if (filters?.sort) {
+    params.set('sort', filters.sort);
+  }
+  if (filters?.page) {
+    params.set('page', String(filters.page));
+  }
+  if (filters?.per_page) {
+    params.set('per_page', String(filters.per_page));
+  }
+
+  const queryString = params.toString();
+  const url = queryString ? `/admin/users?${queryString}` : '/admin/users';
+
+  return apiClient.get<ApiPaginatedResponse<AdminUser>>(url, { signal });
+}
+
+export function useAdminUsers(filters?: AdminUserFilters) {
+  return useQuery<ApiPaginatedResponse<AdminUser>>({
+    queryKey: adminKeys.userList(filters as Record<string, unknown>),
+    queryFn: ({ signal }) => getAdminUsers(filters, signal),
+  });
+}
+
+export async function updateAdminUser(
+  userId: number,
+  payload: UpdateAdminUserPayload,
+): Promise<ApiSuccessResponse<AdminUser>> {
+  return apiClient.patch<ApiSuccessResponse<AdminUser>>(
+    `/admin/users/${userId}`,
+    payload,
+  );
 }
