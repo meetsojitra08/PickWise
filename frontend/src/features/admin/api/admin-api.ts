@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import type { ApiPaginatedResponse, ApiSuccessResponse } from '@/types/api';
 import type {
+  AdminAiUsageData,
+  AdminAiUsageFilters,
   AdminBrand,
   AdminBrandFilters,
   AdminBulkStatusPayload,
@@ -51,6 +53,8 @@ export const adminKeys = {
   reviews: () => [...adminKeys.all, 'reviews'] as const,
   reviewList: (filters?: Record<string, unknown>) =>
     [...adminKeys.reviews(), 'list', filters] as const,
+  aiUsage: (filters?: Record<string, unknown>) =>
+    [...adminKeys.all, 'aiUsage', filters] as const,
 };
 
 export async function getAdminDashboard(
@@ -513,4 +517,54 @@ export async function regenerateProductReviewSummary(
   return apiClient.post<ApiSuccessResponse<RegenerateSummaryResponse>>(
     `/admin/products/${productId}/regenerate-summary`,
   );
+}
+
+export async function getAdminAiUsage(
+  filters?: AdminAiUsageFilters,
+  signal?: AbortSignal,
+): Promise<AdminAiUsageData> {
+  const params = new URLSearchParams();
+
+  if (filters?.start_date) {
+    params.set('start_date', filters.start_date);
+  }
+  if (filters?.end_date) {
+    params.set('end_date', filters.end_date);
+  }
+  if (filters?.feature && filters.feature !== 'all') {
+    params.set('feature', filters.feature);
+  }
+  if (filters?.status && filters.status !== 'all') {
+    params.set('status', filters.status);
+  }
+  if (typeof filters?.user_id === 'number' && filters.user_id > 0) {
+    params.set('user_id', String(filters.user_id));
+  }
+  if (filters?.page) {
+    params.set('page', String(filters.page));
+  }
+  if (filters?.per_page) {
+    params.set('per_page', String(filters.per_page));
+  }
+
+  const queryString = params.toString();
+  const url = queryString
+    ? `/admin/ai/usage?${queryString}`
+    : '/admin/ai/usage';
+
+  const response = await apiClient.get<ApiSuccessResponse<AdminAiUsageData>>(
+    url,
+    {
+      signal,
+    },
+  );
+
+  return response.data;
+}
+
+export function useAdminAiUsage(filters?: AdminAiUsageFilters) {
+  return useQuery<AdminAiUsageData>({
+    queryKey: adminKeys.aiUsage(filters as Record<string, unknown>),
+    queryFn: ({ signal }) => getAdminAiUsage(filters, signal),
+  });
 }

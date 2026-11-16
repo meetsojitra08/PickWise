@@ -10,6 +10,7 @@ import { RequireAdmin } from '@/features/auth/components/RequireAdmin';
 import { RequireAuth } from '@/features/auth/components/RequireAuth';
 import { RequireGuest } from '@/features/auth/components/RequireGuest';
 import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
+import { AdminAiUsagePage } from '@/features/admin/pages/AdminAiUsagePage';
 import { AdminCategoriesPage } from '@/features/admin/pages/AdminCategoriesPage';
 import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage';
 import { AdminProductsPage } from '@/features/admin/pages/AdminProductsPage';
@@ -107,17 +108,7 @@ export function AppRoutes() {
             <Route path="products" element={<AdminProductsPage />} />
             <Route path="users" element={<AdminUsersPage />} />
             <Route path="reviews" element={<AdminReviewsPage />} />
-            <Route
-              path="ai"
-              element={
-                <RoutePlaceholderPage
-                  title="AI Usage Analytics"
-                  description="Monitor assistant, verdict, and review summary usage and costs (arriving in P7-S9)."
-                  actionLabel="Back to Dashboard"
-                  actionTo="/admin"
-                />
-              }
-            />
+            <Route path="ai" element={<AdminAiUsagePage />} />
             <Route
               path="activity-logs"
               element={

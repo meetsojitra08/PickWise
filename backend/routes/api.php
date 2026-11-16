@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Admin\AdminAiUsageController;
 use App\Http\Controllers\Api\V1\Admin\AdminBrandController;
 use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
@@ -172,6 +173,8 @@ Route::prefix('admin')
     ->group(function (): void {
         Route::get('/dashboard', AdminDashboardController::class)
             ->name('api.v1.admin.dashboard');
+        Route::get('ai/usage', AdminAiUsageController::class)
+            ->name('api.v1.admin.ai.usage');
         Route::apiResource('categories', AdminCategoryController::class)
             ->names('api.v1.admin.categories');
         Route::apiResource('categories.specs', AdminSpecDefinitionController::class)

@@ -7,6 +7,7 @@ import {
   deleteAdminProduct,
   deleteAdminProductImage,
   deleteAdminReview,
+  getAdminAiUsage,
   getAdminBrands,
   getAdminProduct,
   getAdminProductImages,
@@ -339,7 +340,14 @@ describe('Admin Review Moderation API', () => {
       data: [
         {
           id: 1,
-          product: { id: 10, name: 'Phone', slug: 'phone', is_published: true, rating_avg: 4.5, rating_count: 2 },
+          product: {
+            id: 10,
+            name: 'Phone',
+            slug: 'phone',
+            is_published: true,
+            rating_avg: 4.5,
+            rating_count: 2,
+          },
           user: { id: 2, name: 'Alice', email: 'alice@example.com' },
           author_name: 'Alice',
           rating: 5,
@@ -357,7 +365,9 @@ describe('Admin Review Moderation API', () => {
       links: {},
     };
 
-    const getSpy = vi.spyOn(apiClient, 'get').mockResolvedValueOnce(mockReviews);
+    const getSpy = vi
+      .spyOn(apiClient, 'get')
+      .mockResolvedValueOnce(mockReviews);
 
     const result = await getAdminReviews({
       status: 'pending',
@@ -383,7 +393,9 @@ describe('Admin Review Moderation API', () => {
       },
     };
 
-    const patchSpy = vi.spyOn(apiClient, 'patch').mockResolvedValueOnce(mockResponse);
+    const patchSpy = vi
+      .spyOn(apiClient, 'patch')
+      .mockResolvedValueOnce(mockResponse);
 
     const result = await moderateAdminReview(1, {
       status: 'approved',
@@ -402,7 +414,9 @@ describe('Admin Review Moderation API', () => {
       data: { count: 3, status: 'rejected' },
     };
 
-    const patchSpy = vi.spyOn(apiClient, 'patch').mockResolvedValueOnce(mockResponse);
+    const patchSpy = vi
+      .spyOn(apiClient, 'patch')
+      .mockResolvedValueOnce(mockResponse);
 
     const result = await bulkModerateAdminReviews({
       review_ids: [1, 2, 3],
@@ -419,7 +433,9 @@ describe('Admin Review Moderation API', () => {
   });
 
   it('deletes a review via DELETE', async () => {
-    const deleteSpy = vi.spyOn(apiClient, 'delete').mockResolvedValueOnce(undefined);
+    const deleteSpy = vi
+      .spyOn(apiClient, 'delete')
+      .mockResolvedValueOnce(undefined);
 
     await deleteAdminReview(1);
 
@@ -428,14 +444,100 @@ describe('Admin Review Moderation API', () => {
 
   it('triggers review summary regeneration via POST', async () => {
     const mockResponse = {
-      data: { product_id: 10, queued: true, message: 'Review summary regeneration queued.' },
+      data: {
+        product_id: 10,
+        queued: true,
+        message: 'Review summary regeneration queued.',
+      },
     };
 
-    const postSpy = vi.spyOn(apiClient, 'post').mockResolvedValueOnce(mockResponse);
+    const postSpy = vi
+      .spyOn(apiClient, 'post')
+      .mockResolvedValueOnce(mockResponse);
 
     const result = await regenerateProductReviewSummary(10);
 
-    expect(postSpy).toHaveBeenCalledWith('/admin/products/10/regenerate-summary');
+    expect(postSpy).toHaveBeenCalledWith(
+      '/admin/products/10/regenerate-summary',
+    );
     expect(result).toEqual(mockResponse);
+  });
+
+  describe('Admin AI Usage API', () => {
+    it('fetches AI usage analytics without filters via GET', async () => {
+      const mockUsageData = {
+        data: {
+          summary: {
+            total_calls: 10,
+            successful_calls: 9,
+            failed_calls: 1,
+            error_calls: 1,
+            rate_limited_calls: 0,
+            error_rate: 10,
+            total_tokens: 3500,
+            prompt_tokens: 2500,
+            completion_tokens: 1000,
+            avg_latency_ms: 540,
+          },
+          by_feature: [],
+          daily_usage: [],
+          top_users: [],
+          guest_calls: 2,
+          logs: [],
+          pagination: { current_page: 1, last_page: 1, per_page: 20, total: 0 },
+          date_range: { start_date: '2026-10-18', end_date: '2026-11-16' },
+        },
+      };
+
+      const getSpy = vi
+        .spyOn(apiClient, 'get')
+        .mockResolvedValueOnce(mockUsageData);
+
+      const result = await getAdminAiUsage();
+
+      expect(getSpy).toHaveBeenCalledWith('/admin/ai/usage', {
+        signal: undefined,
+      });
+      expect(result).toEqual(mockUsageData.data);
+    });
+
+    it('fetches AI usage analytics with date, feature, and pagination query params', async () => {
+      const mockUsageData = {
+        data: {
+          summary: { total_calls: 0 },
+          by_feature: [],
+          daily_usage: [],
+          top_users: [],
+          guest_calls: 0,
+          logs: [],
+          pagination: {
+            current_page: 2,
+            last_page: 5,
+            per_page: 10,
+            total: 50,
+          },
+          date_range: { start_date: '2026-11-01', end_date: '2026-11-10' },
+        },
+      };
+
+      const getSpy = vi
+        .spyOn(apiClient, 'get')
+        .mockResolvedValueOnce(mockUsageData);
+
+      await getAdminAiUsage({
+        start_date: '2026-11-01',
+        end_date: '2026-11-10',
+        feature: 'assistant',
+        status: 'ok',
+        user_id: 42,
+        page: 2,
+        per_page: 10,
+      });
+
+      expect(getSpy).toHaveBeenCalledWith(
+        '/admin/ai/usage?start_date=2026-11-01&end_date=2026-11-10&feature=assistant&status=ok&user_id=42&page=2&per_page=10',
+        { signal: undefined },
+      );
+    });
   });
 });

@@ -346,3 +346,97 @@ export interface RegenerateSummaryResponse {
   queued: boolean;
   message: string;
 }
+
+export interface AdminAiUsageDetailedSummary {
+  total_calls: number;
+  successful_calls: number;
+  failed_calls: number;
+  error_calls: number;
+  rate_limited_calls: number;
+  error_rate: number;
+  total_tokens: number;
+  prompt_tokens: number;
+  completion_tokens: number;
+  avg_latency_ms: number;
+}
+
+export interface AdminAiFeatureBreakdown {
+  feature: 'assistant' | 'compare' | 'review_summary';
+  total_calls: number;
+  successful_calls: number;
+  failed_calls: number;
+  total_tokens: number;
+  avg_latency_ms: number;
+}
+
+export interface AdminAiDailyUsagePoint {
+  date: string;
+  total_calls: number;
+  successful_calls: number;
+  failed_calls: number;
+  total_tokens: number;
+  avg_latency_ms: number;
+  by_feature: {
+    assistant: number;
+    compare: number;
+    review_summary: number;
+  };
+}
+
+export interface AdminAiTopUserItem {
+  user_id: number;
+  name: string;
+  email: string;
+  total_calls: number;
+  total_tokens: number;
+  last_active_at: string | null;
+}
+
+export interface AdminAiUsageLogItem {
+  id: number;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  feature: 'assistant' | 'compare' | 'review_summary';
+  model: string | null;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  total_tokens: number;
+  latency_ms: number | null;
+  status: 'ok' | 'error' | 'rate_limited';
+  error_code: string | null;
+  created_at: string;
+}
+
+export interface AdminAiUsagePagination {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface AdminAiUsageData {
+  summary: AdminAiUsageDetailedSummary;
+  by_feature: AdminAiFeatureBreakdown[];
+  daily_usage: AdminAiDailyUsagePoint[];
+  top_users: AdminAiTopUserItem[];
+  guest_calls: number;
+  logs: AdminAiUsageLogItem[];
+  pagination: AdminAiUsagePagination;
+  date_range: {
+    start_date: string;
+    end_date: string;
+  };
+}
+
+export interface AdminAiUsageFilters {
+  start_date?: string;
+  end_date?: string;
+  feature?: 'assistant' | 'compare' | 'review_summary' | 'all';
+  status?: 'ok' | 'error' | 'rate_limited' | 'all';
+  user_id?: number;
+  page?: number;
+  per_page?: number;
+}
