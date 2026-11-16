@@ -5,6 +5,9 @@ import type {
   AdminCategory,
   AdminCategoryFormData,
   AdminDashboardData,
+  AdminProductImage,
+  AdminProductImageReorderPayload,
+  AdminProductImageUpdatePayload,
   AdminSpecDefinition,
   AdminSpecDefinitionFormData,
 } from '../types';
@@ -17,6 +20,8 @@ export const adminKeys = {
     [...adminKeys.categories(), 'list', filters] as const,
   categorySpecs: (categoryId: number, search?: string) =>
     [...adminKeys.categories(), categoryId, 'specs', search] as const,
+  productImages: (productId: number) =>
+    [...adminKeys.all, 'products', productId, 'images'] as const,
 };
 
 export async function getAdminDashboard(
@@ -165,4 +170,63 @@ export async function deleteAdminSpecDefinition(
   await apiClient.delete<void>(
     `/admin/categories/${categoryId}/specs/${specId}`,
   );
+}
+
+export async function getAdminProductImages(
+  productId: number,
+  signal?: AbortSignal,
+): Promise<AdminProductImage[]> {
+  const response = await apiClient.get<ApiSuccessResponse<AdminProductImage[]>>(
+    `/admin/products/${productId}/images`,
+    { signal },
+  );
+  return response.data;
+}
+
+export function useAdminProductImages(productId: number) {
+  return useQuery<AdminProductImage[]>({
+    queryKey: adminKeys.productImages(productId),
+    queryFn: ({ signal }) => getAdminProductImages(productId, signal),
+    enabled: productId > 0,
+  });
+}
+
+export async function uploadAdminProductImage(
+  productId: number,
+  formData: FormData,
+): Promise<AdminProductImage> {
+  const response = await apiClient.post<ApiSuccessResponse<AdminProductImage>>(
+    `/admin/products/${productId}/images`,
+    formData,
+  );
+  return response.data;
+}
+
+export async function reorderAdminProductImages(
+  productId: number,
+  payload: AdminProductImageReorderPayload,
+): Promise<AdminProductImage[]> {
+  const response = await apiClient.patch<
+    ApiSuccessResponse<AdminProductImage[]>
+  >(`/admin/products/${productId}/images/reorder`, payload);
+  return response.data;
+}
+
+export async function updateAdminProductImage(
+  productId: number,
+  imageId: number,
+  payload: AdminProductImageUpdatePayload,
+): Promise<AdminProductImage> {
+  const response = await apiClient.patch<ApiSuccessResponse<AdminProductImage>>(
+    `/admin/products/${productId}/images/${imageId}`,
+    payload,
+  );
+  return response.data;
+}
+
+export async function deleteAdminProductImage(
+  productId: number,
+  imageId: number,
+): Promise<void> {
+  await apiClient.delete<void>(`/admin/products/${productId}/images/${imageId}`);
 }

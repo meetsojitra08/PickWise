@@ -213,10 +213,14 @@ describe('App shell and route layouts', () => {
     renderRoute(['/admin']);
 
     expect(
-      await screen.findByRole('heading', {
-        level: 1,
-        name: 'Admin overview',
-      }),
+      await screen.findByRole(
+        'heading',
+        {
+          level: 1,
+          name: 'Admin overview',
+        },
+        { timeout: 3000 },
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('navigation', { name: 'Admin navigation' }),

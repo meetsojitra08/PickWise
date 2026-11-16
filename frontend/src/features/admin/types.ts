@@ -117,3 +117,22 @@ export interface AdminSpecDefinitionFormData {
   higher_is_better?: boolean | null;
   sort_order: number;
 }
+
+export interface AdminProductImage {
+  id: number;
+  url: string | null;
+  alt_text: string;
+  sort_order: number;
+  is_primary: boolean;
+}
+
+export interface AdminProductImageReorderPayload {
+  image_ids: number[];
+  primary_id?: number | null;
+}
+
+export interface AdminProductImageUpdatePayload {
+  alt_text?: string;
+  is_primary?: boolean;
+  sort_order?: number;
+}
