@@ -136,3 +136,122 @@ export interface AdminProductImageUpdatePayload {
   is_primary?: boolean;
   sort_order?: number;
 }
+
+export interface AdminProductSpec {
+  id: number;
+  spec_definition_id: number;
+  key: string;
+  label: string;
+  unit: string | null;
+  data_type: SpecDataType;
+  value: string | number | boolean | null;
+  is_filterable: boolean;
+  is_comparable: boolean;
+  higher_is_better: boolean | null;
+}
+
+export interface AdminProduct {
+  id: number;
+  category_id: number;
+  brand_id: number;
+  name: string;
+  slug: string;
+  summary: string | null;
+  description: string | null;
+  price: {
+    amount: string;
+    currency: string;
+    formatted: string;
+  };
+  currency: string;
+  availability: 'in_stock' | 'out_of_stock' | 'preorder' | 'discontinued';
+  availability_label: string;
+  store_url: string | null;
+  rating_avg: number;
+  rating_count: number;
+  value_score: number | null;
+  is_published: boolean;
+  is_deleted: boolean;
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
+  brand?: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
+  primary_image?: {
+    id: number;
+    url: string | null;
+    alt_text: string;
+  } | null;
+  images?: AdminProductImage[];
+  specs?: AdminProductSpec[];
+  price_history?: Array<{
+    id: number;
+    recorded_at: string;
+    price: {
+      amount: string;
+      currency: string;
+      formatted: string;
+    };
+  }>;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+}
+
+export interface AdminBrand {
+  id: number;
+  name: string;
+  slug: string;
+  logo_path: string | null;
+  logo_url: string | null;
+  products_count: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AdminProductFormData {
+  category_id: number;
+  brand_id: number;
+  name: string;
+  slug?: string;
+  summary: string;
+  description: string;
+  price: string | number;
+  currency?: string;
+  availability: 'in_stock' | 'out_of_stock' | 'preorder' | 'discontinued';
+  store_url?: string;
+  is_published: boolean;
+  specs?: Array<{
+    spec_definition_id: number;
+    value: string | number | boolean;
+  }>;
+}
+
+export interface AdminProductFilters {
+  search?: string;
+  category_id?: number;
+  brand_id?: number;
+  is_published?: boolean;
+  availability?: string;
+  trashed?: 'with' | 'only';
+  sort?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface AdminBrandFilters {
+  search?: string;
+  sort?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface AdminBulkStatusPayload {
+  product_ids: number[];
+  is_published: boolean;
+}

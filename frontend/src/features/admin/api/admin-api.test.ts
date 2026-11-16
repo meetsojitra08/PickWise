@@ -1,9 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiClient } from '@/lib/api-client';
 import {
+  bulkUpdateAdminProductStatus,
+  createAdminProduct,
+  deleteAdminProduct,
   deleteAdminProductImage,
+  getAdminBrands,
+  getAdminProduct,
   getAdminProductImages,
+  getAdminProducts,
   reorderAdminProductImages,
+  updateAdminProduct,
   updateAdminProductImage,
   uploadAdminProductImage,
 } from './admin-api';
@@ -58,10 +65,7 @@ describe('Admin Product Image API', () => {
 
     const result = await uploadAdminProductImage(42, formData);
 
-    expect(postSpy).toHaveBeenCalledWith(
-      '/admin/products/42/images',
-      formData,
-    );
+    expect(postSpy).toHaveBeenCalledWith('/admin/products/42/images', formData);
     expect(result).toEqual(mockImage);
   });
 
@@ -128,5 +132,132 @@ describe('Admin Product Image API', () => {
     await deleteAdminProductImage(42, 7);
 
     expect(deleteSpy).toHaveBeenCalledWith('/admin/products/42/images/7');
+  });
+});
+
+describe('Admin Product & Brand API', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('queries products with filter params via GET', async () => {
+    const mockResponse = {
+      data: [],
+      meta: { current_page: 1, last_page: 1, total: 0, per_page: 25 },
+    };
+
+    const getSpy = vi
+      .spyOn(apiClient, 'get')
+      .mockResolvedValueOnce(mockResponse);
+
+    const result = await getAdminProducts({
+      search: 'macbook',
+      category_id: 2,
+      is_published: true,
+      page: 1,
+      per_page: 25,
+    });
+
+    expect(getSpy).toHaveBeenCalledWith(
+      '/admin/products?search=macbook&category_id=2&is_published=1&page=1&per_page=25',
+      { signal: undefined },
+    );
+    expect(result).toEqual(mockResponse);
+  });
+
+  it('fetches a single product by id via GET', async () => {
+    const mockProduct = { id: 10, name: 'Laptop Pro' };
+    const getSpy = vi
+      .spyOn(apiClient, 'get')
+      .mockResolvedValueOnce({ data: mockProduct });
+
+    const result = await getAdminProduct(10);
+
+    expect(getSpy).toHaveBeenCalledWith('/admin/products/10', {
+      signal: undefined,
+    });
+    expect(result).toEqual(mockProduct);
+  });
+
+  it('creates a new product via POST', async () => {
+    const mockProduct = { id: 10, name: 'New Laptop', slug: 'new-laptop' };
+    const postSpy = vi
+      .spyOn(apiClient, 'post')
+      .mockResolvedValueOnce({ data: mockProduct });
+
+    const payload = {
+      name: 'New Laptop',
+      category_id: 1,
+      brand_id: 2,
+      summary: 'Summary text',
+      description: 'Long description',
+      price: 1299,
+      availability: 'in_stock' as const,
+      is_published: true,
+    };
+
+    const result = await createAdminProduct(payload);
+
+    expect(postSpy).toHaveBeenCalledWith('/admin/products', payload);
+    expect(result).toEqual(mockProduct);
+  });
+
+  it('updates an existing product via PATCH', async () => {
+    const mockProduct = { id: 10, name: 'Updated Laptop' };
+    const patchSpy = vi
+      .spyOn(apiClient, 'patch')
+      .mockResolvedValueOnce({ data: mockProduct });
+
+    const payload = { price: 1199 };
+    const result = await updateAdminProduct(10, payload);
+
+    expect(patchSpy).toHaveBeenCalledWith('/admin/products/10', payload);
+    expect(result).toEqual(mockProduct);
+  });
+
+  it('soft-deletes a product via DELETE', async () => {
+    const deleteSpy = vi
+      .spyOn(apiClient, 'delete')
+      .mockResolvedValueOnce(undefined);
+
+    await deleteAdminProduct(10);
+
+    expect(deleteSpy).toHaveBeenCalledWith('/admin/products/10');
+  });
+
+  it('bulk-updates product status via PATCH', async () => {
+    const patchSpy = vi
+      .spyOn(apiClient, 'patch')
+      .mockResolvedValueOnce(undefined);
+
+    await bulkUpdateAdminProductStatus({
+      product_ids: [1, 2, 3],
+      is_published: true,
+    });
+
+    expect(patchSpy).toHaveBeenCalledWith('/admin/products/bulk-status', {
+      product_ids: [1, 2, 3],
+      is_published: true,
+    });
+  });
+
+  it('queries brands via GET', async () => {
+    const mockBrands = {
+      data: [{ id: 1, name: 'Apple', slug: 'apple', products_count: 5 }],
+      meta: { current_page: 1, last_page: 1, total: 1, per_page: 25 },
+    };
+
+    const getSpy = vi.spyOn(apiClient, 'get').mockResolvedValueOnce(mockBrands);
+
+    const result = await getAdminBrands({ search: 'App' });
+
+    expect(getSpy).toHaveBeenCalledWith('/admin/brands?search=App', {
+      signal: undefined,
+    });
+    expect(result).toEqual(mockBrands);
   });
 });

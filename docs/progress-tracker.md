@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P7, Admin
-**Current step:** P7-S6
-**Last updated:** 2026-11-16 (P7-S5)
+**Current step:** P7-S7
+**Last updated:** 2026-11-16 (P7-S6)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -85,7 +85,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P7-S3** Category and spec definition management · `feat(admin)`
 - [x] **P7-S4** Brand and product CRUD (API) · `feat(admin)`
 - [x] **P7-S5** Image upload, reorder, delete (validated, private disk or storage link) · `feat(admin)`
-- [ ] **P7-S6** FE: product management tables and forms · `feat(admin)`
+- [x] **P7-S6** FE: product management tables and forms · `feat(admin)`
 - [ ] **P7-S7** User management (activate/deactivate, role) · `feat(admin)`
 - [ ] **P7-S8** Review moderation queue + triggers summary regeneration · `feat(admin)`
 - [ ] **P7-S9** AI usage analytics endpoint and charts · `feat(admin)`
@@ -163,6 +163,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P7-S4 note: Admin Brand and Product CRUD operations enforce admin-only policies and full audit logging via `AuditLogger` (`brand.created/updated/deleted`, `product.created/updated/deleted`, and `product.bulk_status_updated`). Deleting a brand with existing products is blocked with a 422 validation error. Products utilize soft deletes, dynamically recalculate category Value Scores on creation, price edits, spec synchronization, and deletion, and record initial and subsequent price points in `price_history`. Spec definitions on products are strictly validated to belong to the product's category and match typed data schemas (number, boolean, text).
 - P7-S5 verification: Pint (318 files), PHPStan level 6 (no errors across 248 files), and full Pest pass inside the `app` container (299 tests, 5802 assertions). Frontend lint, typecheck, 190 Vitest tests across 41 test files, and production build pass. `git diff --check` is clean.
 - P7-S5 note: Product image management endpoints (`GET /admin/products/{id}/images`, `POST .../images`, `PATCH .../images/reorder`, `PATCH .../images/{imageId}`, and `DELETE .../images/{imageId}`) enforce admin role policies and record audit trails (`product_image.created/reordered/updated/deleted`). Uploaded images are strictly validated (jpeg, png, webp, ≤ 5 MB, required alt text) and stored on the `public` storage disk with hash-generated filenames. The first uploaded image is automatically designated as primary; uploading or updating an image with `is_primary = true` demotes any existing primary. Deleting an image safely cleans up the physical storage file and automatically promotes the next image in sequence to primary if available. Scoped route parameters ensure cross-product image mutations reject with 404.
+- P7-S6 verification: frontend lint (0 errors, 0 warnings), typecheck (0 errors), 204 Vitest tests across 42 test files, Prettier, and production build pass. This was a frontend-only step; Docker was running and no backend files changed. `git diff --check` is clean.
+- P7-S6 note: Product management tables and dialogs provide keyword search across name/slug/brand, multi-axis filtering (category, brand, publication status, stock availability), multi-item selection with bulk publishing/unpublishing, and paginated rows with thumbnail previews, Value Score and rating displays, and stock badges. Product creation and editing forms use React Hook Form + Zod, prefill brand and category options, dynamically fetch and validate category specifications (handling numbers, booleans, and text), and handle server validation mapping. A dedicated image manager dialog supports reordering, setting primary images, accessible alt text editing, file type/size validation (≤ 5MB), and deletion.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -194,6 +196,7 @@ One line per step on what you learned. Turns into interview material.
 | P7-S3 | In nested REST resources, Laravel scoped route binding requires child relationship names to match the plural URI segment (or explicit relationship alias), while preventing cycle loops in category trees requires ancestry checks in form request validation. |
 | P7-S4 | Synchronizing multi-type catalog specifications on products requires strict category-scoping in request validation, while price changes must record date-stamped history points and trigger category Value Score recalculations across old and new categories. |
 | P7-S5 | Testing image uploads in environments without the GD extension requires lightweight byte-header fixtures rather than canvas rendering, while gallery primary lifecycle must promote the next image on deletion and demote previous primaries on designation. |
+| P7-S6 | Dynamic spec inputs in modal dialogs avoid cascading render warnings when the form is mounted with a key derived from the entity id rather than synchronizing state via useEffect, while bulk operations require tracking page-slice ids against a global selection set. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

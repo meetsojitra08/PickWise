@@ -12,6 +12,7 @@ import { RequireGuest } from '@/features/auth/components/RequireGuest';
 import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
 import { AdminCategoriesPage } from '@/features/admin/pages/AdminCategoriesPage';
 import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage';
+import { AdminProductsPage } from '@/features/admin/pages/AdminProductsPage';
 
 const AdminLayout = lazy(() =>
   import('@/app/layouts/AdminLayout').then((module) => ({
@@ -101,17 +102,7 @@ export function AppRoutes() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboardPage />} />
             <Route path="categories" element={<AdminCategoriesPage />} />
-            <Route
-              path="products"
-              element={
-                <RoutePlaceholderPage
-                  title="Product Catalog"
-                  description="CRUD products, manage specs, and upload product images (arriving in P7-S4 to P7-S6)."
-                  actionLabel="Back to Dashboard"
-                  actionTo="/admin"
-                />
-              }
-            />
+            <Route path="products" element={<AdminProductsPage />} />
             <Route
               path="users"
               element={

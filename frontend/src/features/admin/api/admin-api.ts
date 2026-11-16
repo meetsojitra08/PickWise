@@ -2,9 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import type { ApiPaginatedResponse, ApiSuccessResponse } from '@/types/api';
 import type {
+  AdminBrand,
+  AdminBrandFilters,
+  AdminBulkStatusPayload,
   AdminCategory,
   AdminCategoryFormData,
   AdminDashboardData,
+  AdminProduct,
+  AdminProductFilters,
+  AdminProductFormData,
   AdminProductImage,
   AdminProductImageReorderPayload,
   AdminProductImageUpdatePayload,
@@ -20,8 +26,16 @@ export const adminKeys = {
     [...adminKeys.categories(), 'list', filters] as const,
   categorySpecs: (categoryId: number, search?: string) =>
     [...adminKeys.categories(), categoryId, 'specs', search] as const,
+  products: () => [...adminKeys.all, 'products'] as const,
+  productList: (filters?: Record<string, unknown>) =>
+    [...adminKeys.products(), 'list', filters] as const,
+  productDetail: (id: number) =>
+    [...adminKeys.products(), 'detail', id] as const,
   productImages: (productId: number) =>
     [...adminKeys.all, 'products', productId, 'images'] as const,
+  brands: () => [...adminKeys.all, 'brands'] as const,
+  brandList: (filters?: Record<string, unknown>) =>
+    [...adminKeys.brands(), 'list', filters] as const,
 };
 
 export async function getAdminDashboard(
@@ -228,5 +242,138 @@ export async function deleteAdminProductImage(
   productId: number,
   imageId: number,
 ): Promise<void> {
-  await apiClient.delete<void>(`/admin/products/${productId}/images/${imageId}`);
+  await apiClient.delete<void>(
+    `/admin/products/${productId}/images/${imageId}`,
+  );
+}
+
+export async function getAdminProducts(
+  filters?: AdminProductFilters,
+  signal?: AbortSignal,
+): Promise<ApiPaginatedResponse<AdminProduct>> {
+  const params = new URLSearchParams();
+
+  if (filters?.search) {
+    params.set('search', filters.search);
+  }
+  if (filters?.category_id !== undefined) {
+    params.set('category_id', String(filters.category_id));
+  }
+  if (filters?.brand_id !== undefined) {
+    params.set('brand_id', String(filters.brand_id));
+  }
+  if (typeof filters?.is_published === 'boolean') {
+    params.set('is_published', filters.is_published ? '1' : '0');
+  }
+  if (filters?.availability) {
+    params.set('availability', filters.availability);
+  }
+  if (filters?.trashed) {
+    params.set('trashed', filters.trashed);
+  }
+  if (filters?.sort) {
+    params.set('sort', filters.sort);
+  }
+  if (filters?.page) {
+    params.set('page', String(filters.page));
+  }
+  if (filters?.per_page) {
+    params.set('per_page', String(filters.per_page));
+  }
+
+  const queryString = params.toString();
+  const url = queryString
+    ? `/admin/products?${queryString}`
+    : '/admin/products';
+
+  return apiClient.get<ApiPaginatedResponse<AdminProduct>>(url, { signal });
+}
+
+export function useAdminProducts(filters?: AdminProductFilters) {
+  return useQuery<ApiPaginatedResponse<AdminProduct>>({
+    queryKey: adminKeys.productList(filters as Record<string, unknown>),
+    queryFn: ({ signal }) => getAdminProducts(filters, signal),
+  });
+}
+
+export async function getAdminProduct(
+  id: number,
+  signal?: AbortSignal,
+): Promise<AdminProduct> {
+  const response = await apiClient.get<ApiSuccessResponse<AdminProduct>>(
+    `/admin/products/${id}`,
+    { signal },
+  );
+  return response.data;
+}
+
+export function useAdminProduct(id: number) {
+  return useQuery<AdminProduct>({
+    queryKey: adminKeys.productDetail(id),
+    queryFn: ({ signal }) => getAdminProduct(id, signal),
+    enabled: id > 0,
+  });
+}
+
+export async function createAdminProduct(
+  data: AdminProductFormData,
+): Promise<AdminProduct> {
+  const response = await apiClient.post<ApiSuccessResponse<AdminProduct>>(
+    '/admin/products',
+    data,
+  );
+  return response.data;
+}
+
+export async function updateAdminProduct(
+  id: number,
+  data: Partial<AdminProductFormData>,
+): Promise<AdminProduct> {
+  const response = await apiClient.patch<ApiSuccessResponse<AdminProduct>>(
+    `/admin/products/${id}`,
+    data,
+  );
+  return response.data;
+}
+
+export async function deleteAdminProduct(id: number): Promise<void> {
+  await apiClient.delete<void>(`/admin/products/${id}`);
+}
+
+export async function bulkUpdateAdminProductStatus(
+  payload: AdminBulkStatusPayload,
+): Promise<void> {
+  await apiClient.patch<void>('/admin/products/bulk-status', payload);
+}
+
+export async function getAdminBrands(
+  filters?: AdminBrandFilters,
+  signal?: AbortSignal,
+): Promise<ApiPaginatedResponse<AdminBrand>> {
+  const params = new URLSearchParams();
+
+  if (filters?.search) {
+    params.set('search', filters.search);
+  }
+  if (filters?.sort) {
+    params.set('sort', filters.sort);
+  }
+  if (filters?.page) {
+    params.set('page', String(filters.page));
+  }
+  if (filters?.per_page) {
+    params.set('per_page', String(filters.per_page));
+  }
+
+  const queryString = params.toString();
+  const url = queryString ? `/admin/brands?${queryString}` : '/admin/brands';
+
+  return apiClient.get<ApiPaginatedResponse<AdminBrand>>(url, { signal });
+}
+
+export function useAdminBrands(filters?: AdminBrandFilters) {
+  return useQuery<ApiPaginatedResponse<AdminBrand>>({
+    queryKey: adminKeys.brandList(filters as Record<string, unknown>),
+    queryFn: ({ signal }) => getAdminBrands(filters, signal),
+  });
 }
