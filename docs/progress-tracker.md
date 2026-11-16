@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P7, Admin
-**Current step:** P7-S8
-**Last updated:** 2026-11-16 (P7-S7)
+**Current step:** P7-S9
+**Last updated:** 2026-11-16 (P7-S8)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -87,7 +87,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P7-S5** Image upload, reorder, delete (validated, private disk or storage link) · `feat(admin)`
 - [x] **P7-S6** FE: product management tables and forms · `feat(admin)`
 - [x] **P7-S7** User management (activate/deactivate, role) · `feat(admin)`
-- [ ] **P7-S8** Review moderation queue + triggers summary regeneration · `feat(admin)`
+- [x] **P7-S8** Review moderation queue + triggers summary regeneration · `feat(admin)`
 - [ ] **P7-S9** AI usage analytics endpoint and charts · `feat(admin)`
 - [ ] **P7-S10** Audit log viewer with filters · `feat(admin)`
 
@@ -167,6 +167,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P7-S6 note: Product management tables and dialogs provide keyword search across name/slug/brand, multi-axis filtering (category, brand, publication status, stock availability), multi-item selection with bulk publishing/unpublishing, and paginated rows with thumbnail previews, Value Score and rating displays, and stock badges. Product creation and editing forms use React Hook Form + Zod, prefill brand and category options, dynamically fetch and validate category specifications (handling numbers, booleans, and text), and handle server validation mapping. A dedicated image manager dialog supports reordering, setting primary images, accessible alt text editing, file type/size validation (≤ 5MB), and deletion.
 - P7-S7 verification: Pint (324 files), PHPStan level 6 (no errors across 253 files), and full Pest pass inside the `app` container (308 tests, 5889 assertions). Frontend lint (0 warnings, 0 errors), typecheck (0 errors), 212 Vitest tests across 43 test files, and production build pass. `git diff --check` is clean.
 - P7-S7 note: User management endpoints (`GET /admin/users`, `PATCH /admin/users/{user}`) enforce active admin policy checks and record audit logs (`user.updated` with diffs). Self-protection prevents admins from deactivating or demoting themselves via gate inspection, while a last-admin guard prevents deactivating or demoting the last remaining active administrator in the database. `EnsureUserIsActive` middleware immediately destroys session and logs out deactivated users on their next authenticated request, while `AuthenticateUser` rejects deactivated customer/admin login attempts. The frontend `AdminUsersPage` features search by name or email, role and active status filtering, sort controls, review counts, a "You" self-protection badge disabling actions on the logged-in administrator, and confirmation dialogs with clear explanations for status toggle and role changes.
+- P7-S8 verification: Pint (331 files), PHPStan level 6 (no errors across 259 files), and full Pest pass inside the `app` container (320 tests, 5966 assertions). Frontend lint (0 warnings, 0 errors), typecheck (0 errors), 224 Vitest tests across 44 test files, and production build pass. `git diff --check` is clean.
+- P7-S8 note: Review moderation endpoints (`GET /admin/reviews`, `PATCH /admin/reviews/{id}`, `PATCH /admin/reviews/bulk-status`, `DELETE /admin/reviews/{id}`, and `POST /admin/products/{id}/regenerate-summary`) enforce active admin policies and record full audit trails with optional rejection reasons (`review.moderated`, `review.bulk_moderated`, `review.deleted`, and `product.summary_regenerated`). Moderating or deleting an approved review automatically triggers product rating aggregation, category Value Score recalculation, and queues `GenerateReviewSummary`. On the frontend, `AdminReviewsPage` provides status tabs (defaulting to pending queue), search and star rating filters, single and bulk approve/reject workflows with confirmation modals, and empty state guidance, alongside an AI summary regeneration trigger on products.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -200,6 +202,7 @@ One line per step on what you learned. Turns into interview material.
 | P7-S5 | Testing image uploads in environments without the GD extension requires lightweight byte-header fixtures rather than canvas rendering, while gallery primary lifecycle must promote the next image on deletion and demote previous primaries on designation. |
 | P7-S6 | Dynamic spec inputs in modal dialogs avoid cascading render warnings when the form is mounted with a key derived from the entity id rather than synchronizing state via useEffect, while bulk operations require tracking page-slice ids against a global selection set. |
 | P7-S7 | Managing user accounts requires self-protection and race-condition guards: prevent admins from deactivating or demoting themselves via gate inspection, reject removing the last active administrator in the database, invalidate sessions immediately on deactivation in middleware, and refresh Eloquent instances during testing to accurately track non-fillable status changes. |
+| P7-S8 | Review moderation has cascading catalog side effects: approving, rejecting, or deleting reviews must recalculate product rating aggregates, recompute category Value Scores, and dispatch queued AI summary jobs, while keeping review author fallback chains resilient when seeded reviews lack user accounts. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

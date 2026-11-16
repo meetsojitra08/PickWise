@@ -1,15 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiClient } from '@/lib/api-client';
 import {
+  bulkModerateAdminReviews,
   bulkUpdateAdminProductStatus,
   createAdminProduct,
   deleteAdminProduct,
   deleteAdminProductImage,
+  deleteAdminReview,
   getAdminBrands,
   getAdminProduct,
   getAdminProductImages,
   getAdminProducts,
+  getAdminReviews,
   getAdminUsers,
+  moderateAdminReview,
+  regenerateProductReviewSummary,
   reorderAdminProductImages,
   updateAdminProduct,
   updateAdminProductImage,
@@ -317,5 +322,120 @@ describe('Admin Product & Brand API', () => {
       is_active: false,
     });
     expect(result).toEqual(mockUpdated);
+  });
+});
+
+describe('Admin Review Moderation API', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('fetches reviews with status, search, rating, and pagination filters via GET', async () => {
+    const mockReviews = {
+      data: [
+        {
+          id: 1,
+          product: { id: 10, name: 'Phone', slug: 'phone', is_published: true, rating_avg: 4.5, rating_count: 2 },
+          user: { id: 2, name: 'Alice', email: 'alice@example.com' },
+          author_name: 'Alice',
+          rating: 5,
+          title: 'Great phone',
+          body: 'Really liked it.',
+          status: 'pending',
+          moderator: null,
+          moderated_by: null,
+          moderated_at: null,
+          created_at: '2026-11-01T00:00:00Z',
+          updated_at: '2026-11-01T00:00:00Z',
+        },
+      ],
+      meta: { current_page: 1, last_page: 1, per_page: 25, total: 1 },
+      links: {},
+    };
+
+    const getSpy = vi.spyOn(apiClient, 'get').mockResolvedValueOnce(mockReviews);
+
+    const result = await getAdminReviews({
+      status: 'pending',
+      search: 'phone',
+      rating: 5,
+      page: 1,
+    });
+
+    expect(getSpy).toHaveBeenCalledWith(
+      '/admin/reviews?status=pending&search=phone&rating=5&page=1',
+      { signal: undefined },
+    );
+    expect(result).toEqual(mockReviews);
+  });
+
+  it('moderates a single review via PATCH', async () => {
+    const mockResponse = {
+      data: {
+        id: 1,
+        status: 'approved',
+        moderated_by: 99,
+        moderated_at: '2026-11-16T12:00:00Z',
+      },
+    };
+
+    const patchSpy = vi.spyOn(apiClient, 'patch').mockResolvedValueOnce(mockResponse);
+
+    const result = await moderateAdminReview(1, {
+      status: 'approved',
+      reason: 'Verified customer feedback',
+    });
+
+    expect(patchSpy).toHaveBeenCalledWith('/admin/reviews/1', {
+      status: 'approved',
+      reason: 'Verified customer feedback',
+    });
+    expect(result).toEqual(mockResponse);
+  });
+
+  it('bulk moderates reviews via PATCH', async () => {
+    const mockResponse = {
+      data: { count: 3, status: 'rejected' },
+    };
+
+    const patchSpy = vi.spyOn(apiClient, 'patch').mockResolvedValueOnce(mockResponse);
+
+    const result = await bulkModerateAdminReviews({
+      review_ids: [1, 2, 3],
+      status: 'rejected',
+      reason: 'Spam promotion links',
+    });
+
+    expect(patchSpy).toHaveBeenCalledWith('/admin/reviews/bulk-status', {
+      review_ids: [1, 2, 3],
+      status: 'rejected',
+      reason: 'Spam promotion links',
+    });
+    expect(result).toEqual(mockResponse);
+  });
+
+  it('deletes a review via DELETE', async () => {
+    const deleteSpy = vi.spyOn(apiClient, 'delete').mockResolvedValueOnce(undefined);
+
+    await deleteAdminReview(1);
+
+    expect(deleteSpy).toHaveBeenCalledWith('/admin/reviews/1');
+  });
+
+  it('triggers review summary regeneration via POST', async () => {
+    const mockResponse = {
+      data: { product_id: 10, queued: true, message: 'Review summary regeneration queued.' },
+    };
+
+    const postSpy = vi.spyOn(apiClient, 'post').mockResolvedValueOnce(mockResponse);
+
+    const result = await regenerateProductReviewSummary(10);
+
+    expect(postSpy).toHaveBeenCalledWith('/admin/products/10/regenerate-summary');
+    expect(result).toEqual(mockResponse);
   });
 });

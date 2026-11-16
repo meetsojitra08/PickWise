@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
 use App\Http\Controllers\Api\V1\Admin\AdminProductController;
 use App\Http\Controllers\Api\V1\Admin\AdminProductImageController;
+use App\Http\Controllers\Api\V1\Admin\AdminReviewController;
 use App\Http\Controllers\Api\V1\Admin\AdminSpecDefinitionController;
 use App\Http\Controllers\Api\V1\Admin\AdminUserController;
 use App\Http\Controllers\Api\V1\Assistant\ConversationController;
@@ -195,4 +196,17 @@ Route::prefix('admin')
         Route::patch('users/{user}', [AdminUserController::class, 'update'])
             ->whereNumber('user')
             ->name('api.v1.admin.users.update');
+        Route::post('products/{product}/regenerate-summary', [AdminProductController::class, 'regenerateSummary'])
+            ->whereNumber('product')
+            ->name('api.v1.admin.products.regenerate-summary');
+        Route::patch('reviews/bulk-status', [AdminReviewController::class, 'bulkStatus'])
+            ->name('api.v1.admin.reviews.bulk-status');
+        Route::get('reviews', [AdminReviewController::class, 'index'])
+            ->name('api.v1.admin.reviews.index');
+        Route::patch('reviews/{review}', [AdminReviewController::class, 'update'])
+            ->whereNumber('review')
+            ->name('api.v1.admin.reviews.update');
+        Route::delete('reviews/{review}', [AdminReviewController::class, 'destroy'])
+            ->whereNumber('review')
+            ->name('api.v1.admin.reviews.destroy');
     });

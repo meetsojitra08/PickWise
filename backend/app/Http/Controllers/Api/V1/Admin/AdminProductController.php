@@ -12,6 +12,7 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Http\Resources\Admin\AdminProductResource;
 use App\Http\Responses\ApiResponse;
+use App\Jobs\GenerateReviewSummary;
 use App\Models\PriceHistory;
 use App\Models\Product;
 use App\Models\ProductSpec;
@@ -294,6 +295,35 @@ final class AdminProductController extends Controller
             'updated_count' => count($productIds),
             'is_published' => $isPublished,
             'affected_categories' => count($affectedCategories),
+        ]);
+    }
+
+    /**
+     * Trigger review summary regeneration for a product.
+     */
+    public function regenerateSummary(Product $product, Request $request): JsonResponse
+    {
+        Gate::authorize('update', $product);
+
+        /** @var User $admin */
+        $admin = $request->user();
+
+        GenerateReviewSummary::dispatch($product->id);
+
+        $this->auditLogger->record(
+            admin: $admin,
+            action: 'product.summary_regenerated',
+            subject: $product,
+            changes: [
+                'product_id' => $product->id,
+                'name' => $product->name,
+            ],
+        );
+
+        return ApiResponse::success([
+            'product_id' => $product->id,
+            'queued' => true,
+            'message' => 'Review summary regeneration queued.',
         ]);
     }
 

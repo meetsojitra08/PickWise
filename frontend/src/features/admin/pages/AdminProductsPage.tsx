@@ -8,6 +8,7 @@ import {
   Plus,
   RefreshCw,
   Search,
+  Sparkles,
   Trash2,
   X,
 } from 'lucide-react';
@@ -29,6 +30,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   bulkUpdateAdminProductStatus,
   deleteAdminProduct,
+  regenerateProductReviewSummary,
   useAdminBrands,
   useAdminCategories,
   useAdminProducts,
@@ -190,6 +192,19 @@ export function AdminProductsPage() {
     setAvailabilityFilter('');
     setSort('-created_at');
     setPage(1);
+  }
+
+  async function handleRegenerateSummary(product: AdminProduct): Promise<void> {
+    try {
+      await regenerateProductReviewSummary(product.id);
+      toast.success(`Queued AI summary regeneration for "${product.name}".`);
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : 'Failed to queue summary regeneration.',
+      );
+    }
   }
 
   const hasActiveFilters = Boolean(
@@ -648,6 +663,19 @@ export function AdminProductsPage() {
                           >
                             <ImageIcon className="size-3 text-primary" />
                             Images
+                          </Button>
+
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="xs"
+                            onClick={() => void handleRegenerateSummary(product)}
+                            className="gap-1 text-xs"
+                            title="Regenerate AI review summary"
+                            aria-label={`Regenerate review summary for ${product.name}`}
+                          >
+                            <Sparkles className="size-3 text-amber-500" />
+                            Summary
                           </Button>
 
                           <Button

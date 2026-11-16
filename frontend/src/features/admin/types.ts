@@ -281,3 +281,68 @@ export interface UpdateAdminUserPayload {
   is_active?: boolean;
   role?: 'customer' | 'admin';
 }
+
+export type ReviewModerationStatus = 'pending' | 'approved' | 'rejected';
+
+export interface AdminReview {
+  id: number;
+  product: {
+    id: number;
+    name: string;
+    slug: string;
+    is_published: boolean;
+    rating_avg: number;
+    rating_count: number;
+  } | null;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  author_name: string;
+  rating: number;
+  title: string;
+  body: string;
+  status: ReviewModerationStatus;
+  moderator: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  moderated_by: number | null;
+  moderated_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminReviewFilters {
+  status?: ReviewModerationStatus | 'all';
+  search?: string;
+  rating?: number;
+  product_id?: number;
+  sort?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface ModerateReviewPayload {
+  status: ReviewModerationStatus;
+  reason?: string;
+}
+
+export interface BulkModerateReviewsPayload {
+  review_ids: number[];
+  status: 'approved' | 'rejected';
+  reason?: string;
+}
+
+export interface BulkModerateReviewsResponse {
+  count: number;
+  status: 'approved' | 'rejected';
+}
+
+export interface RegenerateSummaryResponse {
+  product_id: number;
+  queued: boolean;
+  message: string;
+}

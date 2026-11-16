@@ -18,6 +18,12 @@ import type {
   AdminSpecDefinitionFormData,
   AdminUser,
   AdminUserFilters,
+  BulkModerateReviewsPayload,
+  BulkModerateReviewsResponse,
+  ModerateReviewPayload,
+  RegenerateSummaryResponse,
+  AdminReview,
+  AdminReviewFilters,
   UpdateAdminUserPayload,
 } from '../types';
 
@@ -42,6 +48,9 @@ export const adminKeys = {
   users: () => [...adminKeys.all, 'users'] as const,
   userList: (filters?: Record<string, unknown>) =>
     [...adminKeys.users(), 'list', filters] as const,
+  reviews: () => [...adminKeys.all, 'reviews'] as const,
+  reviewList: (filters?: Record<string, unknown>) =>
+    [...adminKeys.reviews(), 'list', filters] as const,
 };
 
 export async function getAdminDashboard(
@@ -429,5 +438,79 @@ export async function updateAdminUser(
   return apiClient.patch<ApiSuccessResponse<AdminUser>>(
     `/admin/users/${userId}`,
     payload,
+  );
+}
+
+export async function getAdminReviews(
+  filters?: AdminReviewFilters,
+  signal?: AbortSignal,
+): Promise<ApiPaginatedResponse<AdminReview>> {
+  const params = new URLSearchParams();
+
+  if (filters?.status && filters.status !== 'all') {
+    params.set('status', filters.status);
+  } else if (filters?.status === 'all') {
+    params.set('status', 'all');
+  }
+  if (filters?.search) {
+    params.set('search', filters.search);
+  }
+  if (typeof filters?.rating === 'number' && filters.rating > 0) {
+    params.set('rating', String(filters.rating));
+  }
+  if (typeof filters?.product_id === 'number' && filters.product_id > 0) {
+    params.set('product_id', String(filters.product_id));
+  }
+  if (filters?.sort) {
+    params.set('sort', filters.sort);
+  }
+  if (filters?.page) {
+    params.set('page', String(filters.page));
+  }
+  if (filters?.per_page) {
+    params.set('per_page', String(filters.per_page));
+  }
+
+  const queryString = params.toString();
+  const url = queryString ? `/admin/reviews?${queryString}` : '/admin/reviews';
+
+  return apiClient.get<ApiPaginatedResponse<AdminReview>>(url, { signal });
+}
+
+export function useAdminReviews(filters?: AdminReviewFilters) {
+  return useQuery<ApiPaginatedResponse<AdminReview>>({
+    queryKey: adminKeys.reviewList(filters as Record<string, unknown>),
+    queryFn: ({ signal }) => getAdminReviews(filters, signal),
+  });
+}
+
+export async function moderateAdminReview(
+  reviewId: number,
+  payload: ModerateReviewPayload,
+): Promise<ApiSuccessResponse<AdminReview>> {
+  return apiClient.patch<ApiSuccessResponse<AdminReview>>(
+    `/admin/reviews/${reviewId}`,
+    payload,
+  );
+}
+
+export async function bulkModerateAdminReviews(
+  payload: BulkModerateReviewsPayload,
+): Promise<ApiSuccessResponse<BulkModerateReviewsResponse>> {
+  return apiClient.patch<ApiSuccessResponse<BulkModerateReviewsResponse>>(
+    '/admin/reviews/bulk-status',
+    payload,
+  );
+}
+
+export async function deleteAdminReview(reviewId: number): Promise<void> {
+  await apiClient.delete<void>(`/admin/reviews/${reviewId}`);
+}
+
+export async function regenerateProductReviewSummary(
+  productId: number,
+): Promise<ApiSuccessResponse<RegenerateSummaryResponse>> {
+  return apiClient.post<ApiSuccessResponse<RegenerateSummaryResponse>>(
+    `/admin/products/${productId}/regenerate-summary`,
   );
 }
