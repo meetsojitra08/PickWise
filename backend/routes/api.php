@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
 use App\Http\Controllers\Api\V1\Assistant\ConversationController;
 use App\Http\Controllers\Api\V1\Assistant\MessageController;
 use App\Http\Controllers\Api\V1\Assistant\QuotaController;
@@ -157,4 +158,11 @@ Route::prefix('assistant')
             ->whereNumber('conversation')
             ->middleware('ai-quota:assistant')
             ->name('api.v1.assistant.messages.store');
+    });
+
+Route::prefix('admin')
+    ->middleware(['auth:sanctum', 'role:admin'])
+    ->group(function (): void {
+        Route::get('/dashboard', AdminDashboardController::class)
+            ->name('api.v1.admin.dashboard');
     });

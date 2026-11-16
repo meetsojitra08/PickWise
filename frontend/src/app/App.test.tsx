@@ -183,9 +183,32 @@ describe('App shell and route layouts', () => {
   });
 
   it('renders AdminLayout for active admin users on /admin', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-      jsonResponse({ data: adminUser }),
-    );
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes('/admin/dashboard')) {
+        return jsonResponse({
+          data: {
+            counts: {
+              products: { total: 0, published: 0, unpublished: 0 },
+              users: { total: 1, active: 1, customers: 0, admins: 1 },
+              pending_reviews: 0,
+              ai_calls_today: 0,
+            },
+            ai_usage_today: {
+              total_calls: 0,
+              successful_calls: 0,
+              failed_calls: 0,
+              total_tokens: 0,
+              avg_latency_ms: 0,
+            },
+            recent_activity: [],
+            pending_reviews: [],
+          },
+        });
+      }
+
+      return jsonResponse({ data: adminUser });
+    });
 
     renderRoute(['/admin']);
 

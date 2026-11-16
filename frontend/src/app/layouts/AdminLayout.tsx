@@ -1,5 +1,15 @@
-import { useState } from 'react';
-import { ArrowLeft, LayoutDashboard, Menu } from 'lucide-react';
+import { Suspense, useState } from 'react';
+import {
+  ArrowLeft,
+  Bot,
+  FolderTree,
+  LayoutDashboard,
+  Menu,
+  MessageSquareAlert,
+  Package,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router';
 import { PickwiseLogo } from '@/components/shared/PickwiseLogo';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
@@ -14,10 +24,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { AuthGuardFallback } from '@/features/auth/components/AuthGuardFallback';
 import { cn } from '@/lib/utils';
 
 const ADMIN_NAV_ITEMS = [
   { label: 'Overview', to: '/admin', icon: LayoutDashboard },
+  { label: 'Categories', to: '/admin/categories', icon: FolderTree },
+  { label: 'Products', to: '/admin/products', icon: Package },
+  { label: 'Users', to: '/admin/users', icon: Users },
+  { label: 'Reviews', to: '/admin/reviews', icon: MessageSquareAlert },
+  { label: 'AI Usage', to: '/admin/ai', icon: Bot },
+  { label: 'Audit Log', to: '/admin/activity-logs', icon: ShieldCheck },
 ] as const;
 
 function adminNavLinkClass({ isActive }: { isActive: boolean }): string {
@@ -197,7 +214,9 @@ export function AdminLayout() {
           className="flex-1 p-4 outline-none sm:p-6"
         >
           <div className="mx-auto max-w-6xl">
-            <Outlet />
+            <Suspense fallback={<AuthGuardFallback />}>
+              <Outlet />
+            </Suspense>
           </div>
         </main>
       </div>

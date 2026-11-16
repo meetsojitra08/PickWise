@@ -10,6 +10,7 @@ import { RequireAdmin } from '@/features/auth/components/RequireAdmin';
 import { RequireAuth } from '@/features/auth/components/RequireAuth';
 import { RequireGuest } from '@/features/auth/components/RequireGuest';
 import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
+import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage';
 
 const AdminLayout = lazy(() =>
   import('@/app/layouts/AdminLayout').then((module) => ({
@@ -97,13 +98,70 @@ export function AppRoutes() {
 
         <Route element={<RequireAdmin />}>
           <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboardPage />} />
             <Route
-              index
+              path="categories"
               element={
                 <RoutePlaceholderPage
-                  title="Admin overview"
-                  description="Catalog management, user controls, review moderation, AI usage analytics, and the audit log arrive in Phase 7."
-                  actionLabel="Return to storefront"
+                  title="Category Management"
+                  description="Manage categories and spec definitions (arriving in P7-S3)."
+                  actionLabel="Back to Dashboard"
+                  actionTo="/admin"
+                />
+              }
+            />
+            <Route
+              path="products"
+              element={
+                <RoutePlaceholderPage
+                  title="Product Catalog"
+                  description="CRUD products, manage specs, and upload product images (arriving in P7-S4 to P7-S6)."
+                  actionLabel="Back to Dashboard"
+                  actionTo="/admin"
+                />
+              }
+            />
+            <Route
+              path="users"
+              element={
+                <RoutePlaceholderPage
+                  title="User Management"
+                  description="Activate, deactivate, and assign administrative roles (arriving in P7-S7)."
+                  actionLabel="Back to Dashboard"
+                  actionTo="/admin"
+                />
+              }
+            />
+            <Route
+              path="reviews"
+              element={
+                <RoutePlaceholderPage
+                  title="Review Moderation"
+                  description="Approve, reject, or remove customer reviews (arriving in P7-S8)."
+                  actionLabel="Back to Dashboard"
+                  actionTo="/admin"
+                />
+              }
+            />
+            <Route
+              path="ai"
+              element={
+                <RoutePlaceholderPage
+                  title="AI Usage Analytics"
+                  description="Monitor assistant, verdict, and review summary usage and costs (arriving in P7-S9)."
+                  actionLabel="Back to Dashboard"
+                  actionTo="/admin"
+                />
+              }
+            />
+            <Route
+              path="activity-logs"
+              element={
+                <RoutePlaceholderPage
+                  title="Audit Log Viewer"
+                  description="Inspect append-only administrative action records and diffs (arriving in P7-S10)."
+                  actionLabel="Back to Dashboard"
+                  actionTo="/admin"
                 />
               }
             />
