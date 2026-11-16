@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P7, Admin
-**Current step:** P7-S1
-**Last updated:** 2026-11-16 (P6-S3)
+**Current step:** P7-S2
+**Last updated:** 2026-11-16 (P7-S1)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -80,7 +80,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P6-S3** Account page: conversation history tab · `feat(account)`
 
 ## P7: Admin (branch `phase/P7-admin`)
-- [ ] **P7-S1** `admin_activity_logs` + `AuditLogger` service · `feat(admin)`
+- [x] **P7-S1** `admin_activity_logs` + `AuditLogger` service · `feat(admin)`
 - [ ] **P7-S2** Admin layout, dashboard endpoint and KPI tiles · `feat(admin)`
 - [ ] **P7-S3** Category and spec definition management · `feat(admin)`
 - [ ] **P7-S4** Brand and product CRUD (API) · `feat(admin)`
@@ -153,6 +153,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P6-S2 note: Assistant prompts now ground recommendations with saved account preferences (default budget, favourite categories, and priorities) as guidance context without leaking user identity or email. Defunct or inactive category slugs are gracefully omitted from prompt context and UI selects. On the frontend, assistant input controls visibly pre-fill from saved preferences, display a subtle "Saved preferences applied" badge, and allow shoppers to clear or override them at any time.
 - P6-S3 verification: frontend lint, typecheck, 175 Vitest tests across 37 test files, and production build pass. This was a frontend-only step; Docker was not running and no backend files changed. `git diff --check` is clean.
 - P6-S3 note: The account page conversation history tab lists saved AI threads with message counts, updated timestamps, empty and skeleton loading states, load-more pagination, and two-step confirmation deletion. Opening a conversation deep-links into `/assistant?conversation={id}`, which synchronizes active conversation state and reopens the thread with grounded database product recommendations.
+- P7-S1 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (249 tests, 5288 assertions). This was a backend-only step; frontend checks were clean before starting and no frontend files changed. `git diff --check` is clean.
+- P7-S1 note: `admin_activity_logs` enforces append-only immutability at the model layer (throwing `BadMethodCallException` on update/delete) and `restrictOnDelete` at the database layer (preventing deletion of admin authors). `AuditLogger` automatically resolves request IPs, computes clean before/after diffs containing only modified attributes, derives standard action names (e.g. `product.updated`), and recursively redacts sensitive credentials (passwords, tokens, keys, prompts) while preserving catalog keys like spec definition keys.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -179,6 +181,7 @@ One line per step on what you learned. Turns into interview material.
 | P6-S1 | Deep-linking into an AI assistant from a home hero requires three handshakes: passing category/budget metadata in the URL query, replacing search params on mount to keep reloads idempotent, and prefilling the input without dispatching when quota is exhausted. |
 | P6-S2 | Personalizing AI prompts requires three boundaries: inject preferences as guidance context without user identity, resolve categories against active database records to drop defunct slugs gracefully, and pre-fill frontend controls so shoppers visibly see and control their defaults. |
 | P6-S3 | Deep-linking conversation history into an active assistant requires syncing query params to state only on external param changes while decoupling manual resets ("New chat") so the URL sync effect does not bounce the cleared chat back to the old id. |
+| P7-S1 | An audit log needs three guarantees: enforce append-only immutability in model boot hooks, protect admin authors with restrictOnDelete in SQL, and redact sensitive keys recursively without clobbering catalog keys like spec_definition.key. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
