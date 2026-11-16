@@ -57,3 +57,63 @@ export interface AdminDashboardData {
   recent_activity: AdminActivityItem[];
   pending_reviews: AdminPendingReviewItem[];
 }
+
+export interface AdminCategory {
+  id: number;
+  parent_id: number | null;
+  parent: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
+  name: string;
+  slug: string;
+  description: string | null;
+  image_path: string | null;
+  image_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  products_count: number;
+  spec_definitions_count: number;
+  children_count: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AdminCategoryFormData {
+  name: string;
+  slug?: string;
+  parent_id: number | null;
+  description?: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export type SpecDataType = 'number' | 'text' | 'boolean';
+
+export interface AdminSpecDefinition {
+  id: number;
+  category_id: number;
+  key: string;
+  label: string;
+  unit: string | null;
+  data_type: SpecDataType;
+  is_filterable: boolean;
+  is_comparable: boolean;
+  higher_is_better: boolean | null;
+  sort_order: number;
+  product_specs_count: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AdminSpecDefinitionFormData {
+  key: string;
+  label: string;
+  unit?: string | null;
+  data_type: SpecDataType;
+  is_filterable: boolean;
+  is_comparable: boolean;
+  higher_is_better?: boolean | null;
+  sort_order: number;
+}

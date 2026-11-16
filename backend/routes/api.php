@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
+use App\Http\Controllers\Api\V1\Admin\AdminSpecDefinitionController;
 use App\Http\Controllers\Api\V1\Assistant\ConversationController;
 use App\Http\Controllers\Api\V1\Assistant\MessageController;
 use App\Http\Controllers\Api\V1\Assistant\QuotaController;
@@ -165,4 +167,9 @@ Route::prefix('admin')
     ->group(function (): void {
         Route::get('/dashboard', AdminDashboardController::class)
             ->name('api.v1.admin.dashboard');
+        Route::apiResource('categories', AdminCategoryController::class)
+            ->names('api.v1.admin.categories');
+        Route::apiResource('categories.specs', AdminSpecDefinitionController::class)
+            ->scoped()
+            ->names('api.v1.admin.categories.specs');
     });

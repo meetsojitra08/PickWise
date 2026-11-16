@@ -4,6 +4,8 @@ import {
   normalizeNetworkError,
 } from '@/lib/api-error';
 
+export { ApiError };
+
 const API_BASE_URL = '/api/v1';
 const SANCTUM_CSRF_ENDPOINT = '/sanctum/csrf-cookie';
 const XSRF_COOKIE_NAME = 'XSRF-TOKEN';

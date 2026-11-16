@@ -10,6 +10,7 @@ import { RequireAdmin } from '@/features/auth/components/RequireAdmin';
 import { RequireAuth } from '@/features/auth/components/RequireAuth';
 import { RequireGuest } from '@/features/auth/components/RequireGuest';
 import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
+import { AdminCategoriesPage } from '@/features/admin/pages/AdminCategoriesPage';
 import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage';
 
 const AdminLayout = lazy(() =>
@@ -99,17 +100,7 @@ export function AppRoutes() {
         <Route element={<RequireAdmin />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboardPage />} />
-            <Route
-              path="categories"
-              element={
-                <RoutePlaceholderPage
-                  title="Category Management"
-                  description="Manage categories and spec definitions (arriving in P7-S3)."
-                  actionLabel="Back to Dashboard"
-                  actionTo="/admin"
-                />
-              }
-            />
+            <Route path="categories" element={<AdminCategoriesPage />} />
             <Route
               path="products"
               element={

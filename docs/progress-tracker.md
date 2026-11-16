@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P7, Admin
-**Current step:** P7-S3
-**Last updated:** 2026-11-16 (P7-S2)
+**Current step:** P7-S4
+**Last updated:** 2026-11-16 (P7-S3)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -82,7 +82,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 ## P7: Admin (branch `phase/P7-admin`)
 - [x] **P7-S1** `admin_activity_logs` + `AuditLogger` service · `feat(admin)`
 - [x] **P7-S2** Admin layout, dashboard endpoint and KPI tiles · `feat(admin)`
-- [ ] **P7-S3** Category and spec definition management · `feat(admin)`
+- [x] **P7-S3** Category and spec definition management · `feat(admin)`
 - [ ] **P7-S4** Brand and product CRUD (API) · `feat(admin)`
 - [ ] **P7-S5** Image upload, reorder, delete (validated, private disk or storage link) · `feat(admin)`
 - [ ] **P7-S6** FE: product management tables and forms · `feat(admin)`
@@ -157,6 +157,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P7-S1 note: `admin_activity_logs` enforces append-only immutability at the model layer (throwing `BadMethodCallException` on update/delete) and `restrictOnDelete` at the database layer (preventing deletion of admin authors). `AuditLogger` automatically resolves request IPs, computes clean before/after diffs containing only modified attributes, derives standard action names (e.g. `product.updated`), and recursively redacts sensitive credentials (passwords, tokens, keys, prompts) while preserving catalog keys like spec definition keys.
 - P7-S2 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (253 tests, 5367 assertions). Frontend lint, typecheck, 180 Vitest tests across 39 test files, Prettier, and production build pass. `git diff --check` is clean.
 - P7-S2 note: `GET /api/v1/admin/dashboard` delivers aggregated catalog counts (total/published/draft products), user counts (active/customer/admin), pending review counts, and today's AI telemetry (total calls, tokens volume, avg response time, error rate), along with latest append-only audit activity and recent pending moderation reviews. The frontend admin layout provides responsive desktop and drawer navigation with clear active states, a dense dashboard grid with accessible KPI tiles, AI health overview, and moderation queue snapshots.
+- P7-S3 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (264 tests, 5506 assertions). Frontend lint, typecheck, 185 Vitest tests across 40 test files, Prettier, and production build pass. `git diff --check` is clean.
+- P7-S3 note: CRUD operations for categories and category-scoped spec definitions enforce admin-only policies and full audit logging via `AuditLogger` (recording `category.created/updated/deleted` and `spec_definition.created/updated/deleted` with before/after diffs). Deleting a category with existing products is blocked with a 422 validation error, while updating a category parent prevents self and descendant loops. On the frontend, `AdminCategoriesPage` features a searchable, filterable table with responsive dialogs for category creation/editing and a slide-over drawer to configure specs with cascade warnings.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -185,6 +187,7 @@ One line per step on what you learned. Turns into interview material.
 | P6-S3 | Deep-linking conversation history into an active assistant requires syncing query params to state only on external param changes while decoupling manual resets ("New chat") so the URL sync effect does not bounce the cleared chat back to the old id. |
 | P7-S1 | An audit log needs three guarantees: enforce append-only immutability in model boot hooks, protect admin authors with restrictOnDelete in SQL, and redact sensitive keys recursively without clobbering catalog keys like spec_definition.key. |
 | P7-S2 | In nested React Router layouts, provide Suspense boundaries around outlet mounts, and enforce sentence case consistency across UI headings and tests. |
+| P7-S3 | In nested REST resources, Laravel scoped route binding requires child relationship names to match the plural URI segment (or explicit relationship alias), while preventing cycle loops in category trees requires ancestry checks in form request validation. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
