@@ -344,3 +344,82 @@ test('alternatives are capped at the three cheapest products inside the 15% wind
         ->and($answer->alternatives[1]->product->price)->toBe('92000.00')
         ->and($answer->alternatives[2]->product->price)->toBe('96000.00');
 });
+
+test('user saved preferences are added to the assistant prompt as context without personal details', function (): void {
+    ['category' => $category, 'brand' => $brand] = assistantCatalog();
+    $monitors = Category::factory()->create(['name' => 'Monitors', 'slug' => 'monitors', 'is_active' => true]);
+    $deletedCat = Category::factory()->create(['name' => 'Old Gadgets', 'slug' => 'old-gadgets', 'is_active' => false]);
+
+    $laptop = Product::factory()->for($category)->for($brand)->create([
+        'name' => 'Aurora Creator 14',
+        'price' => '75000.00',
+    ]);
+
+    $user = User::factory()->create([
+        'name' => 'Private Shopper Name',
+        'email' => 'private-shopper@example.com',
+        'preferences' => [
+            'budget_default' => 80000,
+            'favourite_categories' => ['laptops', 'monitors', 'old-gadgets', 'completely-nonexistent-category'],
+            'priorities' => ['battery life', 'colour accuracy', 'lightweight'],
+        ],
+    ]);
+
+    $fake = fakeGroqClient()->willReturn([
+        'message' => 'Based on your preferences and request, the Aurora Creator 14 fits.',
+        'recommendations' => [
+            ['product_id' => $laptop->id, 'reason' => 'Great battery and colour-accurate screen.'],
+        ],
+    ]);
+
+    $answer = app(AssistantService::class)->answer(
+        new AssistantQuery('laptop for mobile design', 'laptops', '80000.00'),
+        $user,
+    );
+
+    expect($answer->status)->toBe(AssistantReplyStatus::Ok);
+
+    $prompt = $fake->lastUserPrompt();
+
+    // Verify preferences context is included
+    expect($prompt)
+        ->toContain('Shopper saved preferences (guidance context; specific request filters take precedence):')
+        ->toContain('- Default budget: 80000.00 INR')
+        ->toContain('- Favourite categories: Laptops, Monitors')
+        ->toContain('- Priorities: battery life, colour accuracy, lightweight')
+        // Inactive / non-existent categories must be gracefully omitted
+        ->not->toContain('Old Gadgets')
+        ->not->toContain('old-gadgets')
+        ->not->toContain('completely-nonexistent-category')
+        // Sensitive personal details must never leak into the prompt
+        ->not->toContain('Private Shopper Name')
+        ->not->toContain('private-shopper@example.com');
+});
+
+test('a user with null or empty preferences does not add preferences block to prompt', function (): void {
+    ['category' => $category, 'brand' => $brand] = assistantCatalog();
+
+    $laptop = Product::factory()->for($category)->for($brand)->create([
+        'name' => 'Aurora Creator 14',
+        'price' => '75000.00',
+    ]);
+
+    $user = User::factory()->create([
+        'preferences' => null,
+    ]);
+
+    $fake = fakeGroqClient()->willReturn([
+        'message' => 'Here is a laptop recommendation.',
+        'recommendations' => [
+            ['product_id' => $laptop->id, 'reason' => 'Great fit.'],
+        ],
+    ]);
+
+    $answer = app(AssistantService::class)->answer(
+        new AssistantQuery('laptop for office work', 'laptops', '80000.00'),
+        $user,
+    );
+
+    expect($answer->status)->toBe(AssistantReplyStatus::Ok);
+    expect($fake->lastUserPrompt())->not->toContain('Shopper saved preferences');
+});

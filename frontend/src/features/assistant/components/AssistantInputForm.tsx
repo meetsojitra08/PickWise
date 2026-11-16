@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useState } from 'react';
+import { type KeyboardEvent, useMemo, useState } from 'react';
 import { ArrowUp, CornerDownLeft, Sparkles, Tag, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,6 +14,7 @@ interface AssistantInputFormProps {
   initialPrompt?: string;
   initialCategory?: string;
   initialBudget?: number;
+  hasPreferencesApplied?: boolean;
   className?: string;
 }
 
@@ -31,6 +32,7 @@ export function AssistantInputForm({
   initialPrompt = '',
   initialCategory = '',
   initialBudget,
+  hasPreferencesApplied = false,
   className,
 }: AssistantInputFormProps) {
   const [message, setMessage] = useState(initialPrompt);
@@ -38,6 +40,7 @@ export function AssistantInputForm({
   const [budgetMax, setBudgetMax] = useState<string>(
     initialBudget !== undefined ? String(initialBudget) : '',
   );
+  const [isUserCleared, setIsUserCleared] = useState(false);
 
   const [prevInitialPrompt, setPrevInitialPrompt] = useState(initialPrompt);
   if (initialPrompt !== prevInitialPrompt) {
@@ -49,19 +52,46 @@ export function AssistantInputForm({
     useState(initialCategory);
   if (initialCategory !== prevInitialCategory) {
     setPrevInitialCategory(initialCategory);
-    setCategory(initialCategory);
+    if (!isUserCleared) {
+      setCategory(initialCategory);
+    }
   }
 
   const [prevInitialBudget, setPrevInitialBudget] = useState(initialBudget);
   if (initialBudget !== prevInitialBudget) {
     setPrevInitialBudget(initialBudget);
-    setBudgetMax(initialBudget !== undefined ? String(initialBudget) : '');
+    if (!isUserCleared) {
+      setBudgetMax(initialBudget !== undefined ? String(initialBudget) : '');
+    }
   }
 
   const { data: categoriesResponse } = useCatalogCategories();
-  const flatCategories = categoriesResponse
-    ? flattenCategories(categoriesResponse.data)
-    : [];
+  const flatCategories = useMemo(
+    () =>
+      categoriesResponse ? flattenCategories(categoriesResponse.data) : [],
+    [categoriesResponse],
+  );
+
+  // Derived category: if active catalog categories are loaded and the selected category is not valid, treat as empty
+  const isCategoryValid =
+    category === '' ||
+    flatCategories.length === 0 ||
+    flatCategories.some((c) => c.slug === category);
+  const effectiveCategory = isCategoryValid ? category : '';
+
+  const isPreferencesActive =
+    hasPreferencesApplied &&
+    !isUserCleared &&
+    (effectiveCategory === initialCategory ||
+      budgetMax ===
+        (initialBudget !== undefined ? String(initialBudget) : '')) &&
+    (effectiveCategory !== '' || budgetMax !== '');
+
+  function handleClearFilters() {
+    setIsUserCleared(true);
+    setCategory('');
+    setBudgetMax('');
+  }
 
   const trimmedMessage = message.trim();
   const isValidLength =
@@ -78,7 +108,7 @@ export function AssistantInputForm({
 
     onSubmit({
       message: trimmedMessage,
-      category: category.trim() !== '' ? category : null,
+      category: effectiveCategory.trim() !== '' ? effectiveCategory : null,
       budget_max: parsedBudget,
     });
 
@@ -126,8 +156,11 @@ export function AssistantInputForm({
             <select
               id="assistant-category"
               aria-label="Filter by category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              value={effectiveCategory}
+              onChange={(e) => {
+                setIsUserCleared(false);
+                setCategory(e.target.value);
+              }}
               disabled={isPending || isQuotaExhausted}
               className="h-7 cursor-pointer appearance-none rounded-full border border-border/70 bg-muted/40 pr-6 pl-7 text-[11px] font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
             >
@@ -159,19 +192,29 @@ export function AssistantInputForm({
               step={500}
               placeholder="Max budget (₹)"
               value={budgetMax}
-              onChange={(e) => setBudgetMax(e.target.value)}
+              onChange={(e) => {
+                setIsUserCleared(false);
+                setBudgetMax(e.target.value);
+              }}
               disabled={isPending || isQuotaExhausted}
               className="h-7 w-32 rounded-full border border-border/70 bg-muted/40 pr-2.5 pl-7 text-[11px] font-medium text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring tabular-nums"
             />
           </div>
 
-          {(category !== '' || budgetMax !== '') && (
+          {isPreferencesActive && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium text-accent shadow-2xs"
+              data-testid="saved-preferences-badge"
+            >
+              <Sparkles className="size-2.5" aria-hidden="true" />
+              <span>Saved preferences applied</span>
+            </span>
+          )}
+
+          {(effectiveCategory !== '' || budgetMax !== '') && (
             <button
               type="button"
-              onClick={() => {
-                setCategory('');
-                setBudgetMax('');
-              }}
+              onClick={handleClearFilters}
               className="cursor-pointer text-[10px] font-medium text-muted-foreground hover:text-foreground"
             >
               Clear filters

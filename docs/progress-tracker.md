@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P6, Personalisation & home
-**Current step:** P6-S2
-**Last updated:** 2026-11-16 (P6-S1)
+**Current step:** P6-S3
+**Last updated:** 2026-11-16 (P6-S2)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -76,7 +76,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 
 ## P6: Personalisation & home (branch `phase/P6-personalisation`)
 - [x] **P6-S1** Home hero connected to the assistant, with example prompts · `feat(ui)`
-- [ ] **P6-S2** Add saved user preferences (budget, favourite categories) to the assistant prompt · `feat(assistant)`
+- [x] **P6-S2** Add saved user preferences (budget, favourite categories) to the assistant prompt · `feat(assistant)`
 - [ ] **P6-S3** Account page: conversation history tab · `feat(account)`
 
 ## P7: Admin (branch `phase/P7-admin`)
@@ -149,6 +149,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P5-S10 note: `POST /compare/verdict` accepts 2 to 4 products from the same category, evaluates them using Groq with database grounding (ratings, prices, comparable specs), and returns a plain-language verdict along with strengths and weaknesses for each product. Unknown product IDs in LLM output are rejected. Daily quota is guarded via `ai-quota:compare` and consumed only on a successful generation. Optional `priority` customizes recommendations, and `comparison_id` saves the verdict to an owned comparison.
 - P6-S1 verification: frontend lint, typecheck, 165 Vitest tests across 36 test files, and production build pass. This was a frontend-only step; Docker was not running and no backend files changed. `git diff --check` is clean.
 - P6-S1 note: The Home hero command bar is directly connected to the shopping assistant with an Ask Assistant primary button, while preserving a secondary Catalog action for keyword search. Example starter prompts carry structured category and budget metadata, generating clean deep-links (`/assistant?q=...&category=...&budget_max=...`). On mount, `AssistantPage` consumes the URL search parameters, dispatches the prompt, and clears the URL via `replace: true` to avoid duplicate submissions on refresh. When daily quota is exhausted, incoming queries prefill the input without firing failing requests.
+- P6-S2 verification: Pint, PHPStan level 6, and full Pest pass inside the `app` container (242 tests, 5244 assertions). Frontend lint, typecheck, 168 Vitest tests across 36 test files, and production build pass. `git diff --check` is clean.
+- P6-S2 note: Assistant prompts now ground recommendations with saved account preferences (default budget, favourite categories, and priorities) as guidance context without leaking user identity or email. Defunct or inactive category slugs are gracefully omitted from prompt context and UI selects. On the frontend, assistant input controls visibly pre-fill from saved preferences, display a subtle "Saved preferences applied" badge, and allow shoppers to clear or override them at any time.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -173,6 +175,7 @@ One line per step on what you learned. Turns into interview material.
 | P5-S9 | A signature decision panel works across multiple surfaces (assistant recommendation, review summary, and comparison matrix) when its contract separates global headline / fit from optional multi-product breakdowns with strengths and weaknesses. |
 | P5-S10 | Grounding a multi-item comparison requires two guards: pass only database-verified specs to the prompt, and filter the model output so any hallucinated or unselected product ids are discarded before the verdict payload is returned. |
 | P6-S1 | Deep-linking into an AI assistant from a home hero requires three handshakes: passing category/budget metadata in the URL query, replacing search params on mount to keep reloads idempotent, and prefilling the input without dispatching when quota is exhausted. |
+| P6-S2 | Personalizing AI prompts requires three boundaries: inject preferences as guidance context without user identity, resolve categories against active database records to drop defunct slugs gracefully, and pre-fill frontend controls so shoppers visibly see and control their defaults. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

@@ -10,6 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useAuth } from '@/features/auth/hooks/use-auth';
 import {
   useAiQuota,
   useConversation,
@@ -32,6 +33,8 @@ export function AssistantPage() {
     useState<SendMessagePayload | null>(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
+  const { user } = useAuth();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const promptParam = searchParams.get('q') || searchParams.get('prompt') || '';
   const categoryParam = searchParams.get('category') || '';
@@ -46,6 +49,29 @@ export function AssistantPage() {
     const p = budgetParam.trim();
     return p !== '' && !Number.isNaN(Number(p)) ? Number(p) : undefined;
   });
+
+  const userCategoryPreference =
+    user?.preferences?.favourite_categories &&
+    user.preferences.favourite_categories.length > 0
+      ? user.preferences.favourite_categories[0]
+      : '';
+
+  const userBudgetPreference =
+    user?.preferences?.budget_default && user.preferences.budget_default > 0
+      ? user.preferences.budget_default
+      : undefined;
+
+  const resolvedCategory =
+    initialCategoryVal.trim() !== ''
+      ? initialCategoryVal.trim()
+      : userCategoryPreference;
+
+  const resolvedBudget =
+    initialBudgetVal !== undefined ? initialBudgetVal : userBudgetPreference;
+
+  const isUsingSavedPreferences =
+    (initialCategoryVal.trim() === '' && Boolean(userCategoryPreference)) ||
+    (initialBudgetVal === undefined && userBudgetPreference !== undefined);
 
   const { data: quota, isLoading: isQuotaLoading } = useAiQuota();
   const { data: conversationsResponse, isLoading: isConversationsLoading } =
@@ -126,14 +152,14 @@ export function AssistantPage() {
       void handleSendMessage({
         message: trimmedPrompt,
         category:
-          initialCategoryVal.trim() !== '' ? initialCategoryVal.trim() : null,
-        budget_max: initialBudgetVal ?? null,
+          resolvedCategory.trim() !== '' ? resolvedCategory.trim() : null,
+        budget_max: resolvedBudget ?? null,
       });
     });
   }, [
     initialPromptText,
-    initialCategoryVal,
-    initialBudgetVal,
+    resolvedCategory,
+    resolvedBudget,
     promptParam,
     categoryParam,
     budgetParam,
@@ -262,8 +288,9 @@ export function AssistantPage() {
                 initialPrompt={
                   quota && quota.remaining <= 0 ? initialPromptText : ''
                 }
-                initialCategory={initialCategoryVal}
-                initialBudget={initialBudgetVal}
+                initialCategory={resolvedCategory}
+                initialBudget={resolvedBudget}
+                hasPreferencesApplied={isUsingSavedPreferences}
               />
             </div>
           </div>

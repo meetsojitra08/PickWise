@@ -362,3 +362,47 @@ test('deleting a conversation removes it and cascades its messages', function ()
     expect(AiConversation::query()->find($conversation->id))->toBeNull()
         ->and(AiMessage::query()->where('conversation_id', $conversation->id)->count())->toBe(0);
 });
+
+test('saved user preferences are included in prompt when customer posts message', function (): void {
+    $category = Category::factory()->create(['name' => 'Laptops', 'slug' => 'laptops']);
+    $brand = Brand::factory()->create(['name' => 'Aurora']);
+    $laptop = Product::factory()->for($category)->for($brand)->create([
+        'name' => 'Aurora 14 Creator Laptop',
+        'price' => '85000.00',
+    ]);
+
+    $customer = User::factory()->create([
+        'name' => 'Jane Shopper',
+        'email' => 'jane@example.com',
+        'preferences' => [
+            'budget_default' => 90000,
+            'favourite_categories' => ['laptops'],
+            'priorities' => ['display quality', 'portability'],
+        ],
+    ]);
+
+    $conversation = AiConversation::factory()->for($customer)->create();
+
+    $fake = fakeGroqClient()->willReturn([
+        'message' => 'Here is a recommendation tailored to your preferences.',
+        'recommendations' => [
+            ['product_id' => $laptop->id, 'reason' => 'Great display.'],
+        ],
+    ]);
+
+    $this->actingAs($customer)
+        ->postJson("/api/v1/assistant/conversations/{$conversation->id}/messages", [
+            'message' => 'Show me the best laptop for UI design',
+            'category' => 'laptops',
+        ])
+        ->assertCreated();
+
+    $prompt = $fake->lastUserPrompt();
+    expect($prompt)
+        ->toContain('Shopper saved preferences')
+        ->toContain('- Default budget: 90000.00 INR')
+        ->toContain('- Favourite categories: Laptops')
+        ->toContain('- Priorities: display quality, portability')
+        ->not->toContain('Jane Shopper')
+        ->not->toContain('jane@example.com');
+});

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router';
@@ -895,5 +895,216 @@ describe('AssistantPage', () => {
     const messageInput = screen.getByLabelText('Message to assistant');
     expect(messageInput).toHaveValue('Laptop for gaming');
     expect(messagePostAttempted).toBe(false);
+  });
+
+  it('visibly pre-fills saved user preferences (budget and category) and allows clearing them', async () => {
+    const user = userEvent.setup();
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse({
+          data: {
+            id: 1,
+            name: 'Sarah Customer',
+            email: 'sarah@example.com',
+            role: 'customer',
+            is_active: true,
+            email_verified_at: '2026-11-10T00:00:00Z',
+            created_at: '2026-11-10T00:00:00Z',
+            preferences: {
+              budget_default: 75000,
+              favourite_categories: ['laptops', 'monitors'],
+              priorities: ['battery life', 'weight'],
+            },
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 5,
+            remaining: 25,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({
+          data: [
+            { id: 2, name: 'Laptops', slug: 'laptops', children: [] },
+            { id: 3, name: 'Monitors', slug: 'monitors', children: [] },
+          ],
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations')) {
+        return jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 20, total: 0, last_page: 1 },
+          links: {},
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage();
+
+    // Verify category select is pre-filled with the favourite category
+    const categorySelect = screen.getByLabelText('Filter by category');
+    const budgetInput = screen.getByLabelText('Maximum budget in rupees');
+
+    await waitFor(() => {
+      expect(categorySelect).toHaveValue('laptops');
+      expect(budgetInput).toHaveValue(75000);
+      expect(screen.getByTestId('saved-preferences-badge')).toHaveTextContent(
+        'Saved preferences applied',
+      );
+    });
+
+    // Verify "Clear filters" button is visible
+    const clearButton = screen.getByRole('button', { name: 'Clear filters' });
+    expect(clearButton).toBeInTheDocument();
+
+    // Click "Clear filters"
+    await user.click(clearButton);
+
+    // Verify inputs are cleared
+    expect(categorySelect).toHaveValue('');
+    expect(budgetInput).toHaveValue(null);
+    expect(
+      screen.queryByTestId('saved-preferences-badge'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('gracefully ignores removed category in user preferences while keeping budget', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse({
+          data: {
+            id: 1,
+            name: 'Sarah Customer',
+            email: 'sarah@example.com',
+            role: 'customer',
+            is_active: true,
+            email_verified_at: '2026-11-10T00:00:00Z',
+            created_at: '2026-11-10T00:00:00Z',
+            preferences: {
+              budget_default: 60000,
+              favourite_categories: ['defunct-category-slug'],
+              priorities: ['durability'],
+            },
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 0,
+            remaining: 30,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({
+          data: [{ id: 2, name: 'Laptops', slug: 'laptops', children: [] }],
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations')) {
+        return jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 20, total: 0, last_page: 1 },
+          links: {},
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage();
+
+    const categorySelect = screen.getByLabelText('Filter by category');
+    const budgetInput = screen.getByLabelText('Maximum budget in rupees');
+
+    // Defunct category slug is not in active categories, so category select resets to '' while budget is preserved
+    await waitFor(() => {
+      expect(budgetInput).toHaveValue(60000);
+      expect(categorySelect).toHaveValue('');
+    });
+  });
+
+  it('explicit URL parameters take precedence over saved user preferences', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse({
+          data: {
+            id: 1,
+            name: 'Sarah Customer',
+            email: 'sarah@example.com',
+            role: 'customer',
+            is_active: true,
+            preferences: {
+              budget_default: 80000,
+              favourite_categories: ['laptops'],
+            },
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 0,
+            remaining: 30,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({
+          data: [
+            { id: 2, name: 'Laptops', slug: 'laptops', children: [] },
+            { id: 3, name: 'Monitors', slug: 'monitors', children: [] },
+          ],
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations')) {
+        return jsonResponse({
+          data: [],
+          meta: { current_page: 1, per_page: 20, total: 0, last_page: 1 },
+          links: {},
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    // Mount with explicit URL params for monitors at 45000
+    renderAssistantPage(['/assistant?category=monitors&budget_max=45000']);
+
+    const categorySelect = screen.getByLabelText('Filter by category');
+    const budgetInput = screen.getByLabelText('Maximum budget in rupees');
+
+    await waitFor(() => {
+      expect(categorySelect).toHaveValue('monitors');
+      expect(budgetInput).toHaveValue(45000);
+    });
   });
 });
