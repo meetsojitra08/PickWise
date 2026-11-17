@@ -29,6 +29,7 @@ import {
 import { Link, useNavigate } from 'react-router';
 import { ProductCard } from '@/components/shared/ProductCard';
 import { ProductCardSkeleton } from '@/components/shared/ProductCardSkeleton';
+import { AiMark } from '@/components/shared/VerdictPanel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -348,11 +349,7 @@ export function HomePage() {
                     size="default"
                     className="gap-2 rounded-control"
                   >
-                    <Sparkles
-                      className="size-4 text-accent"
-                      strokeWidth={1.5}
-                      aria-hidden="true"
-                    />
+                    <AiMark className="size-4 text-accent" />
                     <span>Ask Assistant</span>
                     <ArrowRight
                       className="size-4"

@@ -11,6 +11,7 @@ import {
 import { Link } from 'react-router';
 import { PriceTag } from '@/components/shared/PriceTag';
 import { RatingStars } from '@/components/shared/RatingStars';
+import { AiMark } from '@/components/shared/VerdictPanel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -79,9 +80,12 @@ export function AssistantRecommendationCard({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <Badge
               variant={badgeConfig.variant}
-              className="font-semibold text-[11px]"
+              className="font-semibold text-[11px] gap-1"
             >
-              {badgeConfig.label}
+              {variant === 'recommendation' && (
+                <AiMark className="size-2.5 text-accent" />
+              )}
+              <span>{badgeConfig.label}</span>
             </Badge>
 
             {product.value_score !== null &&

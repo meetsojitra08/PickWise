@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { History, Sparkles } from 'lucide-react';
 import { useSearchParams } from 'react-router';
-import { toast } from 'sonner';
 import { QuotaMeter } from '@/components/shared/QuotaMeter';
 import { Button } from '@/components/ui/button';
 import {
@@ -88,14 +87,19 @@ export function AssistantPage() {
     (initialBudgetVal === undefined && userBudgetPreference !== undefined);
 
   const { data: quota, isLoading: isQuotaLoading } = useAiQuota();
-  const { data: conversationsResponse, isLoading: isConversationsLoading } =
-    useConversations();
+  const {
+    data: conversationsResponse,
+    isLoading: isConversationsLoading,
+    isError: isConversationsError,
+    refetch: refetchConversations,
+  } = useConversations();
   const conversations = conversationsResponse?.data ?? [];
 
   const {
     data: activeConversation,
     isLoading: isConversationLoading,
     isError: isConversationError,
+    refetch: refetchConversation,
   } = useConversation(activeConversationId);
 
   useEffect(() => {
@@ -107,21 +111,8 @@ export function AssistantPage() {
     }
   }, [conversationParam]);
 
-  const conversationErrorHandledRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (
-      isConversationError &&
-      activeConversationId !== null &&
-      conversationErrorHandledRef.current !== activeConversationId
-    ) {
-      conversationErrorHandledRef.current = activeConversationId;
-      toast.error('This conversation could not be loaded or no longer exists.');
-      queueMicrotask(() => {
-        setActiveConversationId(null);
-      });
-    }
-  }, [isConversationError, activeConversationId]);
+  // When conversation error occurs, keep the ID active so AssistantThread can display
+  // the ErrorState with retry and start new chat options.
 
   const createConversationMutation = useCreateConversation();
   const deleteConversationMutation = useDeleteConversation();
@@ -299,6 +290,8 @@ export function AssistantPage() {
                 onNewConversation={handleNewConversation}
                 onDeleteConversation={handleDeleteConversation}
                 isLoading={isConversationsLoading}
+                isError={isConversationsError}
+                onRetry={() => void refetchConversations()}
               />
             </SheetContent>
           </Sheet>
@@ -318,6 +311,8 @@ export function AssistantPage() {
             onNewConversation={handleNewConversation}
             onDeleteConversation={handleDeleteConversation}
             isLoading={isConversationsLoading}
+            isError={isConversationsError}
+            onRetry={() => void refetchConversations()}
           />
         </div>
 
@@ -326,6 +321,9 @@ export function AssistantPage() {
           <AssistantThread
             messages={activeConversation?.messages ?? []}
             isLoadingConversation={isConversationLoading}
+            isConversationError={isConversationError}
+            onRetryConversation={() => void refetchConversation()}
+            onNewChat={handleNewConversation}
             isSendingMessage={isSending}
             sendError={
               sendMessageMutation.error ??
@@ -338,6 +336,7 @@ export function AssistantPage() {
                 : undefined
             }
             onSelectPrompt={handlePromptSelect}
+            isQuotaExhausted={isQuotaExhausted}
             className="flex-1"
           />
 

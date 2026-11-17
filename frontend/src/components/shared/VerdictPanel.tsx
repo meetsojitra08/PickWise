@@ -487,6 +487,12 @@ export function VerdictPanel({
             {quotaMessage}
           </CardDescription>
         </CardHeader>
+
+        {actions && (
+          <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6 pt-0">
+            {actions}
+          </CardContent>
+        )}
       </Card>
     );
   }

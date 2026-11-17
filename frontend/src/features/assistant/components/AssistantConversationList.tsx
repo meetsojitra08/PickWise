@@ -1,4 +1,11 @@
-import { MessageSquare, Plus, Sparkles, Trash2 } from 'lucide-react';
+import {
+  AlertCircle,
+  MessageSquare,
+  Plus,
+  RotateCcw,
+  Trash2,
+} from 'lucide-react';
+import { AiMark } from '@/components/shared/VerdictPanel';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { AiConversationSummary } from '../types/assistant';
@@ -10,6 +17,8 @@ interface AssistantConversationListProps {
   onNewConversation: () => void;
   onDeleteConversation: (id: number) => void;
   isLoading?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
   className?: string;
 }
 
@@ -20,6 +29,8 @@ export function AssistantConversationList({
   onNewConversation,
   onDeleteConversation,
   isLoading = false,
+  isError = false,
+  onRetry,
   className,
 }: AssistantConversationListProps) {
   return (
@@ -56,7 +67,8 @@ export function AssistantConversationList({
       {/* Conversation List Scroll Area */}
       <div className="flex-1 overflow-y-auto space-y-1 pr-1">
         {isLoading && (
-          <div className="space-y-2 py-2">
+          <div className="space-y-2 py-2" role="status" aria-busy="true">
+            <span className="sr-only">Loading conversation history…</span>
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
@@ -66,10 +78,40 @@ export function AssistantConversationList({
           </div>
         )}
 
-        {!isLoading && conversations.length === 0 && (
+        {isError && (
+          <div
+            role="alert"
+            className="my-3 rounded-xl border border-negative/30 bg-negative/10 p-3 text-center text-xs text-negative space-y-2 shadow-2xs"
+          >
+            <AlertCircle
+              className="mx-auto size-4 text-negative"
+              aria-hidden="true"
+            />
+            <p className="font-semibold text-foreground">
+              Couldn&apos;t load history
+            </p>
+            <p className="text-muted-foreground text-[11px] leading-relaxed">
+              Check your connection and try again.
+            </p>
+            {onRetry && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onRetry}
+                className="h-7 text-xs font-semibold gap-1 rounded-full mx-auto"
+              >
+                <RotateCcw className="size-3" aria-hidden="true" />
+                <span>Retry</span>
+              </Button>
+            )}
+          </div>
+        )}
+
+        {!isLoading && !isError && conversations.length === 0 && (
           <div className="py-12 text-center text-xs text-muted-foreground">
             <div className="mx-auto mb-2 flex size-10 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground">
-              <Sparkles className="size-5 opacity-40" />
+              <AiMark className="size-5 opacity-40 text-accent" />
             </div>
             <p className="font-medium text-foreground">No conversations yet</p>
             <p className="mt-1 text-[11px]">
@@ -79,6 +121,7 @@ export function AssistantConversationList({
         )}
 
         {!isLoading &&
+          !isError &&
           conversations.map((conv) => {
             const isActive = conv.id === activeConversationId;
             const displayTitle = conv.title?.trim() || `Chat #${conv.id}`;

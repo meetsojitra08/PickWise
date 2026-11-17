@@ -1,5 +1,6 @@
-import { AlertTriangle, Columns3, Sparkles } from 'lucide-react';
+import { AlertTriangle, Columns3 } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { AiMark } from '@/components/shared/VerdictPanel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { ProductSummary } from '@/features/catalog/types/catalog';
@@ -71,7 +72,7 @@ export function AssistantThreadMessage({
         className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent shadow-xs"
         aria-hidden="true"
       >
-        <Sparkles className="size-4.5 text-accent" />
+        <AiMark className="size-4.5 text-accent" />
       </div>
 
       <div className="min-w-0 flex-1 space-y-4">

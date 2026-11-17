@@ -1,6 +1,6 @@
 import { MessageSquare } from 'lucide-react';
 import { Link } from 'react-router';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { ErrorState } from '@/components/shared/ErrorState';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInfiniteConversations } from '@/features/assistant/hooks/use-assistant';
@@ -18,7 +18,19 @@ export function ConversationsTab() {
         aria-label="Loading assistant conversations"
       >
         {[0, 1].map((index) => (
-          <Skeleton key={index} className="h-28 w-full rounded-card" />
+          <div
+            key={index}
+            className="rounded-card border border-border bg-card p-4 space-y-3 shadow-card"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1.5 flex-1">
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-3.5 w-32" />
+              </div>
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <Skeleton className="h-3.5 w-3/4" />
+          </div>
         ))}
       </div>
     );
@@ -26,11 +38,11 @@ export function ConversationsTab() {
 
   if (conversations.isError) {
     return (
-      <EmptyState
+      <ErrorState
         title="Your conversations could not load"
         description="Check your connection and try again."
-        actionLabel="Try again"
-        onAction={() => void conversations.refetch()}
+        retryLabel="Try again"
+        onRetry={() => void conversations.refetch()}
         icon={
           <MessageSquare
             className="size-5"

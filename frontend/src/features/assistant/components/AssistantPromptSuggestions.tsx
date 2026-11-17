@@ -1,12 +1,14 @@
 import {
   ArrowRight,
-  Bot,
   Headphones,
   Laptop,
   Monitor,
   Sparkles,
 } from 'lucide-react';
+import { Link } from 'react-router';
+import { AiMark } from '@/components/shared/VerdictPanel';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/hooks/use-auth';
 import {
   type PromptSuggestion,
@@ -16,6 +18,7 @@ import {
 interface AssistantPromptSuggestionsProps {
   onSelect: (suggestion: PromptSuggestion) => void;
   disabled?: boolean;
+  isQuotaExhausted?: boolean;
 }
 
 const PROMPT_ICONS = [Laptop, Headphones, Monitor];
@@ -23,19 +26,18 @@ const PROMPT_ICONS = [Laptop, Headphones, Monitor];
 export function AssistantPromptSuggestions({
   onSelect,
   disabled = false,
+  isQuotaExhausted = false,
 }: AssistantPromptSuggestionsProps) {
   const { user } = useAuth();
   const firstName = user?.name ? user.name.split(' ')[0] : null;
+
+  const isButtonDisabled = disabled || isQuotaExhausted;
 
   return (
     <div className="flex flex-col items-center justify-center py-6 text-center animate-in fade-in duration-300">
       {/* Brand Icon Mark */}
       <div className="relative mb-4 flex size-14 items-center justify-center rounded-2xl border border-accent/40 bg-accent/15 text-accent shadow-xs">
-        <Bot
-          className="size-7 text-accent"
-          strokeWidth={1.8}
-          aria-hidden="true"
-        />
+        <AiMark className="size-7 text-accent" />
         <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground font-bold shadow-xs">
           ✦
         </span>
@@ -49,6 +51,32 @@ export function AssistantPromptSuggestions({
         Ask questions in natural language. I compare verified specs from our
         database to find the best products within your budget.
       </p>
+
+      {/* Quota Exhausted Notice banner */}
+      {isQuotaExhausted && (
+        <div
+          role="alert"
+          className="mt-6 flex flex-col items-center justify-between gap-3 rounded-2xl border border-negative/30 bg-negative/10 p-4 text-center max-w-lg w-full shadow-2xs sm:flex-row sm:text-left"
+        >
+          <div>
+            <p className="text-xs font-semibold text-foreground">
+              Daily AI limit reached
+            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground leading-relaxed">
+              You&apos;ve used today&apos;s AI answers. Your quota resets at
+              midnight UTC.
+            </p>
+          </div>
+          <Button
+            asChild
+            size="sm"
+            variant="default"
+            className="h-8 shrink-0 text-xs font-semibold"
+          >
+            <Link to="/products">Browse catalog</Link>
+          </Button>
+        </div>
+      )}
 
       {/* Suggested Prompts Grid */}
       <div className="mt-8 grid w-full max-w-2xl gap-3 sm:grid-cols-3">
@@ -64,7 +92,7 @@ export function AssistantPromptSuggestions({
             <button
               key={suggestion.text}
               type="button"
-              disabled={disabled}
+              disabled={isButtonDisabled}
               onClick={() => onSelect(suggestion)}
               className="group relative flex flex-col justify-between rounded-xl border border-border/80 bg-card p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
             >

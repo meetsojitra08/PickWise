@@ -1228,4 +1228,136 @@ describe('AssistantPage', () => {
       }),
     ).toBeInTheDocument();
   });
+
+  it('displays error state with retry when active conversation fails to load', async () => {
+    const user = userEvent.setup();
+    let loadAttempts = 0;
+
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse(
+          { error: { code: 'unauthenticated', message: 'Unauthenticated.' } },
+          401,
+        );
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 0,
+            remaining: 30,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({ data: [] });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations/99')) {
+        loadAttempts++;
+        if (loadAttempts === 1) {
+          return jsonResponse(
+            {
+              error: { code: 'server_error', message: 'Database query failed' },
+            },
+            500,
+          );
+        }
+
+        return jsonResponse({
+          data: {
+            id: 99,
+            title: 'Recovered chat',
+            messages: [
+              {
+                id: 501,
+                role: 'user',
+                content: 'Hello again',
+                created_at: '2026-11-15T12:00:00Z',
+              },
+            ],
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations')) {
+        return jsonResponse({
+          data: [
+            {
+              id: 99,
+              title: 'Problem chat',
+              last_message_at: '2026-11-15T12:00:00Z',
+              messages_count: 1,
+            },
+          ],
+          meta: { current_page: 1, per_page: 20, total: 1, last_page: 1 },
+          links: {},
+        });
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage(['/assistant?conversation=99']);
+
+    expect(
+      await screen.findByRole('heading', {
+        level: 2,
+        name: 'Could not load conversation',
+      }),
+    ).toBeInTheDocument();
+
+    const retryBtn = screen.getByRole('button', { name: 'Retry' });
+    await user.click(retryBtn);
+
+    expect(await screen.findByText('Hello again')).toBeInTheDocument();
+  });
+
+  it('displays error state in history sidebar when conversations list fails to load', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('/api/v1/auth/me')) {
+        return jsonResponse(
+          { error: { code: 'unauthenticated', message: 'Unauthenticated.' } },
+          401,
+        );
+      }
+
+      if (url.includes('/api/v1/assistant/quota')) {
+        return jsonResponse({
+          data: {
+            limit: 30,
+            used: 0,
+            remaining: 30,
+            resets_at: '2026-11-15T00:00:00Z',
+          },
+        });
+      }
+
+      if (url.includes('/api/v1/categories')) {
+        return jsonResponse({ data: [] });
+      }
+
+      if (url.includes('/api/v1/assistant/conversations')) {
+        return jsonResponse(
+          { error: { code: 'server_error', message: 'Internal error' } },
+          500,
+        );
+      }
+
+      return jsonResponse({ data: null }, 404);
+    });
+
+    renderAssistantPage();
+
+    expect(
+      await screen.findByText("Couldn't load history"),
+    ).toBeInTheDocument();
+  });
 });

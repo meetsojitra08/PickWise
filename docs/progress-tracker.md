@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P8, Elevation & polish
-**Current step:** P8-S1 (P7 completed)
-**Last updated:** 2026-11-17 (P7-S10)
+**Current step:** P8-S2 (P8-S1 completed)
+**Last updated:** 2026-11-17 (P8-S1)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -92,7 +92,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P7-S10** Audit log viewer with filters · `feat(admin)`
 
 ## P8: Elevation & polish (branch `phase/P8-polish`)
-- [ ] **P8-S1** Polish AI screens: loading, error and empty states · `fix(ui)`
+- [x] **P8-S1** Polish AI screens: loading, error and empty states · `fix(ui)`
 - [ ] **P8-S2** Performance pass: indexes review (`EXPLAIN`), eager loading, caching facets in Redis · `perf`
 - [ ] **P8-S3** Accessibility audit and fixes (keyboard, contrast, screen reader) · `fix(ui)`
 - [ ] **P8-S4** Dark mode verification across all screens · `fix(ui)`
@@ -174,6 +174,9 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P7-S10 verification: Pint (346 files), PHPStan level 6 (no errors across 270 files), and 89 admin Pest tests pass inside the `app` container (847 assertions; full 338 Pest tests pass). Frontend lint (0 warnings, 0 errors), typecheck (0 errors), 240 Vitest tests across 46 test files, Prettier, and production build pass. `git diff --check` is clean.
 - P7-S10 note: Activity logs endpoint (`GET /admin/activity-logs`) enforces active admin policies and delivers paginated append-only records with multi-axis filtering (date range up to 90 days, admin author, action, subject entity, and full-text keyword search across action/IP/author/subject). The table remains strictly append-only, rejecting any mutate attempts (POST, PUT, PATCH, DELETE) at the HTTP routing layer and Eloquent lifecycle hooks. The frontend `AdminActivityLogsPage` provides quick window presets (7D, 14D, 30D, 90D), custom date ranges with validation warnings, filter resets, local timezone display with relative times, color-coded action badges, and an accessible modal diff inspector (`AdminAuditDiffDialog`) displaying attribute-level before/after diffs, creation values, deletion snapshots, raw JSON payload inspection, and sensitive credential redaction notices.
 
+- P8-S1 verification: frontend lint (0 warnings, 0 errors), typecheck (0 errors), 259 Vitest tests across 50 test files, Prettier, and production build pass. This was a frontend-only step; Docker was running and no backend files changed. `git diff --check` is clean.
+- P8-S1 note: Created shared ErrorState component implementing ui-context.md specification with semantic role="alert" and retry handlers. Upgraded AssistantThread with realistic two-pane conversation skeletons avoiding layout shift, in-place conversation error recovery with retry and "Start new chat" fallback, and signature AiMark branding. Enhanced AssistantPromptSuggestions with daily quota exhaustion banner, disabled starter prompts, and direct catalog deep-links. Added error handling and retry to AssistantConversationList. Polished ReviewSummaryCard with AiMark, progress indicator below 3 reviews, and skeleton loading support. Replaced generic empty state in ConversationsTab with ErrorState.
+
 ## Decisions log
 Short entries go in `docs/decisions.md`.
 
@@ -209,6 +212,7 @@ One line per step on what you learned. Turns into interview material.
 | P7-S8 | Review moderation has cascading catalog side effects: approving, rejecting, or deleting reviews must recalculate product rating aggregates, recompute category Value Scores, and dispatch queued AI summary jobs, while keeping review author fallback chains resilient when seeded reviews lack user accounts. |
 | P7-S9 | Aggregating time-series telemetry across SQL engines requires generating gap-free continuous daily buckets in application code, while AVG calculations must account for NULL latencies on throttled or early-rejected requests. |
 | P7-S10 | An audit log viewer requires three presentation boundaries: bounded date windows (max 90 days) prevent table scans while presets (7D, 14D, 30D, 90D) keep exploration snappy; field-level diff inspectors must distinguish created, updated, and deleted payloads with attribute-level highlighting; and append-only immutability must be verified across both HTTP verbs (no PUT/PATCH/DELETE endpoints) and database model hooks. |
+| P8-S1 | Consistent AI experience requires unifying all AI touchpoints under the signature AiMark, matching loading skeletons to final message layouts to eliminate layout shift, providing in-place ErrorState with explicit retry recovery rather than kicking users out of failed chats, and pairing quota exhaustion with direct catalog navigation invitations. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
