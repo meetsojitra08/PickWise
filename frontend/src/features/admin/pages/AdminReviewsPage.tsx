@@ -276,13 +276,18 @@ export function AdminReviewsPage() {
       <Card className="border border-border bg-card">
         <CardContent className="space-y-4 pt-6">
           {/* Status Tabs */}
-          <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
+          <div
+            role="group"
+            aria-label="Filter by review status"
+            className="flex flex-wrap items-center gap-2 border-b border-border pb-4"
+          >
             <span className="mr-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               Status:
             </span>
             <Button
               type="button"
               variant={statusFilter === 'pending' ? 'default' : 'outline'}
+              aria-pressed={statusFilter === 'pending'}
               size="sm"
               onClick={() => {
                 setStatusFilter('pending');
@@ -296,6 +301,7 @@ export function AdminReviewsPage() {
             <Button
               type="button"
               variant={statusFilter === 'approved' ? 'default' : 'outline'}
+              aria-pressed={statusFilter === 'approved'}
               size="sm"
               onClick={() => {
                 setStatusFilter('approved');
@@ -309,6 +315,7 @@ export function AdminReviewsPage() {
             <Button
               type="button"
               variant={statusFilter === 'rejected' ? 'default' : 'outline'}
+              aria-pressed={statusFilter === 'rejected'}
               size="sm"
               onClick={() => {
                 setStatusFilter('rejected');
@@ -322,6 +329,7 @@ export function AdminReviewsPage() {
             <Button
               type="button"
               variant={statusFilter === 'all' ? 'default' : 'outline'}
+              aria-pressed={statusFilter === 'all'}
               size="sm"
               onClick={() => {
                 setStatusFilter('all');
@@ -686,6 +694,7 @@ export function AdminReviewsPage() {
                           type="button"
                           variant="outline"
                           size="sm"
+                          title={`Approve review by ${review.author_name} for ${review.product?.name ?? 'product'}`}
                           onClick={() => void handleApproveSingle(review)}
                           disabled={isSubmitting}
                           className="text-positive hover:bg-positive/10 hover:text-positive"
@@ -703,6 +712,7 @@ export function AdminReviewsPage() {
                           type="button"
                           variant="outline"
                           size="sm"
+                          title={`Reject review by ${review.author_name} for ${review.product?.name ?? 'product'}`}
                           onClick={() => handleOpenRejectSingle(review)}
                           disabled={isSubmitting}
                           className="text-destructive hover:bg-destructive/10 hover:text-destructive"

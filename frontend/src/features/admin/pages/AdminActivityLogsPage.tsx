@@ -273,7 +273,11 @@ export function AdminActivityLogsPage() {
         <CardContent className="space-y-4 p-4 sm:p-5">
           {/* Top Row: Date Presets & Custom Dates */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div
+              role="group"
+              aria-label="Audit log time window presets"
+              className="flex flex-wrap items-center gap-1.5"
+            >
               <span className="mr-1 text-xs font-medium text-muted-foreground">
                 Window:
               </span>
@@ -282,6 +286,7 @@ export function AdminActivityLogsPage() {
                   key={days}
                   type="button"
                   variant={activePreset === days ? 'default' : 'outline'}
+                  aria-pressed={activePreset === days}
                   size="sm"
                   onClick={() => handlePresetChange(days)}
                   className="h-8 text-xs"
@@ -293,6 +298,7 @@ export function AdminActivityLogsPage() {
               <Button
                 type="button"
                 variant={activePreset === 'custom' ? 'default' : 'outline'}
+                aria-pressed={activePreset === 'custom'}
                 size="sm"
                 onClick={() => setActivePreset('custom')}
                 className="h-8 text-xs"
@@ -553,6 +559,9 @@ export function AdminActivityLogsPage() {
                 className="w-full text-left text-xs"
                 data-testid="audit-logs-table"
               >
+                <caption className="sr-only">
+                  Administrative audit log records
+                </caption>
                 <thead className="border-b border-border bg-muted/40 text-muted-foreground">
                   <tr>
                     <th scope="col" className="px-4 py-3 font-medium">
@@ -646,6 +655,7 @@ export function AdminActivityLogsPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => setSelectedActivity(item)}
+                            aria-label={`Inspect audit diff for ${item.action}`}
                             className="h-7 gap-1 text-xs font-medium"
                             data-testid={`inspect-diff-btn-${item.id}`}
                           >

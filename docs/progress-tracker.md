@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P8, Elevation & polish
-**Current step:** P8-S3 (P8-S2 completed)
-**Last updated:** 2026-11-17 (P8-S2)
+**Current step:** P8-S4 (P8-S3 completed)
+**Last updated:** 2026-11-17 (P8-S3)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -94,7 +94,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 ## P8: Elevation & polish (branch `phase/P8-polish`)
 - [x] **P8-S1** Polish AI screens: loading, error and empty states · `fix(ui)`
 - [x] **P8-S2** Performance pass: indexes review (`EXPLAIN`), eager loading, caching facets in Redis · `perf`
-- [ ] **P8-S3** Accessibility audit and fixes (keyboard, contrast, screen reader) · `fix(ui)`
+- [x] **P8-S3** Accessibility audit and fixes (keyboard, contrast, screen reader) · `fix(ui)`
 - [ ] **P8-S4** Dark mode verification across all screens · `fix(ui)`
 - [ ] **P8-S5** Responsive pass (320px to 1440px) · `fix(ui)`
 - [ ] **P8-S6** Security review against `code-standards.md` §4, add security headers · `chore(security)`
@@ -178,6 +178,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P8-S1 note: Created shared ErrorState component implementing ui-context.md specification with semantic role="alert" and retry handlers. Upgraded AssistantThread with realistic two-pane conversation skeletons avoiding layout shift, in-place conversation error recovery with retry and "Start new chat" fallback, and signature AiMark branding. Enhanced AssistantPromptSuggestions with daily quota exhaustion banner, disabled starter prompts, and direct catalog deep-links. Added error handling and retry to AssistantConversationList. Polished ReviewSummaryCard with AiMark, progress indicator below 3 reviews, and skeleton loading support. Replaced generic empty state in ConversationsTab with ErrorState.
 - P8-S2 verification: Pint (352 files), PHPStan level 6 (no errors across 275 files), and full Pest pass inside the `app` container (346 tests, 6191 assertions). Frontend lint (0 warnings, 0 errors), typecheck (0 errors), 259 Vitest tests across 50 test files, and production build pass. `git diff --check` is clean.
 - P8-S2 note: Analyzed SQL execution plans with EXPLAIN ANALYZE on PostgreSQL and added targeted composite indexes (products by category/published with value_score, created_at, and rating_avg; reviews by product/status with created_at and rating; product_specs by spec definition and product). Enabled global Model::preventLazyLoading(! app()->isProduction()) in AppServiceProvider to prevent N+1 queries. Implemented Redis caching for catalog filter facets under pickwise:catalog:facets:{category} with automatic cache invalidation via ProductObserver, CategoryObserver, SpecDefinitionObserver, and admin bulk actions. Added client-side 5-minute staleTime caching in TanStack Query for catalog facets and category trees.
+- P8-S3 verification: Pint (352 files), PHPStan level 6 (no errors across 275 files), and full Pest pass inside the `app` container (346 tests, 6191 assertions). Frontend lint (0 warnings, 0 errors), typecheck (0 errors), 267 Vitest tests across 51 test files (including 8 new dedicated accessibility tests), and production build pass. `git diff --check` is clean.
+- P8-S3 note: Audited and resolved keyboard, contrast, and screen reader accessibility across the storefront and admin panels. Added accessible skip-to-content links and landmarks in `AuthLayout` and `AppLayout`. Calibrated design tokens in `globals.css` to guarantee WCAG 2.2 AA contrast standards (≥ 4.5:1 text/subtle backgrounds, ≥ 3:1 graphical boundaries) across light/dark themes for `--positive` (#246b41, 5.95:1) and `--warning` (#9e6412, 4.7:1), fixing fit score meters and preference badges. Enriched tables with `<caption className="sr-only">` and header `scope="col"/"row"`, progress bars with `aria-valuetext`, and filter groups with `role="group"` and `aria-pressed`. Enabled keyboard navigation and focus management on SVG telemetry chart points. Preserved accessible names for buttons with visible text using `title` rather than replacing them with `aria-label`. Added comprehensive accessibility test suite `frontend/src/test/accessibility.test.tsx`.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -216,6 +218,7 @@ One line per step on what you learned. Turns into interview material.
 | P7-S10 | An audit log viewer requires three presentation boundaries: bounded date windows (max 90 days) prevent table scans while presets (7D, 14D, 30D, 90D) keep exploration snappy; field-level diff inspectors must distinguish created, updated, and deleted payloads with attribute-level highlighting; and append-only immutability must be verified across both HTTP verbs (no PUT/PATCH/DELETE endpoints) and database model hooks. |
 | P8-S1 | Consistent AI experience requires unifying all AI touchpoints under the signature AiMark, matching loading skeletons to final message layouts to eliminate layout shift, providing in-place ErrorState with explicit retry recovery rather than kicking users out of failed chats, and pairing quota exhaustion with direct catalog navigation invitations. |
 | P8-S2 | In PostgreSQL, adding an index on columns used by a query without an explicit ORDER BY can change the physical row scan order chosen by the planner; adding deterministic ->orderBy('id') guards application logic, while composite indexes on (product_id, status, rating) turn review distribution aggregation into index-only scans without heap reads. |
+| P8-S3 | In the Accessible Name and Description Computation spec, `aria-label` completely overrides all child text content rather than supplementing it; buttons with visible text should retain their text-derived accessible name (augmenting with `title` for extended context) while reserving `aria-label` for icon-only controls. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

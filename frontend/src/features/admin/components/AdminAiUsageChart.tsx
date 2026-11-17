@@ -114,7 +114,7 @@ export function AdminAiUsageChart({ data }: AdminAiUsageChartProps) {
             <span className="text-muted-foreground">Total calls</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="inline-block size-2.5 rounded-full bg-emerald-500" />
+            <span className="inline-block size-2.5 rounded-full bg-positive" />
             <span className="text-muted-foreground">Successful</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -245,7 +245,7 @@ export function AdminAiUsageChart({ data }: AdminAiUsageChartProps) {
           <path
             d={successPath}
             fill="none"
-            stroke="#10b981"
+            stroke="var(--color-positive)"
             strokeWidth="1.75"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -256,9 +256,20 @@ export function AdminAiUsageChart({ data }: AdminAiUsageChartProps) {
           {points.map((p) => (
             <g
               key={p.date}
+              tabIndex={0}
+              role="button"
+              aria-label={`${p.date}: ${p.total_calls} calls, ${p.successful_calls} successful, ${p.failed_calls} failed`}
               onMouseEnter={() => setHoveredPoint(p)}
               onMouseLeave={() => setHoveredPoint(null)}
-              className="cursor-pointer transition-transform hover:scale-125"
+              onFocus={() => setHoveredPoint(p)}
+              onBlur={() => setHoveredPoint(null)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setHoveredPoint(p);
+                }
+              }}
+              className="cursor-pointer transition-transform hover:scale-125 focus-visible:outline-none"
             >
               {/* Invisible large hit area */}
               <circle cx={p.x} cy={p.yTotal} r={12} fill="transparent" />

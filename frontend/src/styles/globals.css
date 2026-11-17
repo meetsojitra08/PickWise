@@ -113,7 +113,7 @@
   --muted-foreground: #5b6773;
   --accent: #f2b134;
   --accent-foreground: #17212b;
-  --positive: #2e7d4f;
+  --positive: #246b41;
   --positive-foreground: #ffffff;
   --positive-subtle: #edf6f0;
   --negative: #c0482f;
@@ -121,7 +121,7 @@
   --negative-subtle: #fcf2ef;
   --destructive: var(--negative);
   --destructive-foreground: var(--negative-foreground);
-  --warning: #b7791f;
+  --warning: #9e6412;
   --warning-foreground: #ffffff;
   --warning-subtle: #fdf6e9;
   --verdict-surface: #fdfaf2;

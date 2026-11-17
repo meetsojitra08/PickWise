@@ -502,9 +502,10 @@ export function AdminProductsPage() {
         <Card>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
+              <caption className="sr-only">Product catalog management</caption>
               <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="w-10 px-4 py-3 text-center">
+                  <th scope="col" className="w-10 px-4 py-3 text-center">
                     <Checkbox
                       checked={
                         isAllSelected
@@ -519,13 +520,13 @@ export function AdminProductsPage() {
                       aria-label="Select all products on page"
                     />
                   </th>
-                  <th className="px-4 py-3">Product</th>
-                  <th className="px-4 py-3">Category</th>
-                  <th className="px-4 py-3">Price</th>
-                  <th className="px-4 py-3">Stock</th>
-                  <th className="px-4 py-3 text-center">Score / Rating</th>
-                  <th className="px-4 py-3 text-center">Status</th>
-                  <th className="px-4 py-3 text-right sm:px-6">Actions</th>
+                  <th scope="col" className="px-4 py-3">Product</th>
+                  <th scope="col" className="px-4 py-3">Category</th>
+                  <th scope="col" className="px-4 py-3">Price</th>
+                  <th scope="col" className="px-4 py-3">Stock</th>
+                  <th scope="col" className="px-4 py-3 text-center">Score / Rating</th>
+                  <th scope="col" className="px-4 py-3 text-center">Status</th>
+                  <th scope="col" className="px-4 py-3 text-right sm:px-6">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -601,11 +602,11 @@ export function AdminProductsPage() {
                         <span
                           className={`inline-flex items-center rounded-control px-2 py-0.5 text-[11px] font-medium ${
                             product.availability === 'in_stock'
-                              ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                              ? 'bg-positive-subtle text-positive'
                               : product.availability === 'out_of_stock'
-                                ? 'bg-rose-500/10 text-rose-700 dark:text-rose-400'
+                                ? 'bg-negative-subtle text-negative'
                                 : product.availability === 'preorder'
-                                  ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                                  ? 'border border-warning/35 bg-warning-subtle text-foreground dark:text-warning'
                                   : 'bg-muted text-muted-foreground'
                           }`}
                         >
@@ -649,6 +650,7 @@ export function AdminProductsPage() {
                             variant="ghost"
                             size="xs"
                             onClick={() => handleStartEdit(product)}
+                            title={`Edit ${product.name}`}
                           >
                             Edit
                           </Button>

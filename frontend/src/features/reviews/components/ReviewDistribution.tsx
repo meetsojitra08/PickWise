@@ -65,6 +65,7 @@ export function ReviewDistribution({ distribution }: ReviewDistributionProps) {
                   aria-valuemin={0}
                   aria-valuemax={total}
                   aria-valuenow={count}
+                  aria-valuetext={`${count} of ${total} reviews (${percent}%)`}
                   className="h-2 overflow-hidden rounded-full bg-muted"
                 >
                   <div

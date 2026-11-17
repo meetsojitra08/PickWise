@@ -81,6 +81,7 @@ export function GlobalSearchDialog() {
             document.getElementById('global-search-input')?.focus();
           }}
         >
+          <Dialog.Title className="sr-only">Search products</Dialog.Title>
           <div className="flex items-center gap-3 border-b border-border px-4">
             <Search
               className="size-5 shrink-0 text-muted-foreground"

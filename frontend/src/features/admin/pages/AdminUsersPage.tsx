@@ -238,9 +238,14 @@ export function AdminUsersPage() {
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Role:
                 </span>
-                <div className="flex rounded-md bg-muted p-0.5">
+                <div
+                  role="group"
+                  aria-label="Filter by user role"
+                  className="flex rounded-md bg-muted p-0.5"
+                >
                   <button
                     type="button"
+                    aria-pressed={roleFilter === 'all'}
                     onClick={() => {
                       setRoleFilter('all');
                       setPage(1);
@@ -255,6 +260,7 @@ export function AdminUsersPage() {
                   </button>
                   <button
                     type="button"
+                    aria-pressed={roleFilter === 'customer'}
                     onClick={() => {
                       setRoleFilter('customer');
                       setPage(1);
@@ -269,6 +275,7 @@ export function AdminUsersPage() {
                   </button>
                   <button
                     type="button"
+                    aria-pressed={roleFilter === 'admin'}
                     onClick={() => {
                       setRoleFilter('admin');
                       setPage(1);
@@ -289,9 +296,14 @@ export function AdminUsersPage() {
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Status:
                 </span>
-                <div className="flex rounded-md bg-muted p-0.5">
+                <div
+                  role="group"
+                  aria-label="Filter by user status"
+                  className="flex rounded-md bg-muted p-0.5"
+                >
                   <button
                     type="button"
+                    aria-pressed={statusFilter === 'all'}
                     onClick={() => {
                       setStatusFilter('all');
                       setPage(1);
@@ -306,6 +318,7 @@ export function AdminUsersPage() {
                   </button>
                   <button
                     type="button"
+                    aria-pressed={statusFilter === 'active'}
                     onClick={() => {
                       setStatusFilter('active');
                       setPage(1);
@@ -320,6 +333,7 @@ export function AdminUsersPage() {
                   </button>
                   <button
                     type="button"
+                    aria-pressed={statusFilter === 'inactive'}
                     onClick={() => {
                       setStatusFilter('inactive');
                       setPage(1);
@@ -390,14 +404,15 @@ export function AdminUsersPage() {
                 className="w-full text-left text-sm"
                 data-testid="admin-users-table"
               >
+                <caption className="sr-only">User accounts management</caption>
                 <thead className="border-b bg-muted/40 text-xs uppercase text-muted-foreground">
                   <tr>
-                    <th className="px-4 py-3 font-semibold">User</th>
-                    <th className="px-4 py-3 font-semibold">Role</th>
-                    <th className="px-4 py-3 font-semibold">Status</th>
-                    <th className="px-4 py-3 font-semibold">Reviews</th>
-                    <th className="px-4 py-3 font-semibold">Joined</th>
-                    <th className="px-4 py-3 text-right font-semibold">
+                    <th scope="col" className="px-4 py-3 font-semibold">User</th>
+                    <th scope="col" className="px-4 py-3 font-semibold">Role</th>
+                    <th scope="col" className="px-4 py-3 font-semibold">Status</th>
+                    <th scope="col" className="px-4 py-3 font-semibold">Reviews</th>
+                    <th scope="col" className="px-4 py-3 font-semibold">Joined</th>
+                    <th scope="col" className="px-4 py-3 text-right font-semibold">
                       Actions
                     </th>
                   </tr>
@@ -563,6 +578,11 @@ export function AdminUsersPage() {
                                       ? 'Demote to Customer'
                                       : 'Promote to Admin'
                                 }
+                                aria-label={
+                                  targetUser.role === 'admin'
+                                    ? `Remove admin role from ${targetUser.name}`
+                                    : `Make ${targetUser.name} admin`
+                                }
                                 data-testid={`toggle-role-btn-${targetUser.id}`}
                                 className="h-8 px-2 text-xs gap-1"
                               >
@@ -588,6 +608,7 @@ export function AdminUsersPage() {
                                       ? 'You cannot deactivate your own account.'
                                       : 'Deactivate User'
                                   }
+                                  aria-label={`Deactivate account for ${targetUser.name}`}
                                   data-testid={`toggle-status-btn-${targetUser.id}`}
                                   className="h-8 px-2 text-xs text-destructive hover:bg-destructive/10 gap-1"
                                 >
@@ -605,8 +626,9 @@ export function AdminUsersPage() {
                                     handleOpenStatusDialog(targetUser)
                                   }
                                   title="Activate User"
+                                  aria-label={`Activate account for ${targetUser.name}`}
                                   data-testid={`toggle-status-btn-${targetUser.id}`}
-                                  className="h-8 px-2 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 gap-1"
+                                  className="h-8 px-2 text-xs text-positive hover:bg-positive/10 gap-1"
                                 >
                                   <UserCheck className="h-3.5 w-3.5" />
                                   <span className="hidden sm:inline">

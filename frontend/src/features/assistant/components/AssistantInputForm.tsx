@@ -203,7 +203,7 @@ export function AssistantInputForm({
 
           {isPreferencesActive && (
             <span
-              className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium text-accent shadow-2xs"
+              className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold text-accent-foreground dark:text-accent shadow-2xs"
               data-testid="saved-preferences-badge"
             >
               <Sparkles className="size-2.5" aria-hidden="true" />
@@ -215,7 +215,7 @@ export function AssistantInputForm({
             <button
               type="button"
               onClick={handleClearFilters}
-              className="cursor-pointer text-[10px] font-medium text-muted-foreground hover:text-foreground"
+              className="cursor-pointer rounded-xs text-[10px] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               Clear filters
             </button>

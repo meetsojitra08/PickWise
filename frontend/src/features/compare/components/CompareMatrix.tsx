@@ -113,7 +113,11 @@ export function CompareMatrix({ matrix }: { matrix: CompareMatrixData }) {
                       ) : null}
 
                       {isWinner ? (
-                        <Badge variant="accent" className="mt-1.5">
+                        <Badge
+                          variant="accent"
+                          className="mt-1.5"
+                          aria-label={`Best ${row.label}`}
+                        >
                           <Check strokeWidth={2} aria-hidden="true" />
                           Best
                         </Badge>

@@ -567,7 +567,7 @@ export function VerdictPanel({
                     {product.name}
                   </h4>
                   {product.fitScore !== undefined && (
-                    <span className="shrink-0 text-xs font-semibold tabular-nums text-accent">
+                    <span className="shrink-0 text-xs font-semibold tabular-nums text-foreground dark:text-accent">
                       {product.fitScore}%
                     </span>
                   )}

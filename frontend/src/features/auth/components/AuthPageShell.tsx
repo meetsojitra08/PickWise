@@ -23,7 +23,11 @@ export function AuthPageShell({
   children,
 }: AuthPageShellProps) {
   return (
-    <main className="grid min-h-screen place-items-center bg-background px-4 py-10 text-foreground sm:py-16">
+    <main
+      id="auth-main-content"
+      tabIndex={-1}
+      className="grid min-h-screen place-items-center bg-background px-4 py-10 text-foreground outline-none sm:py-16"
+    >
       <div className="flex w-full max-w-md flex-col gap-6">
         <div className="flex justify-center">
           <Link

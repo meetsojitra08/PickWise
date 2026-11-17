@@ -21,6 +21,9 @@ export function ProductSpecifications({ specs }: Pick<ProductDetail, 'specs'>) {
       {specs.length ? (
         <div className="overflow-hidden rounded-card border border-border bg-card">
           <table className="w-full border-collapse text-left text-sm">
+            <caption className="sr-only">
+              Product technical specifications
+            </caption>
             <thead className="sr-only">
               <tr>
                 <th scope="col">Specification</th>

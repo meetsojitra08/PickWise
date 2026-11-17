@@ -88,7 +88,10 @@ export function ConversationCard({
 
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           <Button asChild size="sm">
-            <Link to={`/assistant?conversation=${conversation.id}`}>
+            <Link
+              to={`/assistant?conversation=${conversation.id}`}
+              title={`Open conversation: ${displayTitle}`}
+            >
               Open conversation
             </Link>
           </Button>

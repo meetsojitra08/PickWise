@@ -257,15 +257,16 @@ export function AdminCategoriesPage() {
         <Card>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
+              <caption className="sr-only">Category catalog hierarchy</caption>
               <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3 sm:px-6">Category</th>
-                  <th className="px-4 py-3">Hierarchy</th>
-                  <th className="px-4 py-3 text-center">Order</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Products</th>
-                  <th className="px-4 py-3">Specs</th>
-                  <th className="px-4 py-3 text-right sm:px-6">Actions</th>
+                  <th scope="col" className="px-4 py-3 sm:px-6">Category</th>
+                  <th scope="col" className="px-4 py-3">Hierarchy</th>
+                  <th scope="col" className="px-4 py-3 text-center">Order</th>
+                  <th scope="col" className="px-4 py-3">Status</th>
+                  <th scope="col" className="px-4 py-3">Products</th>
+                  <th scope="col" className="px-4 py-3">Specs</th>
+                  <th scope="col" className="px-4 py-3 text-right sm:px-6">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -323,6 +324,7 @@ export function AdminCategoriesPage() {
                         variant="outline"
                         size="xs"
                         onClick={() => handleOpenSpecs(cat)}
+                        title={`Configure specs for ${cat.name}`}
                         className="gap-1.5"
                       >
                         <Sliders className="size-3 text-primary" />
@@ -337,6 +339,7 @@ export function AdminCategoriesPage() {
                           variant="ghost"
                           size="xs"
                           onClick={() => handleStartEdit(cat)}
+                          title={`Edit ${cat.name}`}
                         >
                           Edit
                         </Button>

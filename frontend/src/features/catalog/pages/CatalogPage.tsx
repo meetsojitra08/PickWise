@@ -222,6 +222,7 @@ export function CatalogPage() {
 
       {activeFilters.length ? (
         <div
+          role="group"
           className="mb-5 flex flex-wrap items-center gap-2"
           aria-label="Applied filters"
         >
@@ -230,6 +231,7 @@ export function CatalogPage() {
               key={filter.key}
               type="button"
               onClick={() => updateFilter(filter.key, null)}
+              title={`Remove filter: ${filter.label}`}
               className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-medium hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {filter.label}

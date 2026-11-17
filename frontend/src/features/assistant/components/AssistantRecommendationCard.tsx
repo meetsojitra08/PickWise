@@ -226,6 +226,7 @@ export function AssistantRecommendationCard({
             size="sm"
             disabled={wishlistPending}
             onClick={() => toggleWishlist(product, !isWishlisted)}
+            aria-pressed={isWishlisted}
             aria-label={
               isWishlisted
                 ? `Remove ${product.name} from wishlist`
