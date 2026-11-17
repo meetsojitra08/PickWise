@@ -669,7 +669,9 @@ export function AdminProductsPage() {
                             type="button"
                             variant="outline"
                             size="xs"
-                            onClick={() => void handleRegenerateSummary(product)}
+                            onClick={() =>
+                              void handleRegenerateSummary(product)
+                            }
                             className="gap-1 text-xs"
                             title="Regenerate AI review summary"
                             aria-label={`Regenerate review summary for ${product.name}`}

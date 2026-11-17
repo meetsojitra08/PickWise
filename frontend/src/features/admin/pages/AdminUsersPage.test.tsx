@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AuthContext, type AuthContextValue } from '@/features/auth/hooks/auth-context';
+import {
+  AuthContext,
+  type AuthContextValue,
+} from '@/features/auth/hooks/auth-context';
 import { AdminUsersPage } from './AdminUsersPage';
 import type { AdminUser } from '../types';
 
@@ -111,7 +114,12 @@ describe('AdminUsersPage', () => {
 
   it('renders the users table and disables actions for current logged-in user', async () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
-      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : '';
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof Request
+            ? input.url
+            : '';
       if (url.includes('/admin/users')) {
         return jsonResponse({
           data: mockUsers,
@@ -145,16 +153,23 @@ describe('AdminUsersPage', () => {
   });
 
   it('filters users by search and pills', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
-      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : '';
-      if (url.includes('/admin/users')) {
-        return jsonResponse({
-          data: mockUsers,
-          meta: { current_page: 1, last_page: 1, total: 4, per_page: 25 },
-        });
-      }
-      return jsonResponse({ data: null }, 404);
-    });
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async (input) => {
+        const url =
+          typeof input === 'string'
+            ? input
+            : input instanceof Request
+              ? input.url
+              : '';
+        if (url.includes('/admin/users')) {
+          return jsonResponse({
+            data: mockUsers,
+            meta: { current_page: 1, last_page: 1, total: 4, per_page: 25 },
+          });
+        }
+        return jsonResponse({ data: null }, 404);
+      });
 
     const user = userEvent.setup();
     renderAdminUsersPage();
@@ -198,7 +213,12 @@ describe('AdminUsersPage', () => {
   it('opens status dialog and deactivates a user', async () => {
     let patched = false;
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
-      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : '';
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof Request
+            ? input.url
+            : '';
       const method = init?.method ?? 'GET';
 
       if (url.includes('/sanctum/csrf-cookie')) {
@@ -232,7 +252,9 @@ describe('AdminUsersPage', () => {
 
     // Verify dialog content
     expect(screen.getByText('Deactivate User Account')).toBeInTheDocument();
-    expect(screen.getByText(/Are you sure you want to deactivate/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Are you sure you want to deactivate/),
+    ).toBeInTheDocument();
 
     // Confirm deactivation
     const confirmBtn = screen.getByTestId('confirm-status-btn');
@@ -246,7 +268,12 @@ describe('AdminUsersPage', () => {
   it('opens role dialog and changes user role', async () => {
     let rolePatched = false;
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
-      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : '';
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof Request
+            ? input.url
+            : '';
       const method = init?.method ?? 'GET';
 
       if (url.includes('/sanctum/csrf-cookie')) {
@@ -280,7 +307,9 @@ describe('AdminUsersPage', () => {
 
     // Verify role dialog
     expect(screen.getByText('Change User Role')).toBeInTheDocument();
-    expect(screen.getByText(/Grant administrator privileges to/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Grant administrator privileges to/),
+    ).toBeInTheDocument();
 
     // Confirm role change
     const confirmBtn = screen.getByTestId('confirm-role-btn');
@@ -293,7 +322,12 @@ describe('AdminUsersPage', () => {
 
   it('displays error in dialog when backend rejects action', async () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
-      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : '';
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof Request
+            ? input.url
+            : '';
       const method = init?.method ?? 'GET';
 
       if (url.includes('/sanctum/csrf-cookie')) {
@@ -305,7 +339,8 @@ describe('AdminUsersPage', () => {
           {
             error: {
               code: 'validation_failed',
-              message: 'Cannot deactivate or demote the last remaining active administrator.',
+              message:
+                'Cannot deactivate or demote the last remaining active administrator.',
             },
           },
           422,
@@ -336,13 +371,20 @@ describe('AdminUsersPage', () => {
 
     // Verify error is shown in dialog
     expect(
-      await screen.findByText('Cannot deactivate or demote the last remaining active administrator.'),
+      await screen.findByText(
+        'Cannot deactivate or demote the last remaining active administrator.',
+      ),
     ).toBeInTheDocument();
   });
 
   it('displays empty state when no users match', async () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
-      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : '';
+      const url =
+        typeof input === 'string'
+          ? input
+          : input instanceof Request
+            ? input.url
+            : '';
       if (url.includes('/admin/users')) {
         return jsonResponse({
           data: [],

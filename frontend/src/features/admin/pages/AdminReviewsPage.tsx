@@ -121,7 +121,9 @@ export function AdminReviewsPage() {
     setIsSubmitting(true);
     try {
       await moderateAdminReview(review.id, { status: 'approved' });
-      toast.success(`Review for "${review.product?.name ?? 'product'}" approved.`);
+      toast.success(
+        `Review for "${review.product?.name ?? 'product'}" approved.`,
+      );
       await refetch();
     } catch (err) {
       const message =
@@ -217,7 +219,9 @@ export function AdminReviewsPage() {
       toast.success(
         `Review for "${deleteDialogReview.product?.name ?? 'product'}" deleted.`,
       );
-      setSelectedIds((prev) => prev.filter((id) => id !== deleteDialogReview.id));
+      setSelectedIds((prev) =>
+        prev.filter((id) => id !== deleteDialogReview.id),
+      );
       setDeleteDialogReview(null);
       await refetch();
     } catch (err) {
@@ -247,7 +251,8 @@ export function AdminReviewsPage() {
             Review Moderation
           </h1>
           <p className="text-sm text-muted-foreground">
-            Review customer submissions, approve helpful feedback, and ensure review integrity.
+            Review customer submissions, approve helpful feedback, and ensure
+            review integrity.
           </p>
         </div>
 
@@ -497,7 +502,10 @@ export function AdminReviewsPage() {
             </div>
           ) : isError ? (
             <div className="flex flex-col items-center justify-center rounded-control border border-destructive/20 bg-destructive/5 py-12 text-center">
-              <AlertTriangle className="size-8 text-destructive" aria-hidden="true" />
+              <AlertTriangle
+                className="size-8 text-destructive"
+                aria-hidden="true"
+              />
               <p className="mt-2 text-sm font-medium text-foreground">
                 Failed to load reviews
               </p>
@@ -518,7 +526,9 @@ export function AdminReviewsPage() {
             </div>
           ) : reviews.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-control border border-dashed border-border py-16 text-center">
-              {statusFilter === 'pending' && !search && ratingFilter === 'all' ? (
+              {statusFilter === 'pending' &&
+              !search &&
+              ratingFilter === 'all' ? (
                 <>
                   <CheckCircle2
                     className="size-10 text-positive"
@@ -528,7 +538,8 @@ export function AdminReviewsPage() {
                     No reviews waiting for approval
                   </p>
                   <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-                    All submitted shopper reviews have been moderated. Check approved or rejected tabs to review past submissions.
+                    All submitted shopper reviews have been moderated. Check
+                    approved or rejected tabs to review past submissions.
                   </p>
                 </>
               ) : (
@@ -679,7 +690,10 @@ export function AdminReviewsPage() {
                           disabled={isSubmitting}
                           className="text-positive hover:bg-positive/10 hover:text-positive"
                         >
-                          <Check className="mr-1.5 size-3.5" aria-hidden="true" />
+                          <Check
+                            className="mr-1.5 size-3.5"
+                            aria-hidden="true"
+                          />
                           Approve
                         </Button>
                       )}
@@ -693,7 +707,10 @@ export function AdminReviewsPage() {
                           disabled={isSubmitting}
                           className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                         >
-                          <XCircle className="mr-1.5 size-3.5" aria-hidden="true" />
+                          <XCircle
+                            className="mr-1.5 size-3.5"
+                            aria-hidden="true"
+                          />
                           Reject
                         </Button>
                       )}
@@ -720,7 +737,8 @@ export function AdminReviewsPage() {
           {meta && meta.last_page > 1 && (
             <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-4">
               <span className="text-xs text-muted-foreground">
-                Page {meta.current_page} of {meta.last_page} ({meta.total} total reviews)
+                Page {meta.current_page} of {meta.last_page} ({meta.total} total
+                reviews)
               </span>
 
               <div className="flex items-center gap-2">
@@ -838,7 +856,9 @@ export function AdminReviewsPage() {
             <DialogTitle>Delete Review</DialogTitle>
             <DialogDescription>
               Are you sure you want to permanently delete this review for "
-              {deleteDialogReview?.product?.name ?? 'product'}"? This action cannot be undone. If approved, ratings and AI review summaries will be automatically recalculated.
+              {deleteDialogReview?.product?.name ?? 'product'}"? This action
+              cannot be undone. If approved, ratings and AI review summaries
+              will be automatically recalculated.
             </DialogDescription>
           </DialogHeader>
 

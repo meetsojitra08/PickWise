@@ -109,12 +109,8 @@ describe('AdminReviewsPage', () => {
     ).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Superb noise cancellation'),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText('Decent but expensive'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Superb noise cancellation')).toBeInTheDocument();
+      expect(screen.getByText('Decent but expensive')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Sony WH-1000XM5')).toBeInTheDocument();
@@ -125,37 +121,37 @@ describe('AdminReviewsPage', () => {
   it('filters reviews by status when clicking status filter buttons', async () => {
     const user = userEvent.setup();
 
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation((input) => {
-      const url = String(input);
-      if (url.includes('status=approved')) {
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation((input) => {
+        const url = String(input);
+        if (url.includes('status=approved')) {
+          return Promise.resolve(
+            jsonResponse({
+              data: [
+                {
+                  ...mockReviews[0],
+                  status: 'approved',
+                },
+              ],
+              meta: { current_page: 1, last_page: 1, per_page: 20, total: 1 },
+              links: {},
+            }),
+          );
+        }
         return Promise.resolve(
           jsonResponse({
-            data: [
-              {
-                ...mockReviews[0],
-                status: 'approved',
-              },
-            ],
-            meta: { current_page: 1, last_page: 1, per_page: 20, total: 1 },
+            data: mockReviews,
+            meta: { current_page: 1, last_page: 1, per_page: 20, total: 2 },
             links: {},
           }),
         );
-      }
-      return Promise.resolve(
-        jsonResponse({
-          data: mockReviews,
-          meta: { current_page: 1, last_page: 1, per_page: 20, total: 2 },
-          links: {},
-        }),
-      );
-    });
+      });
 
     renderAdminReviewsPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Superb noise cancellation'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Superb noise cancellation')).toBeInTheDocument();
     });
 
     const approvedButton = screen.getByRole('button', { name: 'Approved' });
@@ -201,9 +197,7 @@ describe('AdminReviewsPage', () => {
     renderAdminReviewsPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Superb noise cancellation'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Superb noise cancellation')).toBeInTheDocument();
     });
 
     const approveButton = screen.getByRole('button', { name: 'Approve' });
@@ -252,9 +246,7 @@ describe('AdminReviewsPage', () => {
     renderAdminReviewsPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Superb noise cancellation'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Superb noise cancellation')).toBeInTheDocument();
     });
 
     const rejectButton = screen.getByRole('button', { name: 'Reject' });
@@ -264,7 +256,9 @@ describe('AdminReviewsPage', () => {
       screen.getByRole('heading', { name: 'Reject Review' }),
     ).toBeInTheDocument();
 
-    const reasonInput = screen.getByPlaceholderText(/e\.g\., Promotional external links/i);
+    const reasonInput = screen.getByPlaceholderText(
+      /e\.g\., Promotional external links/i,
+    );
     await user.type(reasonInput, 'Contains external marketing links');
 
     const confirmButton = screen.getByRole('button', {
@@ -309,9 +303,7 @@ describe('AdminReviewsPage', () => {
     renderAdminReviewsPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Superb noise cancellation'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Superb noise cancellation')).toBeInTheDocument();
     });
 
     const deleteButton = screen.getByRole('button', {
@@ -365,9 +357,7 @@ describe('AdminReviewsPage', () => {
     renderAdminReviewsPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Superb noise cancellation'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Superb noise cancellation')).toBeInTheDocument();
     });
 
     const selectAllCheckbox = screen.getByLabelText(
@@ -413,9 +403,7 @@ describe('AdminReviewsPage', () => {
         screen.getByText('No reviews waiting for approval'),
       ).toBeInTheDocument();
       expect(
-        screen.getByText(
-          /All submitted shopper reviews have been moderated/i,
-        ),
+        screen.getByText(/All submitted shopper reviews have been moderated/i),
       ).toBeInTheDocument();
     });
   });

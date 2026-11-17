@@ -58,8 +58,7 @@ export function AdminUsersPage() {
     return {
       search: search.trim() ? search.trim() : undefined,
       role: roleFilter === 'all' ? undefined : roleFilter,
-      is_active:
-        statusFilter === 'all' ? undefined : statusFilter === 'active',
+      is_active: statusFilter === 'all' ? undefined : statusFilter === 'active',
       sort,
       page,
       per_page: perPage,
@@ -360,7 +359,9 @@ export function AdminUsersPage() {
               Failed to load users
             </h3>
             <p className="mt-1 text-sm text-muted-foreground max-w-md">
-              {error instanceof Error ? error.message : 'An error occurred while fetching users.'}
+              {error instanceof Error
+                ? error.message
+                : 'An error occurred while fetching users.'}
             </p>
             <Button
               variant="outline"
@@ -385,7 +386,10 @@ export function AdminUsersPage() {
           </CardHeader>
           <CardContent className="p-0 sm:p-6">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm" data-testid="admin-users-table">
+              <table
+                className="w-full text-left text-sm"
+                data-testid="admin-users-table"
+              >
                 <thead className="border-b bg-muted/40 text-xs uppercase text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3 font-semibold">User</th>
@@ -393,7 +397,9 @@ export function AdminUsersPage() {
                     <th className="px-4 py-3 font-semibold">Status</th>
                     <th className="px-4 py-3 font-semibold">Reviews</th>
                     <th className="px-4 py-3 font-semibold">Joined</th>
-                    <th className="px-4 py-3 text-right font-semibold">Actions</th>
+                    <th className="px-4 py-3 text-right font-semibold">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -430,11 +436,15 @@ export function AdminUsersPage() {
                           No users found
                         </h4>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {search || roleFilter !== 'all' || statusFilter !== 'all'
+                          {search ||
+                          roleFilter !== 'all' ||
+                          statusFilter !== 'all'
                             ? 'No users match your applied filters.'
                             : 'No user accounts have been created yet.'}
                         </p>
-                        {(search || roleFilter !== 'all' || statusFilter !== 'all') && (
+                        {(search ||
+                          roleFilter !== 'all' ||
+                          statusFilter !== 'all') && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -486,7 +496,10 @@ export function AdminUsersPage() {
                                 <span>Admin</span>
                               </Badge>
                             ) : (
-                              <Badge variant="outline" className="text-muted-foreground flex items-center gap-1 w-fit">
+                              <Badge
+                                variant="outline"
+                                className="text-muted-foreground flex items-center gap-1 w-fit"
+                              >
                                 <Users className="h-3 w-3" />
                                 <span>Customer</span>
                               </Badge>
@@ -496,12 +509,18 @@ export function AdminUsersPage() {
                           {/* Status */}
                           <td className="px-4 py-3.5">
                             {targetUser.is_active ? (
-                              <Badge variant="positive" className="flex items-center gap-1 w-fit">
+                              <Badge
+                                variant="positive"
+                                className="flex items-center gap-1 w-fit"
+                              >
                                 <CheckCircle className="h-3 w-3" />
                                 <span>Active</span>
                               </Badge>
                             ) : (
-                              <Badge variant="negative" className="flex items-center gap-1 w-fit">
+                              <Badge
+                                variant="negative"
+                                className="flex items-center gap-1 w-fit"
+                              >
                                 <UserX className="h-3 w-3" />
                                 <span>Deactivated</span>
                               </Badge>
@@ -561,7 +580,9 @@ export function AdminUsersPage() {
                                   variant="ghost"
                                   size="sm"
                                   disabled={isSelf}
-                                  onClick={() => handleOpenStatusDialog(targetUser)}
+                                  onClick={() =>
+                                    handleOpenStatusDialog(targetUser)
+                                  }
                                   title={
                                     isSelf
                                       ? 'You cannot deactivate your own account.'
@@ -571,20 +592,26 @@ export function AdminUsersPage() {
                                   className="h-8 px-2 text-xs text-destructive hover:bg-destructive/10 gap-1"
                                 >
                                   <UserX className="h-3.5 w-3.5" />
-                                  <span className="hidden sm:inline">Deactivate</span>
+                                  <span className="hidden sm:inline">
+                                    Deactivate
+                                  </span>
                                 </Button>
                               ) : (
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   disabled={isSelf}
-                                  onClick={() => handleOpenStatusDialog(targetUser)}
+                                  onClick={() =>
+                                    handleOpenStatusDialog(targetUser)
+                                  }
                                   title="Activate User"
                                   data-testid={`toggle-status-btn-${targetUser.id}`}
                                   className="h-8 px-2 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 gap-1"
                                 >
                                   <UserCheck className="h-3.5 w-3.5" />
-                                  <span className="hidden sm:inline">Activate</span>
+                                  <span className="hidden sm:inline">
+                                    Activate
+                                  </span>
                                 </Button>
                               )}
                             </div>
@@ -600,8 +627,10 @@ export function AdminUsersPage() {
             {meta && meta.last_page > 1 && (
               <div className="flex items-center justify-between border-t px-4 py-3 sm:px-6">
                 <div className="text-xs text-muted-foreground">
-                  Showing page <span className="font-medium">{meta.current_page}</span> of{' '}
-                  <span className="font-medium">{meta.last_page}</span> ({meta.total} total)
+                  Showing page{' '}
+                  <span className="font-medium">{meta.current_page}</span> of{' '}
+                  <span className="font-medium">{meta.last_page}</span> (
+                  {meta.total} total)
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
@@ -656,16 +685,20 @@ export function AdminUsersPage() {
               {statusDialogUser?.is_active ? (
                 <>
                   Are you sure you want to deactivate{' '}
-                  <strong className="text-foreground">{statusDialogUser?.name}</strong> (
-                  {statusDialogUser?.email})? They will be immediately logged out on their next
-                  request and barred from logging back in.
+                  <strong className="text-foreground">
+                    {statusDialogUser?.name}
+                  </strong>{' '}
+                  ({statusDialogUser?.email})? They will be immediately logged
+                  out on their next request and barred from logging back in.
                 </>
               ) : (
                 <>
                   Re-activate account for{' '}
-                  <strong className="text-foreground">{statusDialogUser?.name}</strong> (
-                  {statusDialogUser?.email})? They will regain ability to log in and access
-                  Pickwise.
+                  <strong className="text-foreground">
+                    {statusDialogUser?.name}
+                  </strong>{' '}
+                  ({statusDialogUser?.email})? They will regain ability to log
+                  in and access Pickwise.
                 </>
               )}
             </DialogDescription>
@@ -727,16 +760,21 @@ export function AdminUsersPage() {
               {roleDialogUser?.role === 'admin' ? (
                 <>
                   Remove administrator privileges from{' '}
-                  <strong className="text-foreground">{roleDialogUser?.name}</strong> (
-                  {roleDialogUser?.email})? They will be demoted to a regular Customer account and
-                  will lose access to all admin panel resources.
+                  <strong className="text-foreground">
+                    {roleDialogUser?.name}
+                  </strong>{' '}
+                  ({roleDialogUser?.email})? They will be demoted to a regular
+                  Customer account and will lose access to all admin panel
+                  resources.
                 </>
               ) : (
                 <>
                   Grant administrator privileges to{' '}
-                  <strong className="text-foreground">{roleDialogUser?.name}</strong> (
-                  {roleDialogUser?.email})? They will have full access to manage catalog, products,
-                  users, reviews, and audit logs.
+                  <strong className="text-foreground">
+                    {roleDialogUser?.name}
+                  </strong>{' '}
+                  ({roleDialogUser?.email})? They will have full access to
+                  manage catalog, products, users, reviews, and audit logs.
                 </>
               )}
             </DialogDescription>
