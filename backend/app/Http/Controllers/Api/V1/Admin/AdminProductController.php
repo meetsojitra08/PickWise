@@ -19,6 +19,7 @@ use App\Models\ProductSpec;
 use App\Models\SpecDefinition;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\CatalogFacetCacheService;
 use App\Services\ValueScoreCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,6 +33,7 @@ final class AdminProductController extends Controller
     public function __construct(
         private readonly AuditLogger $auditLogger,
         private readonly ValueScoreCalculator $valueScoreCalculator,
+        private readonly CatalogFacetCacheService $facetCache,
     ) {}
 
     /**
@@ -290,6 +292,10 @@ final class AdminProductController extends Controller
 
             return $categoryIds;
         });
+
+        foreach ($affectedCategories as $categoryId) {
+            $this->facetCache->forgetForCategory((int) $categoryId);
+        }
 
         return ApiResponse::success([
             'updated_count' => count($productIds),

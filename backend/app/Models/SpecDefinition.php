@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\SpecDataType;
+use App\Observers\SpecDefinitionObserver;
 use Database\Factories\SpecDefinitionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'higher_is_better',
     'sort_order',
 ])]
+#[ObservedBy([SpecDefinitionObserver::class])]
 class SpecDefinition extends Model
 {
     /** @use HasFactory<SpecDefinitionFactory> */

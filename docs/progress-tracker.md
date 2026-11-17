@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P8, Elevation & polish
-**Current step:** P8-S2 (P8-S1 completed)
-**Last updated:** 2026-11-17 (P8-S1)
+**Current step:** P8-S3 (P8-S2 completed)
+**Last updated:** 2026-11-17 (P8-S2)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -93,7 +93,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 
 ## P8: Elevation & polish (branch `phase/P8-polish`)
 - [x] **P8-S1** Polish AI screens: loading, error and empty states · `fix(ui)`
-- [ ] **P8-S2** Performance pass: indexes review (`EXPLAIN`), eager loading, caching facets in Redis · `perf`
+- [x] **P8-S2** Performance pass: indexes review (`EXPLAIN`), eager loading, caching facets in Redis · `perf`
 - [ ] **P8-S3** Accessibility audit and fixes (keyboard, contrast, screen reader) · `fix(ui)`
 - [ ] **P8-S4** Dark mode verification across all screens · `fix(ui)`
 - [ ] **P8-S5** Responsive pass (320px to 1440px) · `fix(ui)`
@@ -176,6 +176,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 
 - P8-S1 verification: frontend lint (0 warnings, 0 errors), typecheck (0 errors), 259 Vitest tests across 50 test files, Prettier, and production build pass. This was a frontend-only step; Docker was running and no backend files changed. `git diff --check` is clean.
 - P8-S1 note: Created shared ErrorState component implementing ui-context.md specification with semantic role="alert" and retry handlers. Upgraded AssistantThread with realistic two-pane conversation skeletons avoiding layout shift, in-place conversation error recovery with retry and "Start new chat" fallback, and signature AiMark branding. Enhanced AssistantPromptSuggestions with daily quota exhaustion banner, disabled starter prompts, and direct catalog deep-links. Added error handling and retry to AssistantConversationList. Polished ReviewSummaryCard with AiMark, progress indicator below 3 reviews, and skeleton loading support. Replaced generic empty state in ConversationsTab with ErrorState.
+- P8-S2 verification: Pint (352 files), PHPStan level 6 (no errors across 275 files), and full Pest pass inside the `app` container (346 tests, 6191 assertions). Frontend lint (0 warnings, 0 errors), typecheck (0 errors), 259 Vitest tests across 50 test files, and production build pass. `git diff --check` is clean.
+- P8-S2 note: Analyzed SQL execution plans with EXPLAIN ANALYZE on PostgreSQL and added targeted composite indexes (products by category/published with value_score, created_at, and rating_avg; reviews by product/status with created_at and rating; product_specs by spec definition and product). Enabled global Model::preventLazyLoading(! app()->isProduction()) in AppServiceProvider to prevent N+1 queries. Implemented Redis caching for catalog filter facets under pickwise:catalog:facets:{category} with automatic cache invalidation via ProductObserver, CategoryObserver, SpecDefinitionObserver, and admin bulk actions. Added client-side 5-minute staleTime caching in TanStack Query for catalog facets and category trees.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -213,6 +215,7 @@ One line per step on what you learned. Turns into interview material.
 | P7-S9 | Aggregating time-series telemetry across SQL engines requires generating gap-free continuous daily buckets in application code, while AVG calculations must account for NULL latencies on throttled or early-rejected requests. |
 | P7-S10 | An audit log viewer requires three presentation boundaries: bounded date windows (max 90 days) prevent table scans while presets (7D, 14D, 30D, 90D) keep exploration snappy; field-level diff inspectors must distinguish created, updated, and deleted payloads with attribute-level highlighting; and append-only immutability must be verified across both HTTP verbs (no PUT/PATCH/DELETE endpoints) and database model hooks. |
 | P8-S1 | Consistent AI experience requires unifying all AI touchpoints under the signature AiMark, matching loading skeletons to final message layouts to eliminate layout shift, providing in-place ErrorState with explicit retry recovery rather than kicking users out of failed chats, and pairing quota exhaustion with direct catalog navigation invitations. |
+| P8-S2 | In PostgreSQL, adding an index on columns used by a query without an explicit ORDER BY can change the physical row scan order chosen by the planner; adding deterministic ->orderBy('id') guards application logic, while composite indexes on (product_id, status, rating) turn review distribution aggregation into index-only scans without heap reads. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

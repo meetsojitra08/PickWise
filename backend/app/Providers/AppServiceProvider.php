@@ -31,6 +31,7 @@ use App\Policies\WishlistItemPolicy;
 use App\Queries\Catalog\ActiveCategoryScope;
 use Closure;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -57,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Model::preventLazyLoading(! $this->app->isProduction());
         Route::model('conversation', AiConversation::class);
         $this->configureRateLimiting();
         $this->configureAuthorization();
