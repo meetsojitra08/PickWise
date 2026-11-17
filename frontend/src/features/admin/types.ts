@@ -1,0 +1,453 @@
+export interface AdminDashboardCounts {
+  products: {
+    total: number;
+    published: number;
+    unpublished: number;
+  };
+  users: {
+    total: number;
+    active: number;
+    customers: number;
+    admins: number;
+  };
+  pending_reviews: number;
+  ai_calls_today: number;
+}
+
+export interface AdminAiUsageSummary {
+  total_calls: number;
+  successful_calls: number;
+  failed_calls: number;
+  total_tokens: number;
+  avg_latency_ms: number;
+}
+
+export interface AdminActivityItem {
+  id: number;
+  admin: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  action: string;
+  subject_type: string | null;
+  subject_id: number | null;
+  changes: Record<string, unknown> | null;
+  ip_address: string | null;
+  created_at: string;
+}
+
+export interface AdminPendingReviewItem {
+  id: number;
+  product: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
+  author_name: string;
+  rating: number;
+  title: string;
+  body: string;
+  created_at: string;
+}
+
+export interface AdminDashboardData {
+  counts: AdminDashboardCounts;
+  ai_usage_today: AdminAiUsageSummary;
+  recent_activity: AdminActivityItem[];
+  pending_reviews: AdminPendingReviewItem[];
+}
+
+export interface AdminCategory {
+  id: number;
+  parent_id: number | null;
+  parent: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
+  name: string;
+  slug: string;
+  description: string | null;
+  image_path: string | null;
+  image_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  products_count: number;
+  spec_definitions_count: number;
+  children_count: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AdminCategoryFormData {
+  name: string;
+  slug?: string;
+  parent_id: number | null;
+  description?: string;
+  sort_order: number;
+  is_active: boolean;
+}
+
+export type SpecDataType = 'number' | 'text' | 'boolean';
+
+export interface AdminSpecDefinition {
+  id: number;
+  category_id: number;
+  key: string;
+  label: string;
+  unit: string | null;
+  data_type: SpecDataType;
+  is_filterable: boolean;
+  is_comparable: boolean;
+  higher_is_better: boolean | null;
+  sort_order: number;
+  product_specs_count: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AdminSpecDefinitionFormData {
+  key: string;
+  label: string;
+  unit?: string | null;
+  data_type: SpecDataType;
+  is_filterable: boolean;
+  is_comparable: boolean;
+  higher_is_better?: boolean | null;
+  sort_order: number;
+}
+
+export interface AdminProductImage {
+  id: number;
+  url: string | null;
+  alt_text: string;
+  sort_order: number;
+  is_primary: boolean;
+}
+
+export interface AdminProductImageReorderPayload {
+  image_ids: number[];
+  primary_id?: number | null;
+}
+
+export interface AdminProductImageUpdatePayload {
+  alt_text?: string;
+  is_primary?: boolean;
+  sort_order?: number;
+}
+
+export interface AdminProductSpec {
+  id: number;
+  spec_definition_id: number;
+  key: string;
+  label: string;
+  unit: string | null;
+  data_type: SpecDataType;
+  value: string | number | boolean | null;
+  is_filterable: boolean;
+  is_comparable: boolean;
+  higher_is_better: boolean | null;
+}
+
+export interface AdminProduct {
+  id: number;
+  category_id: number;
+  brand_id: number;
+  name: string;
+  slug: string;
+  summary: string | null;
+  description: string | null;
+  price: {
+    amount: string;
+    currency: string;
+    formatted: string;
+  };
+  currency: string;
+  availability: 'in_stock' | 'out_of_stock' | 'preorder' | 'discontinued';
+  availability_label: string;
+  store_url: string | null;
+  rating_avg: number;
+  rating_count: number;
+  value_score: number | null;
+  is_published: boolean;
+  is_deleted: boolean;
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
+  brand?: {
+    id: number;
+    name: string;
+    slug: string;
+  } | null;
+  primary_image?: {
+    id: number;
+    url: string | null;
+    alt_text: string;
+  } | null;
+  images?: AdminProductImage[];
+  specs?: AdminProductSpec[];
+  price_history?: Array<{
+    id: number;
+    recorded_at: string;
+    price: {
+      amount: string;
+      currency: string;
+      formatted: string;
+    };
+  }>;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+}
+
+export interface AdminBrand {
+  id: number;
+  name: string;
+  slug: string;
+  logo_path: string | null;
+  logo_url: string | null;
+  products_count: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AdminProductFormData {
+  category_id: number;
+  brand_id: number;
+  name: string;
+  slug?: string;
+  summary: string;
+  description: string;
+  price: string | number;
+  currency?: string;
+  availability: 'in_stock' | 'out_of_stock' | 'preorder' | 'discontinued';
+  store_url?: string;
+  is_published: boolean;
+  specs?: Array<{
+    spec_definition_id: number;
+    value: string | number | boolean;
+  }>;
+}
+
+export interface AdminProductFilters {
+  search?: string;
+  category_id?: number;
+  brand_id?: number;
+  is_published?: boolean;
+  availability?: string;
+  trashed?: 'with' | 'only';
+  sort?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface AdminBrandFilters {
+  search?: string;
+  sort?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface AdminBulkStatusPayload {
+  product_ids: number[];
+  is_published: boolean;
+}
+
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  role: 'customer' | 'admin';
+  is_active: boolean;
+  reviews_count: number;
+  preferences?: Record<string, unknown> | null;
+  email_verified_at?: string | null;
+  created_at: string;
+}
+
+export interface AdminUserFilters {
+  search?: string;
+  role?: 'customer' | 'admin';
+  is_active?: boolean;
+  sort?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface UpdateAdminUserPayload {
+  is_active?: boolean;
+  role?: 'customer' | 'admin';
+}
+
+export type ReviewModerationStatus = 'pending' | 'approved' | 'rejected';
+
+export interface AdminReview {
+  id: number;
+  product: {
+    id: number;
+    name: string;
+    slug: string;
+    is_published: boolean;
+    rating_avg: number;
+    rating_count: number;
+  } | null;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  author_name: string;
+  rating: number;
+  title: string;
+  body: string;
+  status: ReviewModerationStatus;
+  moderator: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  moderated_by: number | null;
+  moderated_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminReviewFilters {
+  status?: ReviewModerationStatus | 'all';
+  search?: string;
+  rating?: number;
+  product_id?: number;
+  sort?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export interface ModerateReviewPayload {
+  status: ReviewModerationStatus;
+  reason?: string;
+}
+
+export interface BulkModerateReviewsPayload {
+  review_ids: number[];
+  status: 'approved' | 'rejected';
+  reason?: string;
+}
+
+export interface BulkModerateReviewsResponse {
+  count: number;
+  status: 'approved' | 'rejected';
+}
+
+export interface RegenerateSummaryResponse {
+  product_id: number;
+  queued: boolean;
+  message: string;
+}
+
+export interface AdminAiUsageDetailedSummary {
+  total_calls: number;
+  successful_calls: number;
+  failed_calls: number;
+  error_calls: number;
+  rate_limited_calls: number;
+  error_rate: number;
+  total_tokens: number;
+  prompt_tokens: number;
+  completion_tokens: number;
+  avg_latency_ms: number;
+}
+
+export interface AdminAiFeatureBreakdown {
+  feature: 'assistant' | 'compare' | 'review_summary';
+  total_calls: number;
+  successful_calls: number;
+  failed_calls: number;
+  total_tokens: number;
+  avg_latency_ms: number;
+}
+
+export interface AdminAiDailyUsagePoint {
+  date: string;
+  total_calls: number;
+  successful_calls: number;
+  failed_calls: number;
+  total_tokens: number;
+  avg_latency_ms: number;
+  by_feature: {
+    assistant: number;
+    compare: number;
+    review_summary: number;
+  };
+}
+
+export interface AdminAiTopUserItem {
+  user_id: number;
+  name: string;
+  email: string;
+  total_calls: number;
+  total_tokens: number;
+  last_active_at: string | null;
+}
+
+export interface AdminAiUsageLogItem {
+  id: number;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  feature: 'assistant' | 'compare' | 'review_summary';
+  model: string | null;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  total_tokens: number;
+  latency_ms: number | null;
+  status: 'ok' | 'error' | 'rate_limited';
+  error_code: string | null;
+  created_at: string;
+}
+
+export interface AdminAiUsagePagination {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface AdminAiUsageData {
+  summary: AdminAiUsageDetailedSummary;
+  by_feature: AdminAiFeatureBreakdown[];
+  daily_usage: AdminAiDailyUsagePoint[];
+  top_users: AdminAiTopUserItem[];
+  guest_calls: number;
+  logs: AdminAiUsageLogItem[];
+  pagination: AdminAiUsagePagination;
+  date_range: {
+    start_date: string;
+    end_date: string;
+  };
+}
+
+export interface AdminAiUsageFilters {
+  start_date?: string;
+  end_date?: string;
+  feature?: 'assistant' | 'compare' | 'review_summary' | 'all';
+  status?: 'ok' | 'error' | 'rate_limited' | 'all';
+  user_id?: number;
+  page?: number;
+  per_page?: number;
+}
+
+export interface AdminActivityLogFilters {
+  start_date?: string;
+  end_date?: string;
+  admin_id?: number;
+  action?: string;
+  subject_type?: string;
+  search?: string;
+  page?: number;
+  per_page?: number;
+}

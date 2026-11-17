@@ -8,14 +8,24 @@ use App\AI\GroqClient;
 use App\AI\GroqClientContract;
 use App\Enums\ApiErrorCode;
 use App\Http\Responses\ApiResponse;
+use App\Models\AdminActivityLog;
 use App\Models\AiConversation;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Comparison;
+use App\Models\Product;
 use App\Models\Review;
+use App\Models\SpecDefinition;
 use App\Models\User;
 use App\Models\WishlistItem;
+use App\Policies\AdminActivityLogPolicy;
 use App\Policies\AiConversationPolicy;
+use App\Policies\BrandPolicy;
+use App\Policies\CategoryPolicy;
 use App\Policies\ComparisonPolicy;
+use App\Policies\ProductPolicy;
 use App\Policies\ReviewPolicy;
+use App\Policies\SpecDefinitionPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WishlistItemPolicy;
 use App\Queries\Catalog\ActiveCategoryScope;
@@ -110,10 +120,15 @@ class AppServiceProvider extends ServiceProvider
     private function configureAuthorization(): void
     {
         Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Category::class, CategoryPolicy::class);
+        Gate::policy(SpecDefinition::class, SpecDefinitionPolicy::class);
+        Gate::policy(Brand::class, BrandPolicy::class);
+        Gate::policy(Product::class, ProductPolicy::class);
         Gate::policy(Review::class, ReviewPolicy::class);
         Gate::policy(WishlistItem::class, WishlistItemPolicy::class);
         Gate::policy(Comparison::class, ComparisonPolicy::class);
         Gate::policy(AiConversation::class, AiConversationPolicy::class);
+        Gate::policy(AdminActivityLog::class, AdminActivityLogPolicy::class);
 
         Gate::define(
             'access-admin',

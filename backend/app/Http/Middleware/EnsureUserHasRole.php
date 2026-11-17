@@ -10,6 +10,7 @@ use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -46,6 +47,15 @@ class EnsureUserHasRole
         }, $roles);
 
         if (! $user->isActive()) {
+            Auth::guard('web')->logout();
+
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+
+            Auth::forgetGuards();
+
             throw new AuthorizationException('Your account has been deactivated.');
         }
 

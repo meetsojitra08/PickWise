@@ -4,12 +4,18 @@ import { AppLayout } from '@/app/layouts/AppLayout';
 import { AuthLayout } from '@/app/layouts/AuthLayout';
 import { HomePage } from '@/app/pages/HomePage';
 import { NotFoundPage } from '@/app/pages/NotFoundPage';
-import { RoutePlaceholderPage } from '@/app/pages/RoutePlaceholderPage';
 import { AuthGuardFallback } from '@/features/auth/components/AuthGuardFallback';
 import { RequireAdmin } from '@/features/auth/components/RequireAdmin';
 import { RequireAuth } from '@/features/auth/components/RequireAuth';
 import { RequireGuest } from '@/features/auth/components/RequireGuest';
 import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
+import { AdminActivityLogsPage } from '@/features/admin/pages/AdminActivityLogsPage';
+import { AdminAiUsagePage } from '@/features/admin/pages/AdminAiUsagePage';
+import { AdminCategoriesPage } from '@/features/admin/pages/AdminCategoriesPage';
+import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage';
+import { AdminProductsPage } from '@/features/admin/pages/AdminProductsPage';
+import { AdminReviewsPage } from '@/features/admin/pages/AdminReviewsPage';
+import { AdminUsersPage } from '@/features/admin/pages/AdminUsersPage';
 
 const AdminLayout = lazy(() =>
   import('@/app/layouts/AdminLayout').then((module) => ({
@@ -97,16 +103,13 @@ export function AppRoutes() {
 
         <Route element={<RequireAdmin />}>
           <Route path="/admin" element={<AdminLayout />}>
-            <Route
-              index
-              element={
-                <RoutePlaceholderPage
-                  title="Admin overview"
-                  description="Catalog management, user controls, review moderation, AI usage analytics, and the audit log arrive in Phase 7."
-                  actionLabel="Return to storefront"
-                />
-              }
-            />
+            <Route index element={<AdminDashboardPage />} />
+            <Route path="categories" element={<AdminCategoriesPage />} />
+            <Route path="products" element={<AdminProductsPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="reviews" element={<AdminReviewsPage />} />
+            <Route path="ai" element={<AdminAiUsagePage />} />
+            <Route path="activity-logs" element={<AdminActivityLogsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>

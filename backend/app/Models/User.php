@@ -115,4 +115,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(AiConversation::class)->latest('last_message_at');
     }
+
+    /**
+     * @return HasMany<AdminActivityLog, $this>
+     */
+    public function adminActivityLogs(): HasMany
+    {
+        return $this->hasMany(AdminActivityLog::class, 'admin_id');
+    }
 }

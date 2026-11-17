@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Admin\AdminActivityLogController;
+use App\Http\Controllers\Api\V1\Admin\AdminAiUsageController;
+use App\Http\Controllers\Api\V1\Admin\AdminBrandController;
+use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
+use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
+use App\Http\Controllers\Api\V1\Admin\AdminProductController;
+use App\Http\Controllers\Api\V1\Admin\AdminProductImageController;
+use App\Http\Controllers\Api\V1\Admin\AdminReviewController;
+use App\Http\Controllers\Api\V1\Admin\AdminSpecDefinitionController;
+use App\Http\Controllers\Api\V1\Admin\AdminUserController;
 use App\Http\Controllers\Api\V1\Assistant\ConversationController;
 use App\Http\Controllers\Api\V1\Assistant\MessageController;
 use App\Http\Controllers\Api\V1\Assistant\QuotaController;
@@ -157,4 +167,52 @@ Route::prefix('assistant')
             ->whereNumber('conversation')
             ->middleware('ai-quota:assistant')
             ->name('api.v1.assistant.messages.store');
+    });
+
+Route::prefix('admin')
+    ->middleware(['auth:sanctum', 'role:admin'])
+    ->group(function (): void {
+        Route::get('/dashboard', AdminDashboardController::class)
+            ->name('api.v1.admin.dashboard');
+        Route::get('ai/usage', AdminAiUsageController::class)
+            ->name('api.v1.admin.ai.usage');
+        Route::get('activity-logs', AdminActivityLogController::class)
+            ->name('api.v1.admin.activity-logs.index');
+        Route::apiResource('categories', AdminCategoryController::class)
+            ->names('api.v1.admin.categories');
+        Route::apiResource('categories.specs', AdminSpecDefinitionController::class)
+            ->scoped()
+            ->names('api.v1.admin.categories.specs');
+        Route::apiResource('brands', AdminBrandController::class)
+            ->names('api.v1.admin.brands');
+        Route::patch('products/bulk-status', [AdminProductController::class, 'bulkStatus'])
+            ->name('api.v1.admin.products.bulk-status');
+        Route::patch('products/{product}/images/reorder', [AdminProductImageController::class, 'reorder'])
+            ->name('api.v1.admin.products.images.reorder');
+        Route::apiResource('products.images', AdminProductImageController::class)
+            ->scoped()
+            ->whereNumber('image')
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->names('api.v1.admin.products.images');
+        Route::apiResource('products', AdminProductController::class)
+            ->withTrashed()
+            ->names('api.v1.admin.products');
+        Route::get('users', [AdminUserController::class, 'index'])
+            ->name('api.v1.admin.users.index');
+        Route::patch('users/{user}', [AdminUserController::class, 'update'])
+            ->whereNumber('user')
+            ->name('api.v1.admin.users.update');
+        Route::post('products/{product}/regenerate-summary', [AdminProductController::class, 'regenerateSummary'])
+            ->whereNumber('product')
+            ->name('api.v1.admin.products.regenerate-summary');
+        Route::patch('reviews/bulk-status', [AdminReviewController::class, 'bulkStatus'])
+            ->name('api.v1.admin.reviews.bulk-status');
+        Route::get('reviews', [AdminReviewController::class, 'index'])
+            ->name('api.v1.admin.reviews.index');
+        Route::patch('reviews/{review}', [AdminReviewController::class, 'update'])
+            ->whereNumber('review')
+            ->name('api.v1.admin.reviews.update');
+        Route::delete('reviews/{review}', [AdminReviewController::class, 'destroy'])
+            ->whereNumber('review')
+            ->name('api.v1.admin.reviews.destroy');
     });

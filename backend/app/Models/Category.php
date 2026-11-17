@@ -79,6 +79,16 @@ class Category extends Model
     }
 
     /**
+     * Alias for specDefinitions relation to support scoped route binding for /categories/{category}/specs.
+     *
+     * @return HasMany<SpecDefinition, $this>
+     */
+    public function specs(): HasMany
+    {
+        return $this->specDefinitions();
+    }
+
+    /**
      * @param  Builder<self>  $query
      */
     public function scopeActive(Builder $query): void
