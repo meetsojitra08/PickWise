@@ -440,3 +440,14 @@ export interface AdminAiUsageFilters {
   page?: number;
   per_page?: number;
 }
+
+export interface AdminActivityLogFilters {
+  start_date?: string;
+  end_date?: string;
+  admin_id?: number;
+  action?: string;
+  subject_type?: string;
+  search?: string;
+  page?: number;
+  per_page?: number;
+}

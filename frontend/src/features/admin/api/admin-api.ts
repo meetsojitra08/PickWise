@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import type { ApiPaginatedResponse, ApiSuccessResponse } from '@/types/api';
 import type {
+  AdminActivityItem,
+  AdminActivityLogFilters,
   AdminAiUsageData,
   AdminAiUsageFilters,
   AdminBrand,
@@ -55,6 +57,8 @@ export const adminKeys = {
     [...adminKeys.reviews(), 'list', filters] as const,
   aiUsage: (filters?: Record<string, unknown>) =>
     [...adminKeys.all, 'aiUsage', filters] as const,
+  activityLogs: (filters?: Record<string, unknown>) =>
+    [...adminKeys.all, 'activityLogs', filters] as const,
 };
 
 export async function getAdminDashboard(
@@ -566,5 +570,53 @@ export function useAdminAiUsage(filters?: AdminAiUsageFilters) {
   return useQuery<AdminAiUsageData>({
     queryKey: adminKeys.aiUsage(filters as Record<string, unknown>),
     queryFn: ({ signal }) => getAdminAiUsage(filters, signal),
+  });
+}
+
+export async function getAdminActivityLogs(
+  filters?: AdminActivityLogFilters,
+  signal?: AbortSignal,
+): Promise<ApiPaginatedResponse<AdminActivityItem>> {
+  const params = new URLSearchParams();
+
+  if (filters?.start_date) {
+    params.set('start_date', filters.start_date);
+  }
+  if (filters?.end_date) {
+    params.set('end_date', filters.end_date);
+  }
+  if (typeof filters?.admin_id === 'number' && filters.admin_id > 0) {
+    params.set('admin_id', String(filters.admin_id));
+  }
+  if (filters?.action && filters.action !== 'all') {
+    params.set('action', filters.action);
+  }
+  if (filters?.subject_type && filters.subject_type !== 'all') {
+    params.set('subject_type', filters.subject_type);
+  }
+  if (filters?.search) {
+    params.set('search', filters.search);
+  }
+  if (filters?.page) {
+    params.set('page', String(filters.page));
+  }
+  if (filters?.per_page) {
+    params.set('per_page', String(filters.per_page));
+  }
+
+  const queryString = params.toString();
+  const url = queryString
+    ? `/admin/activity-logs?${queryString}`
+    : '/admin/activity-logs';
+
+  return apiClient.get<ApiPaginatedResponse<AdminActivityItem>>(url, {
+    signal,
+  });
+}
+
+export function useAdminActivityLogs(filters?: AdminActivityLogFilters) {
+  return useQuery<ApiPaginatedResponse<AdminActivityItem>>({
+    queryKey: adminKeys.activityLogs(filters as Record<string, unknown>),
+    queryFn: ({ signal }) => getAdminActivityLogs(filters, signal),
   });
 }

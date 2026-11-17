@@ -4,12 +4,12 @@ import { AppLayout } from '@/app/layouts/AppLayout';
 import { AuthLayout } from '@/app/layouts/AuthLayout';
 import { HomePage } from '@/app/pages/HomePage';
 import { NotFoundPage } from '@/app/pages/NotFoundPage';
-import { RoutePlaceholderPage } from '@/app/pages/RoutePlaceholderPage';
 import { AuthGuardFallback } from '@/features/auth/components/AuthGuardFallback';
 import { RequireAdmin } from '@/features/auth/components/RequireAdmin';
 import { RequireAuth } from '@/features/auth/components/RequireAuth';
 import { RequireGuest } from '@/features/auth/components/RequireGuest';
 import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
+import { AdminActivityLogsPage } from '@/features/admin/pages/AdminActivityLogsPage';
 import { AdminAiUsagePage } from '@/features/admin/pages/AdminAiUsagePage';
 import { AdminCategoriesPage } from '@/features/admin/pages/AdminCategoriesPage';
 import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage';
@@ -109,17 +109,7 @@ export function AppRoutes() {
             <Route path="users" element={<AdminUsersPage />} />
             <Route path="reviews" element={<AdminReviewsPage />} />
             <Route path="ai" element={<AdminAiUsagePage />} />
-            <Route
-              path="activity-logs"
-              element={
-                <RoutePlaceholderPage
-                  title="Audit Log Viewer"
-                  description="Inspect append-only administrative action records and diffs (arriving in P7-S10)."
-                  actionLabel="Back to Dashboard"
-                  actionTo="/admin"
-                />
-              }
-            />
+            <Route path="activity-logs" element={<AdminActivityLogsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Route>

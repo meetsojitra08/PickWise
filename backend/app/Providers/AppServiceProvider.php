@@ -8,6 +8,7 @@ use App\AI\GroqClient;
 use App\AI\GroqClientContract;
 use App\Enums\ApiErrorCode;
 use App\Http\Responses\ApiResponse;
+use App\Models\AdminActivityLog;
 use App\Models\AiConversation;
 use App\Models\Brand;
 use App\Models\Category;
@@ -17,6 +18,7 @@ use App\Models\Review;
 use App\Models\SpecDefinition;
 use App\Models\User;
 use App\Models\WishlistItem;
+use App\Policies\AdminActivityLogPolicy;
 use App\Policies\AiConversationPolicy;
 use App\Policies\BrandPolicy;
 use App\Policies\CategoryPolicy;
@@ -126,6 +128,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(WishlistItem::class, WishlistItemPolicy::class);
         Gate::policy(Comparison::class, ComparisonPolicy::class);
         Gate::policy(AiConversation::class, AiConversationPolicy::class);
+        Gate::policy(AdminActivityLog::class, AdminActivityLogPolicy::class);
 
         Gate::define(
             'access-admin',

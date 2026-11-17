@@ -7,6 +7,7 @@ import {
   deleteAdminProduct,
   deleteAdminProductImage,
   deleteAdminReview,
+  getAdminActivityLogs,
   getAdminAiUsage,
   getAdminBrands,
   getAdminProduct,
@@ -536,6 +537,77 @@ describe('Admin Review Moderation API', () => {
 
       expect(getSpy).toHaveBeenCalledWith(
         '/admin/ai/usage?start_date=2026-11-01&end_date=2026-11-10&feature=assistant&status=ok&user_id=42&page=2&per_page=10',
+        { signal: undefined },
+      );
+    });
+  });
+
+  describe('Admin Activity Logs API', () => {
+    it('fetches paginated activity logs without filters', async () => {
+      const mockLogs = {
+        data: [
+          {
+            id: 1,
+            admin: { id: 1, name: 'Admin', email: 'admin@pickwise.test' },
+            action: 'product.created',
+            subject_type: 'Product',
+            subject_id: 10,
+            changes: { after: { name: 'New Phone' } },
+            ip_address: '127.0.0.1',
+            created_at: '2026-11-17T10:00:00Z',
+          },
+        ],
+        meta: {
+          current_page: 1,
+          last_page: 1,
+          per_page: 20,
+          total: 1,
+        },
+        links: {
+          first: '/admin/activity-logs?page=1',
+          last: '/admin/activity-logs?page=1',
+          prev: null,
+          next: null,
+        },
+      };
+
+      const getSpy = vi.spyOn(apiClient, 'get').mockResolvedValueOnce(mockLogs);
+
+      const result = await getAdminActivityLogs();
+
+      expect(getSpy).toHaveBeenCalledWith('/admin/activity-logs', {
+        signal: undefined,
+      });
+      expect(result).toEqual(mockLogs);
+    });
+
+    it('fetches activity logs with date, admin, action, search, and pagination query params', async () => {
+      const mockLogs = {
+        data: [],
+        meta: {
+          current_page: 2,
+          last_page: 3,
+          per_page: 10,
+          total: 25,
+        },
+        links: { first: null, last: null, prev: null, next: null },
+      };
+
+      const getSpy = vi.spyOn(apiClient, 'get').mockResolvedValueOnce(mockLogs);
+
+      await getAdminActivityLogs({
+        start_date: '2026-11-01',
+        end_date: '2026-11-15',
+        admin_id: 5,
+        action: 'product.updated',
+        subject_type: 'Product',
+        search: 'iPhone',
+        page: 2,
+        per_page: 10,
+      });
+
+      expect(getSpy).toHaveBeenCalledWith(
+        '/admin/activity-logs?start_date=2026-11-01&end_date=2026-11-15&admin_id=5&action=product.updated&subject_type=Product&search=iPhone&page=2&per_page=10',
         { signal: undefined },
       );
     });

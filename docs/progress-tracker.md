@@ -1,8 +1,8 @@
 # Progress Tracker
 
-**Current phase:** P7, Admin
-**Current step:** P7-S10
-**Last updated:** 2026-11-16 (P7-S9)
+**Current phase:** P8, Elevation & polish
+**Current step:** P8-S1 (P7 completed)
+**Last updated:** 2026-11-17 (P7-S10)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -89,7 +89,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P7-S7** User management (activate/deactivate, role) · `feat(admin)`
 - [x] **P7-S8** Review moderation queue + triggers summary regeneration · `feat(admin)`
 - [x] **P7-S9** AI usage analytics endpoint and charts · `feat(admin)`
-- [ ] **P7-S10** Audit log viewer with filters · `feat(admin)`
+- [x] **P7-S10** Audit log viewer with filters · `feat(admin)`
 
 ## P8: Elevation & polish (branch `phase/P8-polish`)
 - [ ] **P8-S1** Polish AI screens: loading, error and empty states · `fix(ui)`
@@ -171,6 +171,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P7-S8 note: Review moderation endpoints (`GET /admin/reviews`, `PATCH /admin/reviews/{id}`, `PATCH /admin/reviews/bulk-status`, `DELETE /admin/reviews/{id}`, and `POST /admin/products/{id}/regenerate-summary`) enforce active admin policies and record full audit trails with optional rejection reasons (`review.moderated`, `review.bulk_moderated`, `review.deleted`, and `product.summary_regenerated`). Moderating or deleting an approved review automatically triggers product rating aggregation, category Value Score recalculation, and queues `GenerateReviewSummary`. On the frontend, `AdminReviewsPage` provides status tabs (defaulting to pending queue), search and star rating filters, single and bulk approve/reject workflows with confirmation modals, and empty state guidance, alongside an AI summary regeneration trigger on products.
 - P7-S9 verification: Pint (338 files), PHPStan level 6 (no errors across 265 files), and 79 admin Pest tests pass inside the `app` container (736 assertions). Frontend lint (0 warnings, 0 errors), typecheck (0 errors), 231 Vitest tests across 45 test files, Prettier, and production build pass. `git diff --check` is clean.
 - P7-S9 note: AI usage telemetry endpoints (`GET /admin/ai/usage`) enforce active admin policies and return aggregated KPI summaries (calls, successes, errors, rate limits, error rates, prompt/completion tokens, average latency), per-feature breakdowns (assistant, compare, review_summary), gap-free chronological daily usage timeseries, top consumers by call frequency with guest counts, and paginated audit logs with flexible date range (max 90 days), feature, and status filters. The frontend `AdminAiUsagePage` provides quick window presets (7D, 14D, 30D, 90D), custom date ranges, accessible SVG daily volume and reliability charts with hover telemetry and screen reader tables, feature breakdown cards, top consumer ranking, and paginated logs.
+- P7-S10 verification: Pint (346 files), PHPStan level 6 (no errors across 270 files), and 89 admin Pest tests pass inside the `app` container (847 assertions; full 338 Pest tests pass). Frontend lint (0 warnings, 0 errors), typecheck (0 errors), 240 Vitest tests across 46 test files, Prettier, and production build pass. `git diff --check` is clean.
+- P7-S10 note: Activity logs endpoint (`GET /admin/activity-logs`) enforces active admin policies and delivers paginated append-only records with multi-axis filtering (date range up to 90 days, admin author, action, subject entity, and full-text keyword search across action/IP/author/subject). The table remains strictly append-only, rejecting any mutate attempts (POST, PUT, PATCH, DELETE) at the HTTP routing layer and Eloquent lifecycle hooks. The frontend `AdminActivityLogsPage` provides quick window presets (7D, 14D, 30D, 90D), custom date ranges with validation warnings, filter resets, local timezone display with relative times, color-coded action badges, and an accessible modal diff inspector (`AdminAuditDiffDialog`) displaying attribute-level before/after diffs, creation values, deletion snapshots, raw JSON payload inspection, and sensitive credential redaction notices.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -206,6 +208,7 @@ One line per step on what you learned. Turns into interview material.
 | P7-S7 | Managing user accounts requires self-protection and race-condition guards: prevent admins from deactivating or demoting themselves via gate inspection, reject removing the last active administrator in the database, invalidate sessions immediately on deactivation in middleware, and refresh Eloquent instances during testing to accurately track non-fillable status changes. |
 | P7-S8 | Review moderation has cascading catalog side effects: approving, rejecting, or deleting reviews must recalculate product rating aggregates, recompute category Value Scores, and dispatch queued AI summary jobs, while keeping review author fallback chains resilient when seeded reviews lack user accounts. |
 | P7-S9 | Aggregating time-series telemetry across SQL engines requires generating gap-free continuous daily buckets in application code, while AVG calculations must account for NULL latencies on throttled or early-rejected requests. |
+| P7-S10 | An audit log viewer requires three presentation boundaries: bounded date windows (max 90 days) prevent table scans while presets (7D, 14D, 30D, 90D) keep exploration snappy; field-level diff inspectors must distinguish created, updated, and deleted payloads with attribute-level highlighting; and append-only immutability must be verified across both HTTP verbs (no PUT/PATCH/DELETE endpoints) and database model hooks. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

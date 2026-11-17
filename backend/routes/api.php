@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Admin\AdminActivityLogController;
 use App\Http\Controllers\Api\V1\Admin\AdminAiUsageController;
 use App\Http\Controllers\Api\V1\Admin\AdminBrandController;
 use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
@@ -175,6 +176,8 @@ Route::prefix('admin')
             ->name('api.v1.admin.dashboard');
         Route::get('ai/usage', AdminAiUsageController::class)
             ->name('api.v1.admin.ai.usage');
+        Route::get('activity-logs', AdminActivityLogController::class)
+            ->name('api.v1.admin.activity-logs.index');
         Route::apiResource('categories', AdminCategoryController::class)
             ->names('api.v1.admin.categories');
         Route::apiResource('categories.specs', AdminSpecDefinitionController::class)
