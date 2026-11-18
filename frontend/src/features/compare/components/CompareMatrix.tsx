@@ -65,7 +65,7 @@ export function CompareMatrix({ matrix }: { matrix: CompareMatrixData }) {
             <tr className="border-b border-border">
               <th
                 scope="col"
-                className="sticky left-0 z-20 min-w-40 bg-card px-4 py-4 align-bottom text-xs font-medium text-muted-foreground sm:px-5 lg:top-16 lg:z-40"
+                className="sticky left-0 z-20 min-w-28 border-r border-border/60 bg-card px-3 py-4 align-bottom text-xs font-medium text-muted-foreground sm:min-w-40 sm:px-5 lg:top-16 lg:z-40 lg:border-r-0"
               >
                 Specification
               </th>
@@ -81,7 +81,7 @@ export function CompareMatrix({ matrix }: { matrix: CompareMatrixData }) {
               <tr key={row.key} className="border-t border-border">
                 <th
                   scope="row"
-                  className="sticky left-0 z-10 bg-card px-4 py-3 align-top font-medium text-muted-foreground sm:px-5"
+                  className="sticky left-0 z-10 border-r border-border/60 bg-card px-3 py-3 align-top font-medium text-muted-foreground sm:px-5 lg:border-r-0"
                 >
                   {row.label}
                 </th>

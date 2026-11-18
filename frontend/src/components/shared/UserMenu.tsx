@@ -60,7 +60,7 @@ export function UserMenu() {
           type="button"
           variant="outline"
           aria-label={`Account menu for ${user.name}`}
-          className="min-h-11 gap-2 pr-3 pl-2"
+          className="min-h-11 gap-2 px-2 sm:pr-3 sm:pl-2"
         >
           <span
             aria-hidden="true"
@@ -68,11 +68,11 @@ export function UserMenu() {
           >
             {getUserInitials(user.name)}
           </span>
-          <span className="max-w-28 truncate text-sm font-medium text-foreground">
+          <span className="hidden max-w-28 truncate text-sm font-medium text-foreground sm:inline">
             {user.name}
           </span>
           <ChevronDown
-            className="size-4 text-muted-foreground"
+            className="hidden size-4 text-muted-foreground sm:block"
             strokeWidth={1.5}
             aria-hidden="true"
           />

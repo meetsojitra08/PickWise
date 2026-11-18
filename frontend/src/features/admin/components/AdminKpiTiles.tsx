@@ -111,7 +111,7 @@ export function AdminKpiTiles({ counts, aiUsage }: AdminKpiTilesProps) {
                 <div className="text-3xl font-bold tracking-tight text-foreground tabular-nums">
                   {tile.value.toLocaleString()}
                 </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
                   <span>{tile.subtitle}</span>
                   <span
                     className={cn(

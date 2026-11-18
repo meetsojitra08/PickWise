@@ -89,7 +89,7 @@ export function CompareVerdictSection({
         onChange={(e) => setPriority(e.target.value)}
         placeholder="e.g. Battery life, best value, portability"
         maxLength={100}
-        className="h-8 text-xs bg-background/80"
+        className="h-11 bg-background/80 text-sm sm:h-9 sm:text-xs"
         disabled={status === 'loading'}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
@@ -123,14 +123,14 @@ export function CompareVerdictSection({
           status === 'idle' ? (
             priorityInput
           ) : status === 'ready' ? (
-            <div className="flex items-center gap-2 max-w-xs">
+            <div className="flex w-full items-center gap-2 sm:w-auto sm:max-w-xs">
               <Input
                 aria-label="Adjust comparison priority"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
                 placeholder="Adjust priority (e.g. battery)"
                 maxLength={100}
-                className="h-7 text-xs bg-background/80"
+                className="h-10 bg-background/80 text-sm sm:h-8 sm:text-xs"
               />
             </div>
           ) : null

@@ -283,14 +283,14 @@ export function AdminProductsPage() {
               )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">
               <select
                 value={selectedCategory}
                 onChange={(e) => {
                   setSelectedCategory(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-10 w-full rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto"
                 aria-label="Filter by category"
               >
                 <option value="">All categories</option>
@@ -307,7 +307,7 @@ export function AdminProductsPage() {
                   setSelectedBrand(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-10 w-full rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto"
                 aria-label="Filter by brand"
               >
                 <option value="">All brands</option>
@@ -326,7 +326,7 @@ export function AdminProductsPage() {
                   );
                   setPage(1);
                 }}
-                className="h-10 rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-10 w-full rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto"
                 aria-label="Filter by status"
               >
                 <option value="all">All statuses</option>
@@ -340,7 +340,7 @@ export function AdminProductsPage() {
                   setAvailabilityFilter(e.target.value);
                   setPage(1);
                 }}
-                className="h-10 rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-10 w-full rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto"
                 aria-label="Filter by availability"
               >
                 <option value="">All stock</option>
@@ -353,7 +353,7 @@ export function AdminProductsPage() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="h-10 rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-10 w-full rounded-control border border-input bg-background px-3 py-2 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto"
                 aria-label="Sort products"
               >
                 <option value="-created_at">Newest first</option>
@@ -391,7 +391,7 @@ export function AdminProductsPage() {
               selected
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
               size="xs"
@@ -500,10 +500,10 @@ export function AdminProductsPage() {
         </Card>
       ) : (
         <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          <div className="md:overflow-x-auto">
+            <table className="block w-full text-left text-sm md:table">
               <caption className="sr-only">Product catalog management</caption>
-              <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <thead className="hidden border-b border-border bg-muted/40 text-xs font-semibold tracking-wider text-muted-foreground uppercase md:table-header-group">
                 <tr>
                   <th scope="col" className="w-10 px-4 py-3 text-center">
                     <Checkbox
@@ -520,27 +520,44 @@ export function AdminProductsPage() {
                       aria-label="Select all products on page"
                     />
                   </th>
-                  <th scope="col" className="px-4 py-3">Product</th>
-                  <th scope="col" className="px-4 py-3">Category</th>
-                  <th scope="col" className="px-4 py-3">Price</th>
-                  <th scope="col" className="px-4 py-3">Stock</th>
-                  <th scope="col" className="px-4 py-3 text-center">Score / Rating</th>
-                  <th scope="col" className="px-4 py-3 text-center">Status</th>
-                  <th scope="col" className="px-4 py-3 text-right sm:px-6">Actions</th>
+                  <th scope="col" className="px-4 py-3">
+                    Product
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Category
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Price
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Stock
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center">
+                    Score / Rating
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center">
+                    Status
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right sm:px-6">
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="block divide-y divide-border md:table-row-group">
                 {products.map((product) => {
                   const isSelected = selectedIds.includes(product.id);
 
                   return (
                     <tr
                       key={product.id}
-                      className={`transition-colors hover:bg-muted/30 ${
+                      className={`block space-y-2.5 p-4 transition-colors hover:bg-muted/30 md:table-row md:space-y-0 md:p-0 ${
                         isSelected ? 'bg-primary/5' : ''
                       }`}
                     >
-                      <td className="px-4 py-3.5 text-center">
+                      <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3.5 md:text-center">
+                        <span className="text-xs font-medium text-muted-foreground md:hidden">
+                          Select
+                        </span>
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() => handleToggleSelect(product.id)}
@@ -548,7 +565,7 @@ export function AdminProductsPage() {
                         />
                       </td>
 
-                      <td className="px-4 py-3.5">
+                      <td className="block p-0 md:table-cell md:px-4 md:py-3.5">
                         <div className="flex items-center gap-3">
                           <div className="relative size-10 shrink-0 overflow-hidden rounded border border-border bg-muted/30">
                             {product.primary_image?.url ? (
@@ -563,21 +580,21 @@ export function AdminProductsPage() {
                               </div>
                             )}
                           </div>
-                          <div className="flex flex-col min-w-0">
+                          <div className="flex min-w-0 flex-col">
                             <span
-                              className="font-medium text-foreground truncate max-w-xs"
+                              className="max-w-xs truncate font-medium text-foreground"
                               title={product.name}
                             >
                               {product.name}
                             </span>
-                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                               {product.brand?.name && (
                                 <span className="font-medium">
                                   {product.brand.name}
                                 </span>
                               )}
                               <span>•</span>
-                              <code className="text-[11px] font-mono">
+                              <code className="truncate font-mono text-[11px]">
                                 /{product.slug}
                               </code>
                             </div>
@@ -585,7 +602,10 @@ export function AdminProductsPage() {
                         </div>
                       </td>
 
-                      <td className="px-4 py-3.5">
+                      <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3.5">
+                        <span className="text-xs font-medium text-muted-foreground md:hidden">
+                          Category
+                        </span>
                         <Badge
                           variant="outline"
                           className="text-xs font-normal"
@@ -594,11 +614,17 @@ export function AdminProductsPage() {
                         </Badge>
                       </td>
 
-                      <td className="px-4 py-3.5 font-mono text-xs font-semibold text-foreground">
-                        {product.price.formatted}
+                      <td className="flex items-center justify-between gap-2 p-0 font-mono text-xs font-semibold text-foreground md:table-cell md:px-4 md:py-3.5">
+                        <span className="font-sans font-medium text-muted-foreground md:hidden">
+                          Price
+                        </span>
+                        <span>{product.price.formatted}</span>
                       </td>
 
-                      <td className="px-4 py-3.5">
+                      <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3.5">
+                        <span className="text-xs font-medium text-muted-foreground md:hidden">
+                          Stock
+                        </span>
                         <span
                           className={`inline-flex items-center rounded-control px-2 py-0.5 text-[11px] font-medium ${
                             product.availability === 'in_stock'
@@ -614,10 +640,13 @@ export function AdminProductsPage() {
                         </span>
                       </td>
 
-                      <td className="px-4 py-3.5 text-center text-xs">
-                        <div className="flex flex-col items-center">
+                      <td className="flex items-center justify-between gap-2 p-0 text-xs md:table-cell md:px-4 md:py-3.5 md:text-center">
+                        <span className="font-medium text-muted-foreground md:hidden">
+                          Score / Rating
+                        </span>
+                        <div className="flex items-center gap-2 md:flex-col md:gap-0">
                           {product.value_score !== null ? (
-                            <span className="inline-flex items-center gap-1 font-semibold text-foreground dark:text-accent font-mono">
+                            <span className="inline-flex items-center gap-1 font-mono font-semibold text-foreground dark:text-accent">
                               VS {product.value_score}
                             </span>
                           ) : (
@@ -632,19 +661,22 @@ export function AdminProductsPage() {
                         </div>
                       </td>
 
-                      <td className="px-4 py-3.5 text-center">
+                      <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3.5 md:text-center">
+                        <span className="text-xs font-medium text-muted-foreground md:hidden">
+                          Status
+                        </span>
                         <Badge
                           variant={
                             product.is_published ? 'default' : 'secondary'
                           }
-                          className="text-[10px] uppercase font-semibold tracking-wider"
+                          className="text-[10px] font-semibold tracking-wider uppercase"
                         >
                           {product.is_published ? 'Published' : 'Draft'}
                         </Badge>
                       </td>
 
-                      <td className="px-4 py-3.5 text-right sm:px-6">
-                        <div className="flex items-center justify-end gap-1.5">
+                      <td className="block border-t border-border/50 pt-2.5 text-right md:table-cell md:border-t-0 md:px-4 md:py-3.5 lg:px-6">
+                        <div className="flex flex-wrap items-center justify-end gap-1.5">
                           <Button
                             type="button"
                             variant="ghost"
@@ -703,7 +735,7 @@ export function AdminProductsPage() {
 
           {/* Pagination Controls */}
           {meta && meta.last_page > 1 && (
-            <div className="flex items-center justify-between border-t border-border px-4 py-3 sm:px-6">
+            <div className="flex flex-col items-center justify-between gap-3 border-t border-border px-4 py-3 sm:flex-row sm:px-6">
               <span className="text-xs text-muted-foreground">
                 Page {meta.current_page} of {meta.last_page} ({meta.total}{' '}
                 products)

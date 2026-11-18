@@ -158,7 +158,7 @@ export function CatalogPage() {
               (searchParams.has('q') ? 'relevance' : 'value')
             }
             onChange={(event) => updateFilter('sort', event.target.value)}
-            className="h-11 min-w-40 rounded-control border border-input bg-card px-3 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            className="h-11 min-w-0 flex-1 rounded-control border border-input bg-card px-3 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:min-w-44 sm:flex-initial"
           >
             <option value="relevance">Relevance</option>
             <option value="value">Best value</option>
@@ -232,7 +232,7 @@ export function CatalogPage() {
               type="button"
               onClick={() => updateFilter(filter.key, null)}
               title={`Remove filter: ${filter.label}`}
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-medium hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-medium hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:min-h-9"
             >
               {filter.label}
               <X className="size-3.5" aria-hidden="true" />
@@ -313,7 +313,7 @@ export function CatalogPage() {
               {lastPage > 1 ? (
                 <nav
                   aria-label="Catalog pagination"
-                  className="mt-8 flex items-center justify-center gap-4"
+                  className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-4"
                 >
                   <Button
                     type="button"

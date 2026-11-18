@@ -108,7 +108,7 @@ export function AdminAiUsageChart({ data }: AdminAiUsageChartProps) {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-4 text-xs font-medium">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-medium">
           <div className="flex items-center gap-1.5">
             <span className="inline-block size-2.5 rounded-full bg-primary" />
             <span className="text-muted-foreground">Total calls</span>
@@ -126,7 +126,7 @@ export function AdminAiUsageChart({ data }: AdminAiUsageChartProps) {
 
       {/* Hover details tooltip */}
       <div
-        className="mt-3 flex min-h-[32px] items-center justify-between rounded-control bg-muted/50 px-3 py-1.5 text-xs text-foreground"
+        className="mt-3 flex min-h-[32px] flex-wrap items-center justify-between gap-2 rounded-control bg-muted/50 px-3 py-1.5 text-xs text-foreground"
         aria-live="polite"
       >
         {hoveredPoint ? (
@@ -134,7 +134,7 @@ export function AdminAiUsageChart({ data }: AdminAiUsageChartProps) {
             <span className="font-semibold text-foreground">
               {hoveredPoint.date}
             </span>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
               <span>
                 Total:{' '}
                 <strong className="text-primary">

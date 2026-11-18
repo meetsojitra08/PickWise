@@ -22,7 +22,7 @@ export function AdminAiSummaryCard({ aiUsage }: AdminAiSummaryCardProps) {
 
   return (
     <Card className="border border-border bg-card">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
+      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-3">
         <div className="flex items-center gap-2">
           <div className="flex size-7 items-center justify-center rounded-control bg-accent/20 text-warning dark:text-accent">
             <Bot className="size-4" strokeWidth={1.5} aria-hidden="true" />

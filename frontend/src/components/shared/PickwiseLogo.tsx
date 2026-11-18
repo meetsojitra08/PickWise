@@ -35,11 +35,11 @@ export function PickwiseLogo({
           />
         </svg>
       </span>
-      <span className="font-heading text-xl font-semibold tracking-tight">
+      <span className="font-heading text-lg font-semibold tracking-tight sm:text-xl">
         Pickwise
       </span>
       {labelSuffix ? (
-        <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+        <span className="hidden rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground sm:inline-flex">
           {labelSuffix}
         </span>
       ) : null}

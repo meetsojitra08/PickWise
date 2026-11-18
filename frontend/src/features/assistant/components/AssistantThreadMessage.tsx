@@ -63,13 +63,13 @@ export function AssistantThreadMessage({
   return (
     <div
       className={cn(
-        'flex items-start gap-3.5 animate-in fade-in slide-in-from-bottom-2 duration-300',
+        'flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 sm:flex-row sm:items-start sm:gap-3.5',
         className,
       )}
     >
-      {/* Advisor Avatar */}
+      {/* Advisor Avatar (side rail on sm+) */}
       <div
-        className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent shadow-xs"
+        className="hidden size-9 shrink-0 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent shadow-xs sm:mt-1 sm:flex"
         aria-hidden="true"
       >
         <AiMark className="size-4.5 text-accent" />
@@ -77,7 +77,13 @@ export function AssistantThreadMessage({
 
       <div className="min-w-0 flex-1 space-y-4">
         {/* Advisor identity header */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <div
+            className="flex size-6 shrink-0 items-center justify-center rounded-lg border border-accent/40 bg-accent/15 text-accent shadow-xs sm:hidden"
+            aria-hidden="true"
+          >
+            <AiMark className="size-3.5 text-accent" />
+          </div>
           <span className="font-heading text-xs font-bold text-foreground">
             Pickwise Advisor
           </span>

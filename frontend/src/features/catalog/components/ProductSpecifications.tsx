@@ -20,7 +20,7 @@ export function ProductSpecifications({ specs }: Pick<ProductDetail, 'specs'>) {
       </div>
       {specs.length ? (
         <div className="overflow-hidden rounded-card border border-border bg-card">
-          <table className="w-full border-collapse text-left text-sm">
+          <table className="block w-full border-collapse text-left text-sm sm:table">
             <caption className="sr-only">
               Product technical specifications
             </caption>
@@ -30,19 +30,19 @@ export function ProductSpecifications({ specs }: Pick<ProductDetail, 'specs'>) {
                 <th scope="col">Value</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="block sm:table-row-group">
               {specs.map((spec) => (
                 <tr
                   key={spec.key}
-                  className="border-t border-border first:border-t-0"
+                  className="flex flex-col gap-0.5 border-t border-border px-4 py-3 first:border-t-0 sm:table-row sm:p-0"
                 >
                   <th
                     scope="row"
-                    className="w-2/5 px-4 py-3 font-medium text-muted-foreground sm:px-6"
+                    className="block p-0 text-xs font-medium text-muted-foreground sm:table-cell sm:w-2/5 sm:px-6 sm:py-3 sm:text-sm"
                   >
                     {spec.label}
                   </th>
-                  <td className="px-4 py-3 text-foreground sm:px-6">
+                  <td className="block p-0 text-foreground sm:table-cell sm:px-6 sm:py-3">
                     <span className="break-words">
                       {formatSpecValue(spec.value)}
                     </span>

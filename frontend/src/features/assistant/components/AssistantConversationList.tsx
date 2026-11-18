@@ -154,7 +154,7 @@ export function AssistantConversationList({
                     e.stopPropagation();
                     onDeleteConversation(conv.id);
                   }}
-                  className="size-6 p-0 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100 hover:text-negative hover:bg-negative/10"
+                  className="size-9 shrink-0 p-0 opacity-100 transition-opacity hover:bg-negative/10 hover:text-negative focus-visible:opacity-100 md:size-6 md:opacity-0 md:group-hover:opacity-100"
                 >
                   <Trash2 className="size-3.5" />
                 </Button>

@@ -282,23 +282,25 @@ export function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex flex-col items-center text-center">
             {/* Pill badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-card/80 px-3.5 py-1.5 text-xs font-medium text-foreground shadow-xs backdrop-blur-xs">
-              <span className="flex size-2 rounded-full bg-positive animate-pulse" />
+            <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-full border border-primary/25 bg-card/80 px-3.5 py-1.5 text-xs font-medium text-foreground shadow-xs backdrop-blur-xs">
+              <span className="flex size-2 shrink-0 rounded-full bg-positive animate-pulse" />
               <span className="font-semibold text-primary">Pickwise 2.0</span>
-              <span className="text-muted-foreground">·</span>
-              <span>Hardware Intelligence & Grounded AI Verdicts</span>
+              <span className="text-muted-foreground" aria-hidden="true">
+                ·
+              </span>
+              <span>Hardware Intelligence &amp; Grounded AI Verdicts</span>
             </div>
 
             {/* H1 Main Heading */}
             <h1
               id="hero-heading"
-              className="mt-6 max-w-4xl font-heading text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl leading-[1.08]"
+              className="mt-6 max-w-4xl font-heading text-3xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-7xl leading-[1.08]"
             >
               Decide what to buy, with the homework done.
             </h1>
 
             {/* Subtitle */}
-            <p className="mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
+            <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-xl">
               Cut through marketing jargon, bot reviews, and 40 open browser
               tabs. Pickwise benchmarks 60+ verified models with transparent
               Value Scores, side-by-side spec matrices, and budget-grounded AI
@@ -313,32 +315,34 @@ export function HomePage() {
                 method="get"
                 role="search"
                 aria-label="Shopping assistant search"
-                className="relative flex items-center rounded-surface border border-border/80 bg-card p-1.5 shadow-float transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
+                className="relative flex flex-col items-stretch gap-2 rounded-surface border border-border/80 bg-card p-2 shadow-float transition-all focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 sm:flex-row sm:items-center sm:gap-0 sm:p-1.5"
               >
-                <Sparkles
-                  className="ml-3.5 size-5 shrink-0 text-accent"
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-                <label htmlFor="home-search" className="sr-only">
-                  Search with shopping assistant
-                </label>
-                <Input
-                  id="home-search"
-                  type="search"
-                  name="q"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="What are you shopping for, and what's your budget?"
-                  className="h-12 border-0 bg-transparent text-base shadow-none focus-visible:ring-0 placeholder:text-muted-foreground"
-                />
-                <div className="flex items-center gap-1.5 pr-1">
+                <div className="flex min-w-0 flex-1 items-center">
+                  <Sparkles
+                    className="ml-2.5 size-5 shrink-0 text-accent sm:ml-3.5"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
+                  <label htmlFor="home-search" className="sr-only">
+                    Search with shopping assistant
+                  </label>
+                  <Input
+                    id="home-search"
+                    type="search"
+                    name="q"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="What are you shopping for, and what's your budget?"
+                    className="h-12 min-w-0 flex-1 border-0 bg-transparent text-base shadow-none focus-visible:ring-0 placeholder:text-muted-foreground"
+                  />
+                </div>
+                <div className="flex items-center justify-end gap-1.5 sm:pr-1">
                   <Button
                     type="button"
                     onClick={handleCatalogSearch}
                     variant="ghost"
                     size="sm"
-                    className="hidden gap-1.5 rounded-control text-xs sm:inline-flex text-muted-foreground hover:text-foreground"
+                    className="min-h-11 gap-1.5 rounded-control text-xs text-muted-foreground hover:text-foreground sm:min-h-9"
                     title="Search catalog by keyword"
                   >
                     <Search className="size-3.5" aria-hidden="true" />
@@ -347,7 +351,7 @@ export function HomePage() {
                   <Button
                     type="submit"
                     size="default"
-                    className="gap-2 rounded-control"
+                    className="min-h-11 flex-1 gap-2 rounded-control sm:min-h-10 sm:flex-initial"
                   >
                     <AiMark className="size-4 text-accent dark:text-primary-foreground" />
                     <span>Ask Assistant</span>
@@ -425,12 +429,12 @@ export function HomePage() {
           <div className="mt-14 sm:mt-18">
             <div className="overflow-hidden rounded-surface border border-border/80 bg-card shadow-float">
               {/* Window chrome header */}
-              <div className="flex items-center justify-between border-b border-border/60 bg-muted/40 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="size-3 rounded-full bg-destructive/60" />
-                  <span className="size-3 rounded-full bg-warning/60" />
-                  <span className="size-3 rounded-full bg-positive/60" />
-                  <span className="ml-2 font-mono text-xs text-muted-foreground">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 bg-muted/40 px-4 py-3">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="size-3 shrink-0 rounded-full bg-destructive/60" />
+                  <span className="size-3 shrink-0 rounded-full bg-warning/60" />
+                  <span className="size-3 shrink-0 rounded-full bg-positive/60" />
+                  <span className="ml-2 truncate font-mono text-xs text-muted-foreground">
                     pickwise.app/verdict
                   </span>
                 </div>
@@ -450,7 +454,7 @@ export function HomePage() {
               </div>
 
               {/* Showcase content: Verdict signature demo */}
-              <div className="grid grid-cols-1 gap-6 p-6 lg:grid-cols-12 lg:gap-8 lg:p-8">
+              <div className="grid grid-cols-1 gap-6 p-4 sm:p-6 lg:grid-cols-12 lg:gap-8 lg:p-8">
                 {/* Left side: Contestants in comparison */}
                 <div className="flex flex-col justify-between space-y-4 lg:col-span-5">
                   <div>
@@ -463,7 +467,7 @@ export function HomePage() {
                       <span>Active Comparison · 3 Finalists</span>
                     </div>
                     <h3 className="mt-1.5 font-heading text-xl font-semibold text-foreground">
-                      Laptops for 4K video editing & travel
+                      Laptops for 4K video editing &amp; travel
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Benchmark comparison evaluated across 18 specifications
@@ -473,64 +477,64 @@ export function HomePage() {
 
                   {/* 3 mini product contestant cards */}
                   <div className="space-y-2.5">
-                    <div className="flex items-center justify-between rounded-control border border-primary/40 bg-primary/5 p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex size-9 items-center justify-center rounded-md bg-card font-semibold text-primary shadow-xs">
+                    <div className="flex items-center justify-between gap-2 rounded-control border border-primary/40 bg-primary/5 p-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-card font-semibold text-primary shadow-xs">
                           #1
                         </div>
-                        <div>
-                          <div className="text-sm font-semibold text-foreground">
-                            Apple MacBook Air 15" M3
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-semibold text-foreground">
+                            Apple MacBook Air 15&quot; M3
                           </div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="truncate text-xs text-muted-foreground">
                             16GB / 512GB · 1.51kg
                           </div>
                         </div>
                       </div>
-                      <Badge className="bg-positive/15 text-positive font-semibold">
+                      <Badge className="shrink-0 bg-positive/15 font-semibold text-positive">
                         94% Fit
                       </Badge>
                     </div>
 
-                    <div className="flex items-center justify-between rounded-control border border-border/70 bg-card p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex size-9 items-center justify-center rounded-md bg-muted font-medium text-muted-foreground">
+                    <div className="flex items-center justify-between gap-2 rounded-control border border-border/70 bg-card p-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted font-medium text-muted-foreground">
                           #2
                         </div>
-                        <div>
-                          <div className="text-sm font-medium text-foreground">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-foreground">
                             Dell XPS 13 9340
                           </div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="truncate text-xs text-muted-foreground">
                             Intel Core Ultra 7 · 1.19kg
                           </div>
                         </div>
                       </div>
                       <Badge
                         variant="outline"
-                        className="text-muted-foreground"
+                        className="shrink-0 text-muted-foreground"
                       >
                         86% Fit
                       </Badge>
                     </div>
 
-                    <div className="flex items-center justify-between rounded-control border border-border/70 bg-card p-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex size-9 items-center justify-center rounded-md bg-muted font-medium text-muted-foreground">
+                    <div className="flex items-center justify-between gap-2 rounded-control border border-border/70 bg-card p-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted font-medium text-muted-foreground">
                           #3
                         </div>
-                        <div>
-                          <div className="text-sm font-medium text-foreground">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-foreground">
                             Lenovo ThinkPad T14s Gen 5
                           </div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="truncate text-xs text-muted-foreground">
                             Snapdragon X Elite · 1.24kg
                           </div>
                         </div>
                       </div>
                       <Badge
                         variant="outline"
-                        className="text-muted-foreground"
+                        className="shrink-0 text-muted-foreground"
                       >
                         83% Fit
                       </Badge>
@@ -682,11 +686,14 @@ export function HomePage() {
         aria-label="Platform proof metrics"
         className="mx-auto w-full max-w-7xl px-4 sm:px-6"
       >
-        <div className="grid grid-cols-1 divide-y divide-border/60 rounded-surface border border-border/80 bg-card shadow-xs sm:grid-cols-2 sm:divide-y-0 sm:divide-x lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-surface border border-border/80 bg-border/60 shadow-xs sm:grid-cols-2 lg:grid-cols-4">
           {PLATFORM_STATS.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.label} className="flex flex-col p-6 sm:p-7">
+              <div
+                key={stat.label}
+                className="flex flex-col bg-card p-5 sm:p-7"
+              >
                 <div className="flex items-center gap-3">
                   <span className="flex size-10 items-center justify-center rounded-control bg-primary/10 text-primary">
                     <Icon
@@ -841,7 +848,7 @@ export function HomePage() {
           </div>
 
           {/* Category Filter Pills */}
-          <div className="flex flex-wrap gap-1.5 rounded-full border border-border/80 bg-card p-1 shadow-xs">
+          <div className="flex w-full flex-wrap gap-1.5 rounded-card border border-border/80 bg-card p-1 shadow-xs sm:w-auto sm:rounded-full">
             {[
               { id: 'all', label: 'All Picks' },
               { id: 'smartphones', label: 'Phones' },
@@ -853,7 +860,7 @@ export function HomePage() {
                 type="button"
                 onClick={() => setActiveCategoryTab(tab.id)}
                 className={cn(
-                  'rounded-full px-3 py-1 text-xs font-medium transition-colors',
+                  'min-h-10 flex-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors sm:min-h-8 sm:flex-initial sm:py-1',
                   activeCategoryTab === tab.id
                     ? 'bg-primary text-primary-foreground shadow-xs'
                     : 'text-muted-foreground hover:text-foreground',
@@ -972,15 +979,15 @@ export function HomePage() {
                   </Badge>
                 </div>
                 <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
-                  <div className="flex justify-between">
+                  <div className="flex items-baseline justify-between gap-2">
                     <span>Hardware Spec Percentile</span>
-                    <span className="font-mono font-medium text-foreground">
+                    <span className="shrink-0 font-mono font-medium text-foreground">
                       88th
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex items-baseline justify-between gap-2">
                     <span>Price Bracket Position</span>
-                    <span className="font-mono font-medium text-positive">
+                    <span className="text-right font-mono font-medium text-positive">
                       34th (Budget-friendly)
                     </span>
                   </div>
@@ -1132,15 +1139,15 @@ export function HomePage() {
         </div>
 
         <div className="mt-10 overflow-hidden rounded-surface border border-border/80 bg-card shadow-xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border/80 bg-muted/50 text-xs font-semibold text-foreground uppercase">
+          <div className="md:overflow-x-auto">
+            <table className="block w-full text-left text-sm md:table">
+              <thead className="hidden border-b border-border/80 bg-muted/50 text-xs font-semibold text-foreground uppercase md:table-header-group">
                 <tr>
                   <th scope="col" className="px-6 py-4">
                     Shopping Dimension
                   </th>
                   <th scope="col" className="px-6 py-4 text-muted-foreground">
-                    Traditional Search & Marketplaces
+                    Traditional Search &amp; Marketplaces
                   </th>
                   <th
                     scope="col"
@@ -1150,32 +1157,38 @@ export function HomePage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/60">
+              <tbody className="block divide-y divide-border/60 md:table-row-group">
                 {COMPARISON_ROWS.map((row) => (
                   <tr
                     key={row.feature}
-                    className="transition-colors hover:bg-muted/20"
+                    className="block space-y-2.5 p-4 transition-colors hover:bg-muted/20 md:table-row md:space-y-0 md:p-0"
                   >
                     <th
                       scope="row"
-                      className="px-6 py-4 font-semibold text-foreground"
+                      className="block px-0 py-0 font-heading text-base font-semibold text-foreground md:table-cell md:px-6 md:py-4 md:font-sans md:text-sm"
                     >
                       {row.feature}
                     </th>
-                    <td className="px-6 py-4 text-muted-foreground">
-                      <div className="flex items-center gap-2">
+                    <td className="block px-0 py-0 text-muted-foreground md:table-cell md:px-6 md:py-4">
+                      <span className="mb-1 block text-[11px] font-semibold tracking-wide text-muted-foreground uppercase md:hidden">
+                        Traditional search
+                      </span>
+                      <div className="flex items-start gap-2 md:items-center">
                         <XCircle
-                          className="size-4 shrink-0 text-destructive/70"
+                          className="mt-0.5 size-4 shrink-0 text-destructive/70 md:mt-0"
                           strokeWidth={1.5}
                           aria-hidden="true"
                         />
                         <span>{row.traditional}</span>
                       </div>
                     </td>
-                    <td className="bg-primary/5 px-6 py-4 font-medium text-foreground">
-                      <div className="flex items-center gap-2">
+                    <td className="block rounded-control bg-primary/5 p-3 font-medium text-foreground md:table-cell md:rounded-none md:px-6 md:py-4">
+                      <span className="mb-1 block text-[11px] font-semibold tracking-wide text-primary uppercase md:hidden">
+                        Pickwise
+                      </span>
+                      <div className="flex items-start gap-2 md:items-center">
                         <CheckCircle2
-                          className="size-4 shrink-0 text-positive"
+                          className="mt-0.5 size-4 shrink-0 text-positive md:mt-0"
                           strokeWidth={1.5}
                           aria-hidden="true"
                         />
@@ -1251,7 +1264,7 @@ export function HomePage() {
         aria-labelledby="cta-heading"
         className="mx-auto w-full max-w-7xl px-4 sm:px-6"
       >
-        <div className="relative overflow-hidden rounded-surface border border-primary/30 bg-gradient-to-br from-card via-card to-primary/10 p-8 sm:p-12 lg:p-16 shadow-float text-center">
+        <div className="relative overflow-hidden rounded-surface border border-primary/30 bg-gradient-to-br from-card via-card to-primary/10 p-5 text-center shadow-float sm:p-10 lg:p-16">
           {/* Ambient decorative glow */}
           <div
             className="pointer-events-none absolute -bottom-20 left-1/2 -z-10 h-72 w-96 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl"

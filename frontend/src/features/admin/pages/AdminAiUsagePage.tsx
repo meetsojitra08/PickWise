@@ -177,13 +177,13 @@ export function AdminAiUsagePage() {
           ))}
 
           {/* Custom Date Inputs */}
-          <div className="flex items-center gap-1.5 ml-1 text-xs">
+          <div className="flex w-full flex-wrap items-center gap-1.5 text-xs sm:ml-1 sm:w-auto">
             <input
               type="date"
               value={filters.start_date ?? ''}
               onChange={(e) => handleStartDateChange(e.target.value)}
               aria-label="Start date"
-              className="h-8 rounded-control border border-input bg-background px-2 text-xs text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+              className="h-9 min-w-0 flex-1 rounded-control border border-input bg-background px-2 text-xs text-foreground focus-visible:outline-2 focus-visible:outline-ring sm:h-8 sm:flex-initial"
               data-testid="start-date-input"
             />
             <span className="text-muted-foreground">to</span>
@@ -192,7 +192,7 @@ export function AdminAiUsagePage() {
               value={filters.end_date ?? ''}
               onChange={(e) => handleEndDateChange(e.target.value)}
               aria-label="End date"
-              className="h-8 rounded-control border border-input bg-background px-2 text-xs text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+              className="h-9 min-w-0 flex-1 rounded-control border border-input bg-background px-2 text-xs text-foreground focus-visible:outline-2 focus-visible:outline-ring sm:h-8 sm:flex-initial"
               data-testid="end-date-input"
             />
           </div>
@@ -200,8 +200,8 @@ export function AdminAiUsagePage() {
 
         <div className="flex flex-wrap items-center gap-3">
           {/* Feature selector */}
-          <div className="flex items-center gap-1.5">
-            <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+          <div className="flex w-full items-center gap-1.5 sm:w-auto">
+            <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground">
               <Bot className="size-3.5" aria-hidden="true" />
               Feature:
             </span>
@@ -213,7 +213,7 @@ export function AdminAiUsagePage() {
                 )
               }
               aria-label="Filter by feature"
-              className="h-8 rounded-control border border-input bg-background px-2.5 text-xs text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+              className="h-9 min-w-0 flex-1 rounded-control border border-input bg-background px-2.5 text-xs text-foreground focus-visible:outline-2 focus-visible:outline-ring sm:h-8 sm:flex-initial"
               data-testid="feature-select"
             >
               <option value="all">All features</option>
@@ -224,8 +224,8 @@ export function AdminAiUsagePage() {
           </div>
 
           {/* Status selector */}
-          <div className="flex items-center gap-1.5">
-            <span className="flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+          <div className="flex w-full items-center gap-1.5 sm:w-auto">
+            <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground">
               <Filter className="size-3.5" aria-hidden="true" />
               Status:
             </span>
@@ -237,7 +237,7 @@ export function AdminAiUsagePage() {
                 )
               }
               aria-label="Filter by status"
-              className="h-8 rounded-control border border-input bg-background px-2.5 text-xs text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+              className="h-9 min-w-0 flex-1 rounded-control border border-input bg-background px-2.5 text-xs text-foreground focus-visible:outline-2 focus-visible:outline-ring sm:h-8 sm:flex-initial"
               data-testid="status-select"
             >
               <option value="all">All statuses</option>

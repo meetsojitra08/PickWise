@@ -250,7 +250,7 @@ export function ProductImagesManagerDialog({
               {images.map((image, index) => (
                 <div
                   key={image.id}
-                  className="flex items-center justify-between gap-3 p-3 transition-colors hover:bg-muted/30"
+                  className="flex flex-col gap-2.5 p-3 transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="relative size-12 shrink-0 overflow-hidden rounded border border-border bg-muted/40">

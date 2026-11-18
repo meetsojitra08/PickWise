@@ -468,7 +468,7 @@ export function AdminReviewsPage() {
 
       {/* Main Review List */}
       <Card className="border border-border bg-card">
-        <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-3">
           <div className="flex items-center gap-3">
             <input
               type="checkbox"
@@ -670,7 +670,7 @@ export function AdminReviewsPage() {
                     </div>
 
                     {/* Review Title and Body */}
-                    <div className="pl-7">
+                    <div className="pl-0 sm:pl-7">
                       <h3 className="text-sm font-semibold text-foreground">
                         {review.title}
                       </h3>
@@ -688,7 +688,7 @@ export function AdminReviewsPage() {
                     </div>
 
                     {/* Action Bar per Review */}
-                    <div className="flex flex-wrap items-center justify-end gap-2 pl-7 pt-1">
+                    <div className="flex flex-wrap items-center justify-end gap-2 pl-0 pt-1 sm:pl-7">
                       {review.status !== 'approved' && (
                         <Button
                           type="button"

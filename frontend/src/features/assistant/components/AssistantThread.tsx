@@ -65,13 +65,13 @@ export function AssistantThread({
 
           {/* User message placeholder */}
           <div className="flex justify-end">
-            <Skeleton className="h-12 w-64 rounded-2xl rounded-tr-xs" />
+            <Skeleton className="h-12 w-4/5 max-w-64 rounded-2xl rounded-tr-xs" />
           </div>
 
           {/* Assistant message placeholder */}
-          <div className="flex items-start gap-3.5">
-            <Skeleton className="mt-1 size-9 shrink-0 rounded-xl" />
-            <div className="flex-1 space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3.5">
+            <Skeleton className="hidden size-9 shrink-0 rounded-xl sm:mt-1 sm:block" />
+            <div className="min-w-0 flex-1 space-y-3">
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-14 w-full rounded-xl" />
               <div className="grid gap-3.5 sm:grid-cols-1 md:grid-cols-2">
@@ -146,16 +146,16 @@ export function AssistantThread({
           <div
             role="status"
             aria-live="polite"
-            className="flex items-start gap-3.5 text-sm animate-in fade-in duration-300"
+            className="flex flex-col gap-2 text-sm animate-in fade-in duration-300 sm:flex-row sm:items-start sm:gap-3.5"
           >
             <div
-              className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent shadow-xs"
+              className="hidden size-9 shrink-0 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent shadow-xs sm:mt-1 sm:flex"
               aria-hidden="true"
             >
               <AiMark className="size-4.5 text-accent animate-pulse" />
             </div>
 
-            <div className="flex-1 space-y-3">
+            <div className="min-w-0 flex-1 space-y-3">
               <div className="flex items-center gap-2 text-primary font-medium text-xs">
                 <Loader2 className="size-3.5 animate-spin text-primary" />
                 <span>Finding products…</span>
@@ -187,7 +187,7 @@ export function AssistantThread({
         {sendError && (
           <div
             role="alert"
-            className="flex items-center justify-between gap-3 rounded-xl border border-negative/30 bg-negative/10 p-3.5 text-xs text-negative shadow-2xs"
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-negative/30 bg-negative/10 p-3.5 text-xs text-negative shadow-2xs"
           >
             <div className="flex items-center gap-2 font-medium">
               <AlertCircle className="size-4 shrink-0" aria-hidden="true" />
