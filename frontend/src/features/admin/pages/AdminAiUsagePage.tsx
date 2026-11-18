@@ -354,7 +354,7 @@ export function AdminAiUsagePage() {
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Success reliability
                   </span>
-                  <div className="flex size-8 items-center justify-center rounded-control bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                  <div className="flex size-8 items-center justify-center rounded-control bg-positive-subtle text-positive">
                     <CheckCircle
                       className="size-4"
                       strokeWidth={1.75}
@@ -387,7 +387,7 @@ export function AdminAiUsagePage() {
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Total tokens
                   </span>
-                  <div className="flex size-8 items-center justify-center rounded-control bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
+                  <div className="flex size-8 items-center justify-center rounded-control bg-warning-subtle text-warning">
                     <Coins
                       className="size-4"
                       strokeWidth={1.75}
@@ -417,7 +417,7 @@ export function AdminAiUsagePage() {
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Average latency
                   </span>
-                  <div className="flex size-8 items-center justify-center rounded-control bg-sky-50 text-sky-600 dark:bg-sky-950/40 dark:text-sky-400">
+                  <div className="flex size-8 items-center justify-center rounded-control bg-primary/10 text-primary">
                     <Clock
                       className="size-4"
                       strokeWidth={1.75}

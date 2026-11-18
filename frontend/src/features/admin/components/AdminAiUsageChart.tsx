@@ -143,7 +143,7 @@ export function AdminAiUsageChart({ data }: AdminAiUsageChartProps) {
               </span>
               <span>
                 Success:{' '}
-                <strong className="text-emerald-600 dark:text-emerald-400">
+                <strong className="text-positive">
                   {hoveredPoint.successful_calls}
                 </strong>
               </span>

@@ -90,7 +90,7 @@ export function AssistantThreadMessage({
         {isFallback && (
           <div
             role="status"
-            className="flex items-start gap-2.5 rounded-xl border border-warning/40 bg-warning/10 p-3.5 text-xs text-warning-foreground shadow-2xs"
+            className="flex items-start gap-2.5 rounded-xl border border-warning/40 bg-warning-subtle p-3.5 text-xs text-foreground shadow-2xs"
           >
             <AlertTriangle
               className="mt-0.5 size-4 shrink-0 text-warning"

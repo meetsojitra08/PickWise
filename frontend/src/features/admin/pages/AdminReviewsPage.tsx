@@ -638,7 +638,7 @@ export function AdminReviewsPage() {
                         {review.status === 'pending' && (
                           <Badge
                             variant="outline"
-                            className="border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                            className="border-warning/35 bg-warning-subtle text-foreground dark:text-warning"
                           >
                             Pending
                           </Badge>

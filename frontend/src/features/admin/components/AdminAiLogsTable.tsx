@@ -174,7 +174,7 @@ export function AdminAiLogsTable({
                       {/* Status */}
                       <td className="py-2.5 text-right whitespace-nowrap">
                         {log.status === 'ok' ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-positive-subtle px-2 py-0.5 text-[11px] font-medium text-positive">
                             <CheckCircle2 className="size-3" />
                             Ok
                           </span>
@@ -188,7 +188,7 @@ export function AdminAiLogsTable({
                           </span>
                         ) : (
                           <span
-                            className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
+                            className="inline-flex items-center gap-1 rounded-full bg-warning-subtle px-2 py-0.5 text-[11px] font-medium text-foreground dark:text-warning"
                             title="Rate limited (daily quota exceeded)"
                           >
                             <ShieldAlert className="size-3" />

@@ -698,7 +698,7 @@ export function AdminUsersPage() {
                 </>
               ) : (
                 <>
-                  <UserCheck className="h-5 w-5 text-emerald-600" />
+                  <UserCheck className="h-5 w-5 text-positive" />
                   <span>Activate User Account</span>
                 </>
               )}

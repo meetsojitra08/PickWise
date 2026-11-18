@@ -349,7 +349,7 @@ export function HomePage() {
                     size="default"
                     className="gap-2 rounded-control"
                   >
-                    <AiMark className="size-4 text-accent" />
+                    <AiMark className="size-4 text-accent dark:text-primary-foreground" />
                     <span>Ask Assistant</span>
                     <ArrowRight
                       className="size-4"
@@ -551,7 +551,7 @@ export function HomePage() {
                 <div className="rounded-card border-l-4 border-l-accent border-y border-r border-border/80 bg-verdict-surface p-5 sm:p-6 lg:col-span-7">
                   <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-3">
                     <div className="flex items-center gap-2">
-                      <span className="flex size-6 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-accent-foreground">
+                      <span className="flex size-6 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-foreground dark:text-accent">
                         ◈
                       </span>
                       <span className="font-heading text-sm font-semibold text-foreground">
@@ -820,7 +820,7 @@ export function HomePage() {
       >
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-accent-foreground uppercase">
+            <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-warning dark:text-accent uppercase">
               <Flame
                 className="size-4 text-accent"
                 strokeWidth={1.5}
@@ -945,7 +945,7 @@ export function HomePage() {
           {/* Pillar 1: Value Score */}
           <Card className="flex flex-col justify-between rounded-card border-border/80 bg-card p-6 shadow-xs">
             <div>
-              <div className="flex size-12 items-center justify-center rounded-control bg-accent/15 text-accent-foreground">
+              <div className="flex size-12 items-center justify-center rounded-control bg-accent/15 text-warning dark:text-accent">
                 <TrendingUp
                   className="size-6"
                   strokeWidth={1.5}

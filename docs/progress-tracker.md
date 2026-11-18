@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Current phase:** P8, Elevation & polish
-**Current step:** P8-S4 (P8-S3 completed)
-**Last updated:** 2026-11-17 (P8-S3)
+**Current step:** P8-S5 (P8-S4 completed)
+**Last updated:** 2026-11-18 (P8-S4)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
@@ -95,7 +95,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P8-S1** Polish AI screens: loading, error and empty states · `fix(ui)`
 - [x] **P8-S2** Performance pass: indexes review (`EXPLAIN`), eager loading, caching facets in Redis · `perf`
 - [x] **P8-S3** Accessibility audit and fixes (keyboard, contrast, screen reader) · `fix(ui)`
-- [ ] **P8-S4** Dark mode verification across all screens · `fix(ui)`
+- [x] **P8-S4** Dark mode verification across all screens · `fix(ui)`
 - [ ] **P8-S5** Responsive pass (320px to 1440px) · `fix(ui)`
 - [ ] **P8-S6** Security review against `code-standards.md` §4, add security headers · `chore(security)`
 - [ ] **P8-S7** Playwright E2E for key journeys (optional) · `test`
@@ -180,6 +180,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P8-S2 note: Analyzed SQL execution plans with EXPLAIN ANALYZE on PostgreSQL and added targeted composite indexes (products by category/published with value_score, created_at, and rating_avg; reviews by product/status with created_at and rating; product_specs by spec definition and product). Enabled global Model::preventLazyLoading(! app()->isProduction()) in AppServiceProvider to prevent N+1 queries. Implemented Redis caching for catalog filter facets under pickwise:catalog:facets:{category} with automatic cache invalidation via ProductObserver, CategoryObserver, SpecDefinitionObserver, and admin bulk actions. Added client-side 5-minute staleTime caching in TanStack Query for catalog facets and category trees.
 - P8-S3 verification: Pint (352 files), PHPStan level 6 (no errors across 275 files), and full Pest pass inside the `app` container (346 tests, 6191 assertions). Frontend lint (0 warnings, 0 errors), typecheck (0 errors), 267 Vitest tests across 51 test files (including 8 new dedicated accessibility tests), and production build pass. `git diff --check` is clean.
 - P8-S3 note: Audited and resolved keyboard, contrast, and screen reader accessibility across the storefront and admin panels. Added accessible skip-to-content links and landmarks in `AuthLayout` and `AppLayout`. Calibrated design tokens in `globals.css` to guarantee WCAG 2.2 AA contrast standards (≥ 4.5:1 text/subtle backgrounds, ≥ 3:1 graphical boundaries) across light/dark themes for `--positive` (#246b41, 5.95:1) and `--warning` (#9e6412, 4.7:1), fixing fit score meters and preference badges. Enriched tables with `<caption className="sr-only">` and header `scope="col"/"row"`, progress bars with `aria-valuetext`, and filter groups with `role="group"` and `aria-pressed`. Enabled keyboard navigation and focus management on SVG telemetry chart points. Preserved accessible names for buttons with visible text using `title` rather than replacing them with `aria-label`. Added comprehensive accessibility test suite `frontend/src/test/accessibility.test.tsx`.
+- P8-S4 verification: frontend lint (0 warnings, 0 errors), typecheck (0 errors), 280 Vitest tests across 52 test files (including 13 new dark-mode verification tests), and production build pass. This was a frontend-only step; no backend files changed. `git diff --check` is clean.
+- P8-S4 note: Audited dark mode across storefront, auth, account, assistant, compare, and admin screens. Added a CSP-safe pre-hydration script (`frontend/public/theme-init.js`) and `<meta name="color-scheme" content="light dark">` in `index.html` to prevent light-mode flash (FOUC) on reload. Added semantic `--overlay` token (`rgb(4 8 11 / 0.72)` in dark mode) to replace `bg-foreground/30` (which produced a milky white haze in dark mode) across `Dialog`, `Sheet`, and `GlobalSearchDialog`. Styled native `<option>`/`<optgroup>` with popover tokens in `globals.css` so all native `<select>` dropdowns stay legible on dark backgrounds, and warmed dark `--verdict-surface` to `#222018` so Verdict panels and CompareMatrix winner cells remain distinct from `#161e24` cards at ≥ 5.0:1 contrast. Fixed dark-invisible `text-accent-foreground` (`#0f1519`) and `text-warning-foreground` usages across `HomePage`, `AssistantThreadMessage`, `AdminKpiTiles`, `AdminAiSummaryCard`, `AdminPendingReviewsCard`, and `AdminProductsPage`, fixed `PickwiseLogo` and hero primary CTA `AiMark` contrast on dark `#3fb6ae` primary surfaces, and replaced remaining raw Tailwind color utilities in admin screens with calibrated semantic tokens. Added `frontend/src/test/dark-mode.test.tsx` to verify WCAG 2.2 AA contrast ratios across all dark token pairs, FOUC bootstrap behavior, layout toggles, and component regressions.
 
 ## Decisions log
 Short entries go in `docs/decisions.md`.
@@ -219,6 +221,7 @@ One line per step on what you learned. Turns into interview material.
 | P8-S1 | Consistent AI experience requires unifying all AI touchpoints under the signature AiMark, matching loading skeletons to final message layouts to eliminate layout shift, providing in-place ErrorState with explicit retry recovery rather than kicking users out of failed chats, and pairing quota exhaustion with direct catalog navigation invitations. |
 | P8-S2 | In PostgreSQL, adding an index on columns used by a query without an explicit ORDER BY can change the physical row scan order chosen by the planner; adding deterministic ->orderBy('id') guards application logic, while composite indexes on (product_id, status, rating) turn review distribution aggregation into index-only scans without heap reads. |
 | P8-S3 | In the Accessible Name and Description Computation spec, `aria-label` completely overrides all child text content rather than supplementing it; buttons with visible text should retain their text-derived accessible name (augmenting with `title` for extended context) while reserving `aria-label` for icon-only controls. |
+| P8-S4 | Semantic `*-foreground` tokens (like `--accent-foreground` or `--warning-foreground`) invert to near-black in dark mode because they are paired strictly with their solid fill token—never apply them on transparent, tinted, or card surfaces, and use a dedicated `--overlay` token rather than `bg-foreground/30` so modal scrims still darken instead of turning milky white in dark mode. |
 
 ## Resume bullet drafts (refine at P9)
 - Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.

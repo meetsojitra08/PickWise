@@ -8,11 +8,11 @@ import {
   Plus,
   RefreshCw,
   Search,
-  Sparkles,
   Trash2,
   X,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { AiMark } from '@/components/shared/VerdictPanel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -400,7 +400,7 @@ export function AdminProductsPage() {
               disabled={isBulkUpdating}
               className="gap-1"
             >
-              <Eye className="size-3 text-emerald-600" />
+              <Eye className="size-3 text-positive" />
               Publish selected
             </Button>
             <Button
@@ -617,7 +617,7 @@ export function AdminProductsPage() {
                       <td className="px-4 py-3.5 text-center text-xs">
                         <div className="flex flex-col items-center">
                           {product.value_score !== null ? (
-                            <span className="inline-flex items-center gap-1 font-semibold text-accent-foreground font-mono">
+                            <span className="inline-flex items-center gap-1 font-semibold text-foreground dark:text-accent font-mono">
                               VS {product.value_score}
                             </span>
                           ) : (
@@ -678,7 +678,7 @@ export function AdminProductsPage() {
                             title="Regenerate AI review summary"
                             aria-label={`Regenerate review summary for ${product.name}`}
                           >
-                            <Sparkles className="size-3 text-amber-500" />
+                            <AiMark className="size-3 text-warning dark:text-accent" />
                             Summary
                           </Button>
 

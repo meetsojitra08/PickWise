@@ -312,7 +312,7 @@ export function AdminAuditDiffDialog({
           {/* Redaction Notice */}
           <div className="flex items-start gap-2 rounded-control border border-border/80 bg-muted/30 p-2.5 text-[11px] text-muted-foreground">
             <ShieldAlert
-              className="mt-0.5 size-3.5 shrink-0 text-amber-500"
+              className="mt-0.5 size-3.5 shrink-0 text-warning"
               aria-hidden="true"
             />
             <span>

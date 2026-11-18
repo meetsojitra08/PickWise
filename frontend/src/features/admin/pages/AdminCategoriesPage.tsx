@@ -405,7 +405,7 @@ export function AdminCategoriesPage() {
           {deletingCategory && deletingCategory.products_count > 0 ? (
             <div
               role="alert"
-              className="rounded-panel border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300 space-y-1"
+              className="rounded-panel border border-warning/35 bg-warning-subtle p-3 text-xs text-foreground dark:text-warning space-y-1"
             >
               <p className="font-semibold">Category contains products</p>
               <p>
