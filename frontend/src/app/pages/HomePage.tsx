@@ -233,7 +233,7 @@ export function HomePage() {
   // Load top value items for the live showcase
   const productsQuery = useCatalogProducts(
     {
-      sort: 'value_desc',
+      sort: 'value',
       per_page: '6',
       ...(activeCategoryTab !== 'all' ? { category: activeCategoryTab } : {}),
     },
@@ -997,7 +997,7 @@ export function HomePage() {
 
             <div className="pt-6">
               <Button asChild variant="ghost" className="p-0 text-primary">
-                <Link to="/products?sort=value_desc">
+                <Link to="/products?sort=value">
                   Browse by Value Score
                   <ArrowRight
                     className="size-4"
