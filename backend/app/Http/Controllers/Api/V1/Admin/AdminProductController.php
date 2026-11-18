@@ -21,6 +21,7 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use App\Services\CatalogFacetCacheService;
 use App\Services\ValueScoreCalculator;
+use App\Support\LikePattern;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -54,12 +55,12 @@ final class AdminProductController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = (string) $request->input('search');
-            $query->where(static function ($q) use ($search): void {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%")
-                    ->orWhereHas('brand', static function ($bq) use ($search): void {
-                        $bq->where('name', 'like', "%{$search}%");
+            $pattern = LikePattern::containsLower((string) $request->input('search'));
+            $query->where(static function ($q) use ($pattern): void {
+                $q->whereRaw("LOWER(name) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereRaw("LOWER(slug) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereHas('brand', static function ($bq) use ($pattern): void {
+                        $bq->whereRaw("LOWER(name) LIKE ? ESCAPE '!'", [$pattern]);
                     });
             });
         }

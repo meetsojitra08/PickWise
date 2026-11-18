@@ -14,6 +14,7 @@ use App\Http\Responses\ApiResponse;
 use App\Models\Brand;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Support\LikePattern;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -34,10 +35,10 @@ final class AdminBrandController extends Controller
         $query = Brand::query()->withCount('products');
 
         if ($request->filled('search')) {
-            $search = (string) $request->input('search');
-            $query->where(static function ($q) use ($search): void {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('slug', 'like', "%{$search}%");
+            $pattern = LikePattern::containsLower((string) $request->input('search'));
+            $query->where(static function ($q) use ($pattern): void {
+                $q->whereRaw("LOWER(name) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereRaw("LOWER(slug) LIKE ? ESCAPE '!'", [$pattern]);
             });
         }
 

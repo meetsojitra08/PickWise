@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use App\Services\ProductRatingAggregator;
 use App\Services\ValueScoreCalculator;
+use App\Support\LikePattern;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -51,17 +52,17 @@ final class AdminReviewController extends Controller
 
         $search = (string) ($request->input('search') ?? $request->input('q') ?? '');
         if (trim($search) !== '') {
-            $needle = mb_strtolower(trim($search));
-            $query->where(static function ($q) use ($needle): void {
-                $q->whereRaw('LOWER(title) LIKE ?', ["%{$needle}%"])
-                    ->orWhereRaw('LOWER(body) LIKE ?', ["%{$needle}%"])
-                    ->orWhereRaw('LOWER(author_name) LIKE ?', ["%{$needle}%"])
-                    ->orWhereHas('product', static function ($pq) use ($needle): void {
-                        $pq->whereRaw('LOWER(name) LIKE ?', ["%{$needle}%"]);
+            $pattern = LikePattern::containsLower($search);
+            $query->where(static function ($q) use ($pattern): void {
+                $q->whereRaw("LOWER(title) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereRaw("LOWER(body) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereRaw("LOWER(author_name) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereHas('product', static function ($pq) use ($pattern): void {
+                        $pq->whereRaw("LOWER(name) LIKE ? ESCAPE '!'", [$pattern]);
                     })
-                    ->orWhereHas('user', static function ($uq) use ($needle): void {
-                        $uq->whereRaw('LOWER(name) LIKE ?', ["%{$needle}%"])
-                            ->orWhereRaw('LOWER(email) LIKE ?', ["%{$needle}%"]);
+                    ->orWhereHas('user', static function ($uq) use ($pattern): void {
+                        $uq->whereRaw("LOWER(name) LIKE ? ESCAPE '!'", [$pattern])
+                            ->orWhereRaw("LOWER(email) LIKE ? ESCAPE '!'", [$pattern]);
                     });
             });
         }

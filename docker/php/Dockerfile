@@ -39,6 +39,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Sensible PHP defaults for local API development and image uploads
 RUN { \
+    echo 'expose_php=Off'; \
     echo 'memory_limit=256M'; \
     echo 'upload_max_filesize=10M'; \
     echo 'post_max_size=12M'; \

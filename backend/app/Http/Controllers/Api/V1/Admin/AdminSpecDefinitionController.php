@@ -14,6 +14,7 @@ use App\Models\Category;
 use App\Models\SpecDefinition;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Support\LikePattern;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -34,10 +35,10 @@ final class AdminSpecDefinitionController extends Controller
         $query = $category->specDefinitions()->withCount('productSpecs');
 
         if ($request->filled('search')) {
-            $search = (string) $request->input('search');
-            $query->where(static function ($q) use ($search): void {
-                $q->where('label', 'like', "%{$search}%")
-                    ->orWhere('key', 'like', "%{$search}%");
+            $pattern = LikePattern::containsLower((string) $request->input('search'));
+            $query->where(static function ($q) use ($pattern): void {
+                $q->whereRaw("LOWER(label) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereRaw("LOWER(key) LIKE ? ESCAPE '!'", [$pattern]);
             });
         }
 

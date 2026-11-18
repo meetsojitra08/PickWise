@@ -20,6 +20,7 @@ import {
   useWishlistToggle,
 } from '@/features/wishlist/hooks/use-wishlist';
 import { isApiError } from '@/lib/api-error';
+import { getSafeExternalUrl } from '@/lib/safe-url';
 import { cn } from '@/lib/utils';
 
 function ProductDetailContent({ product }: { product: ProductDetail }) {
@@ -28,6 +29,7 @@ function ProductDetailContent({ product }: { product: ProductDetail }) {
   const compare = useCompare();
   const { toggle: toggleCompare } = useCompareToggle();
   const wishlistPending = wishlist.isFetching || isToggling(product.id);
+  const safeStoreUrl = getSafeExternalUrl(product.store_url);
   const images = product.images.length
     ? product.images
     : product.primary_image
@@ -87,13 +89,9 @@ function ProductDetailContent({ product }: { product: ProductDetail }) {
             size="default"
             className="min-w-0 flex-1"
           />
-          {product.store_url ? (
+          {safeStoreUrl ? (
             <Button asChild className="min-h-11 shrink-0">
-              <a
-                href={product.store_url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={safeStoreUrl} target="_blank" rel="noopener noreferrer">
                 View on store <ExternalLink aria-hidden="true" />
               </a>
             </Button>

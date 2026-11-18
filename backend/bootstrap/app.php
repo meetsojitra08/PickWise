@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Exceptions\ApiException;
 use App\Exceptions\ApiExceptionRenderer;
+use App\Http\Middleware\AddSecurityHeaders;
 use App\Http\Middleware\AssignRequestId;
 use App\Http\Middleware\EnsureAiQuota;
 use App\Http\Middleware\EnsureUserHasRole;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(AssignRequestId::class);
+        $middleware->append(AddSecurityHeaders::class);
         $middleware->statefulApi();
         $middleware->redirectGuestsTo(fn (): ?string => null);
         $middleware->alias([

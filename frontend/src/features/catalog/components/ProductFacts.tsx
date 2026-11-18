@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PriceTag } from '@/components/shared/PriceTag';
 import { RatingStars } from '@/components/shared/RatingStars';
 import type { ProductDetail } from '@/features/catalog/types/catalog-api';
+import { getSafeExternalUrl } from '@/lib/safe-url';
 
 interface ProductFactsProps {
   product: ProductDetail;
@@ -30,6 +31,8 @@ export function ProductFacts({
   onWishlistToggle,
   onCompareToggle,
 }: ProductFactsProps) {
+  const safeStoreUrl = getSafeExternalUrl(product.store_url);
+
   return (
     <section className="min-w-0 lg:sticky lg:top-6 lg:self-start">
       <div className="flex flex-wrap items-center gap-2">
@@ -79,13 +82,9 @@ export function ProductFacts({
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
-        {product.store_url ? (
+        {safeStoreUrl ? (
           <Button asChild size="lg" className="hidden flex-1 md:inline-flex">
-            <a
-              href={product.store_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href={safeStoreUrl} target="_blank" rel="noopener noreferrer">
               View on store
               <ExternalLink aria-hidden="true" />
             </a>

@@ -71,10 +71,25 @@ const productFormSchema = z.object({
   store_url: z
     .string()
     .trim()
-    .url('Store URL must be a valid URL starting with http:// or https://')
-    .max(2048, 'Store URL cannot exceed 2048 characters.')
-    .optional()
-    .or(z.literal('')),
+    .refine(
+      (val) => {
+        if (val === '') return true;
+        try {
+          const parsed = new URL(val);
+          return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+        } catch {
+          return false;
+        }
+      },
+      {
+        message:
+          'Store URL must be a valid URL starting with http:// or https://',
+      },
+    )
+    .refine((val) => val.length <= 2048, {
+      message: 'Store URL cannot exceed 2048 characters.',
+    })
+    .optional(),
   is_published: z.boolean(),
 });
 

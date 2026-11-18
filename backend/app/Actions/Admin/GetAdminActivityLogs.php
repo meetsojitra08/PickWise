@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Admin;
 
 use App\Models\AdminActivityLog;
+use App\Support\LikePattern;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 
@@ -40,22 +41,23 @@ final class GetAdminActivityLogs
 
         if ($subjectType !== null && trim($subjectType) !== '' && trim($subjectType) !== 'all') {
             $cleanSubject = trim($subjectType);
-            $query->where(static function ($q) use ($cleanSubject): void {
+            $escapedSubjectSuffix = '%\\'.LikePattern::escape($cleanSubject);
+            $query->where(static function ($q) use ($cleanSubject, $escapedSubjectSuffix): void {
                 $q->where('subject_type', $cleanSubject)
-                    ->orWhere('subject_type', 'like', "%\\{$cleanSubject}");
+                    ->orWhereRaw("subject_type LIKE ? ESCAPE '!'", [$escapedSubjectSuffix]);
             });
         }
 
         if ($search !== null && trim($search) !== '') {
             $trimmedSearch = trim($search);
-            $needle = mb_strtolower($trimmedSearch);
+            $pattern = LikePattern::containsLower($trimmedSearch);
 
-            $query->where(static function ($q) use ($needle, $trimmedSearch): void {
-                $q->whereRaw('LOWER(action) LIKE ?', ["%{$needle}%"])
-                    ->orWhereRaw('LOWER(ip_address) LIKE ?', ["%{$needle}%"])
-                    ->orWhereHas('admin', static function ($adminQuery) use ($needle): void {
-                        $adminQuery->whereRaw('LOWER(name) LIKE ?', ["%{$needle}%"])
-                            ->orWhereRaw('LOWER(email) LIKE ?', ["%{$needle}%"]);
+            $query->where(static function ($q) use ($pattern, $trimmedSearch): void {
+                $q->whereRaw("LOWER(action) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereRaw("LOWER(ip_address) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereHas('admin', static function ($adminQuery) use ($pattern): void {
+                        $adminQuery->whereRaw("LOWER(name) LIKE ? ESCAPE '!'", [$pattern])
+                            ->orWhereRaw("LOWER(email) LIKE ? ESCAPE '!'", [$pattern]);
                     });
 
                 if (is_numeric($trimmedSearch)) {

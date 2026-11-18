@@ -137,5 +137,5 @@ jobs:
         run: npm run build
 
       - name: Audit npm dependencies
-        # Enforce high/critical severity gate; transitive low/moderate advisories come from CLI/dev tooling (eslint, shadcn).
-        run: npm audit --audit-level=high
+        # Enforce moderate+ severity gate on production runtime dependencies (dev/CLI tooling like eslint/vite/shadcn is excluded).
+        run: npm audit --omit=dev --audit-level=moderate
