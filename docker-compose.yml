@@ -5,7 +5,7 @@ services:
       - "${NGINX_PORT:-8080}:80"
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./backend:/var/www/html:ro
+      - ./backend/storage/public:/app/storage/public:ro
     depends_on:
       app:
         condition: service_started
@@ -15,13 +15,26 @@ services:
     networks:
       - pickwise
 
-  app: &php-service
+  app:
     build:
-      context: ./docker/php
-    image: pickwise-php:dev
-    working_dir: /var/www/html
+      context: ./backend
+      dockerfile: ../docker/fastapi/Dockerfile
+    image: pickwise-fastapi:dev
+    working_dir: /app
     volumes:
-      - ./backend:/var/www/html
+      - ./backend:/app
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-pickwise}
+      - DB_USERNAME=${DB_USERNAME:-pickwise}
+      - DB_PASSWORD=${DB_PASSWORD:-pickwise}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - APP_ENV=local
+    ports:
+      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -30,28 +43,6 @@ services:
     restart: unless-stopped
     networks:
       - pickwise
-
-  queue:
-    <<: *php-service
-    command:
-      - sh
-      - -c
-      - |
-        until [ -f /var/www/html/artisan ] && [ -f /var/www/html/vendor/autoload.php ]; do
-          sleep 5
-        done
-        exec php artisan queue:work --sleep=3 --tries=3
-
-  scheduler:
-    <<: *php-service
-    command:
-      - sh
-      - -c
-      - |
-        until [ -f /var/www/html/artisan ] && [ -f /var/www/html/vendor/autoload.php ]; do
-          sleep 5
-        done
-        exec php artisan schedule:work
 
   db:
     image: postgres:17-alpine

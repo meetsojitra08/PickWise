@@ -3,20 +3,15 @@
 .env.*
 !.env.example
 
-# PHP / Laravel
-vendor/
-auth.json
-/backend/docs/
-/backend/bootstrap/cache/*.php
-!/backend/bootstrap/cache/.gitignore
-/backend/public/hot
-/backend/public/storage
-/backend/public/build/
-/backend/storage/*.key
-/backend/storage/logs/*.log
-.phpunit.cache/
-phpunit.result.cache
-.pest/
+# Python / FastAPI
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # Node / React / Vite
 node_modules/

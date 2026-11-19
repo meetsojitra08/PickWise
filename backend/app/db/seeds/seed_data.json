@@ -1,0 +1,2004 @@
+{
+    "categories": [
+        {
+            "slug": "smartphones",
+            "name": "Smartphones",
+            "description": "Compare 5G handsets across camera performance, battery endurance, display smoothness, and everyday value.",
+            "sort_order": 1
+        },
+        {
+            "slug": "laptops",
+            "name": "Laptops",
+            "description": "Ultrabooks, creator workstations, and gaming notebooks filtered by memory, storage, portability, and GPU capability.",
+            "sort_order": 2
+        },
+        {
+            "slug": "headphones",
+            "name": "Headphones",
+            "description": "Noise-cancelling travel headphones, workout earbuds, wireless gaming headsets, and studio reference cans.",
+            "sort_order": 3
+        },
+        {
+            "slug": "monitors",
+            "name": "Monitors",
+            "description": "Color-accurate 4K creator displays, fast 1440p gaming panels, and single-cable USB-C productivity monitors.",
+            "sort_order": 4
+        },
+        {
+            "slug": "keyboards",
+            "name": "Keyboards",
+            "description": "Hot-swappable mechanical boards, low-profile wireless travel keyboards, and quiet desk setups.",
+            "sort_order": 5
+        },
+        {
+            "slug": "smartwatches",
+            "name": "Smartwatches",
+            "description": "Multi-day AMOLED fitness watches, dual-frequency GPS running trackers, and everyday LTE wearables.",
+            "sort_order": 6
+        }
+    ],
+    "brands": [
+        {
+            "slug": "amazfit",
+            "name": "Amazfit"
+        },
+        {
+            "slug": "apple",
+            "name": "Apple"
+        },
+        {
+            "slug": "asus",
+            "name": "ASUS"
+        },
+        {
+            "slug": "benq",
+            "name": "BenQ"
+        },
+        {
+            "slug": "bose",
+            "name": "Bose"
+        },
+        {
+            "slug": "dell",
+            "name": "Dell"
+        },
+        {
+            "slug": "garmin",
+            "name": "Garmin"
+        },
+        {
+            "slug": "google",
+            "name": "Google"
+        },
+        {
+            "slug": "hp",
+            "name": "HP"
+        },
+        {
+            "slug": "keychron",
+            "name": "Keychron"
+        },
+        {
+            "slug": "lenovo",
+            "name": "Lenovo"
+        },
+        {
+            "slug": "lg",
+            "name": "LG"
+        },
+        {
+            "slug": "logitech",
+            "name": "Logitech"
+        },
+        {
+            "slug": "nothing",
+            "name": "Nothing"
+        },
+        {
+            "slug": "nuphy",
+            "name": "NuPhy"
+        },
+        {
+            "slug": "oneplus",
+            "name": "OnePlus"
+        },
+        {
+            "slug": "royal-kludge",
+            "name": "Royal Kludge"
+        },
+        {
+            "slug": "samsung",
+            "name": "Samsung"
+        },
+        {
+            "slug": "sennheiser",
+            "name": "Sennheiser"
+        },
+        {
+            "slug": "sony",
+            "name": "Sony"
+        },
+        {
+            "slug": "xiaomi",
+            "name": "Xiaomi"
+        }
+    ],
+    "catalog": {
+        "smartphones": {
+            "spec_definitions": [
+                {
+                    "key": "ram_gb",
+                    "name": "RAM",
+                    "unit": "GB",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 1
+                },
+                {
+                    "key": "storage_gb",
+                    "name": "Storage",
+                    "unit": "GB",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 2
+                },
+                {
+                    "key": "display_size_in",
+                    "name": "Display Size",
+                    "unit": "in",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 3
+                },
+                {
+                    "key": "refresh_rate_hz",
+                    "name": "Refresh Rate",
+                    "unit": "Hz",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 4
+                },
+                {
+                    "key": "battery_mah",
+                    "name": "Battery Capacity",
+                    "unit": "mAh",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 5
+                },
+                {
+                    "key": "main_camera_mp",
+                    "name": "Main Camera",
+                    "unit": "MP",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 6
+                },
+                {
+                    "key": "weight_g",
+                    "name": "Weight",
+                    "unit": "g",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": false,
+                    "sort_order": 7
+                },
+                {
+                    "key": "supports_5g",
+                    "name": "5G Support",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 8
+                },
+                {
+                    "key": "chipset",
+                    "name": "Processor",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 9
+                }
+            ],
+            "products": [
+                {
+                    "slug": "nothing-cmf-phone-1",
+                    "name": "CMF Phone 1 by Nothing",
+                    "brand_slug": "nothing",
+                    "summary": "Modular back casing with screw mounts, fluid 120Hz AMOLED, and clean Nothing OS under \u20b916,000.",
+                    "description": "Stands out in the budget tier for clean bloat-free software, expandable storage, and interchangeable back covers with modular accessories. Skips NFC and stereo speakers to hit its aggressive price.",
+                    "price_rupees": 15999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.25,
+                    "rating_count": 8,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "ram_gb": 6,
+                        "storage_gb": 128,
+                        "display_size_in": 6.67,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 5000,
+                        "main_camera_mp": 50,
+                        "weight_g": 197,
+                        "supports_5g": true,
+                        "chipset": "MediaTek Dimensity 7300"
+                    }
+                },
+                {
+                    "slug": "nothing-phone-2a",
+                    "name": "Nothing Phone (2a)",
+                    "brand_slug": "nothing",
+                    "summary": "Iconic transparent back with Glyph lighting, vibrant 120Hz flexible AMOLED, and balanced Dimensity 7200 Pro.",
+                    "description": "Pairs striking see-through industrial design and custom notification lights with smooth everyday performance and long battery endurance. Plastic rear frame requires a case to avoid micro-scratches.",
+                    "price_rupees": 23999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.45,
+                    "rating_count": 9,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "ram_gb": 8,
+                        "storage_gb": 128,
+                        "display_size_in": 6.7,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 5000,
+                        "main_camera_mp": 50,
+                        "weight_g": 190,
+                        "supports_5g": true,
+                        "chipset": "MediaTek Dimensity 7200 Pro"
+                    }
+                },
+                {
+                    "slug": "samsung-galaxy-a35-5g",
+                    "name": "Samsung Galaxy A35 5G",
+                    "brand_slug": "samsung",
+                    "summary": "Dependable mid-range 5G phone with IP67 water resistance, Knox security, and bright 120Hz Super AMOLED.",
+                    "description": "Targets shoppers prioritizing multi-year OS updates, bright outdoor visibility, and dependable daytime photography with OIS. Charging speeds lag behind rivals, topping out at 25W.",
+                    "price_rupees": 25999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.15,
+                    "rating_count": 7,
+                    "price_profile": "steady",
+                    "specs": {
+                        "ram_gb": 8,
+                        "storage_gb": 128,
+                        "display_size_in": 6.6,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 5000,
+                        "main_camera_mp": 50,
+                        "weight_g": 209,
+                        "supports_5g": true,
+                        "chipset": "Exynos 1380"
+                    }
+                },
+                {
+                    "slug": "oneplus-nord-4-5g",
+                    "name": "OnePlus Nord 4 5G",
+                    "brand_slug": "oneplus",
+                    "summary": "Metal unibody mid-ranger with 5500mAh battery and strong sustained gaming performance.",
+                    "description": "Stands out under \u20b930,000 for thermal stability, fast 100W wired charging, and a sturdy aluminum build. Ultrawide photography is basic, making the primary lens the clear daily choice.",
+                    "price_rupees": 29999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.5,
+                    "rating_count": 10,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "ram_gb": 8,
+                        "storage_gb": 256,
+                        "display_size_in": 6.74,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 5500,
+                        "main_camera_mp": 50,
+                        "weight_g": 199,
+                        "supports_5g": true,
+                        "chipset": "Snapdragon 7+ Gen 3"
+                    }
+                },
+                {
+                    "slug": "oneplus-12r",
+                    "name": "OnePlus 12R",
+                    "brand_slug": "oneplus",
+                    "summary": "Endurance powerhouse packing a 5500mAh battery, 4th-gen LTPO AMOLED, and Snapdragon 8 Gen 2 silicon.",
+                    "description": "Delivers multi-day battery reliability, rapid 100W charging, and flagship-tier gaming at an upper mid-range price. Omits wireless charging and telephoto zoom compared to the flagship OnePlus 12.",
+                    "price_rupees": 39999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.65,
+                    "rating_count": 8,
+                    "price_profile": "steady",
+                    "specs": {
+                        "ram_gb": 8,
+                        "storage_gb": 128,
+                        "display_size_in": 6.78,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 5500,
+                        "main_camera_mp": 50,
+                        "weight_g": 207,
+                        "supports_5g": true,
+                        "chipset": "Snapdragon 8 Gen 2"
+                    }
+                },
+                {
+                    "slug": "xiaomi-14-civi",
+                    "name": "Xiaomi 14 Civi",
+                    "brand_slug": "xiaomi",
+                    "summary": "Slim 178g handset with Leica optics, quad-curved AMOLED, and dual 32MP portrait selfie cameras.",
+                    "description": "Appeals to buyers tired of heavy slab phones while keeping flagship-grade portrait focal lengths and Snapdragon 8s Gen 3 processing. Heavy gaming sessions drain the 4700mAh battery noticeably faster than larger rivals.",
+                    "price_rupees": 39999,
+                    "availability": "low_stock",
+                    "rating_avg": 4.35,
+                    "rating_count": 6,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "ram_gb": 8,
+                        "storage_gb": 256,
+                        "display_size_in": 6.55,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 4700,
+                        "main_camera_mp": 50,
+                        "weight_g": 178,
+                        "supports_5g": true,
+                        "chipset": "Snapdragon 8s Gen 3"
+                    }
+                },
+                {
+                    "slug": "google-pixel-8a",
+                    "name": "Google Pixel 8a",
+                    "brand_slug": "google",
+                    "summary": "Compact 6.1-inch camera phone with Tensor G3 intelligence, Best Take, and 7 years of OS updates.",
+                    "description": "Prioritizes industry-leading computational photography, pocket-friendly ergonomics, and long-term Google software support. Wired charging tops out at 18W, which is slower than competitors in its segment.",
+                    "price_rupees": 43999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.5,
+                    "rating_count": 9,
+                    "price_profile": "gradual_drop",
+                    "specs": {
+                        "ram_gb": 8,
+                        "storage_gb": 128,
+                        "display_size_in": 6.1,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 4492,
+                        "main_camera_mp": 64,
+                        "weight_g": 188,
+                        "supports_5g": true,
+                        "chipset": "Google Tensor G3"
+                    }
+                },
+                {
+                    "slug": "samsung-galaxy-s24",
+                    "name": "Samsung Galaxy S24 5G",
+                    "brand_slug": "samsung",
+                    "summary": "Featherweight 167g flagship with Galaxy AI tools, 2600-nit Dynamic AMOLED 2X, and 3x optical zoom.",
+                    "description": "One of the best compact high-end Android phones available, combining top-tier build quality, 7-year update guarantee, and dedicated telephoto zoom in a pocketable frame. Battery capacity is modest compared to Plus/Ultra models.",
+                    "price_rupees": 64999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.6,
+                    "rating_count": 8,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "ram_gb": 8,
+                        "storage_gb": 128,
+                        "display_size_in": 6.2,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 4000,
+                        "main_camera_mp": 50,
+                        "weight_g": 167,
+                        "supports_5g": true,
+                        "chipset": "Exynos 2400"
+                    }
+                },
+                {
+                    "slug": "google-pixel-9-pro",
+                    "name": "Google Pixel 9 Pro",
+                    "brand_slug": "google",
+                    "summary": "Triple-lens flagship with 16GB RAM, 5x periscope telephoto, Tensor G4, and bright 6.3-inch Super Actua panel.",
+                    "description": "Brings full pro-grade optical zoom and high-memory headroom into a manageable 6.3-inch chassis. Suited for mobile photographers who prefer manageable one-handed sizing over giant phablets.",
+                    "price_rupees": 99999,
+                    "availability": "out_of_stock",
+                    "rating_avg": 4.7,
+                    "rating_count": 8,
+                    "price_profile": "rebound",
+                    "specs": {
+                        "ram_gb": 16,
+                        "storage_gb": 256,
+                        "display_size_in": 6.3,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 4700,
+                        "main_camera_mp": 50,
+                        "weight_g": 199,
+                        "supports_5g": true,
+                        "chipset": "Google Tensor G4"
+                    }
+                },
+                {
+                    "slug": "apple-iphone-16-pro",
+                    "name": "Apple iPhone 16 Pro",
+                    "brand_slug": "apple",
+                    "summary": "Grade 5 titanium chassis with Camera Control button, 4K120 Dolby Vision, 5x optical zoom, and A18 Pro.",
+                    "description": "Benchmark choice for mobile video creators and iOS ecosystem users needing consistent color science, pro audio capture, and unmatched chip efficiency. Base model starts with 128GB storage.",
+                    "price_rupees": 119900,
+                    "availability": "in_stock",
+                    "rating_avg": 4.8,
+                    "rating_count": 10,
+                    "price_profile": "steady",
+                    "specs": {
+                        "ram_gb": 8,
+                        "storage_gb": 128,
+                        "display_size_in": 6.3,
+                        "refresh_rate_hz": 120,
+                        "battery_mah": 3582,
+                        "main_camera_mp": 48,
+                        "weight_g": 199,
+                        "supports_5g": true,
+                        "chipset": "Apple A18 Pro"
+                    }
+                }
+            ]
+        },
+        "laptops": {
+            "spec_definitions": [
+                {
+                    "key": "ram_gb",
+                    "name": "RAM",
+                    "unit": "GB",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 1
+                },
+                {
+                    "key": "storage_gb",
+                    "name": "SSD Storage",
+                    "unit": "GB",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 2
+                },
+                {
+                    "key": "display_size_in",
+                    "name": "Display Size",
+                    "unit": "in",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 3
+                },
+                {
+                    "key": "battery_hours",
+                    "name": "Battery Life",
+                    "unit": "hrs",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 4
+                },
+                {
+                    "key": "weight_kg",
+                    "name": "Weight",
+                    "unit": "kg",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": false,
+                    "sort_order": 5
+                },
+                {
+                    "key": "refresh_rate_hz",
+                    "name": "Refresh Rate",
+                    "unit": "Hz",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 6
+                },
+                {
+                    "key": "dedicated_gpu",
+                    "name": "Dedicated GPU",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 7
+                },
+                {
+                    "key": "processor",
+                    "name": "Processor",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 8
+                },
+                {
+                    "key": "display_panel",
+                    "name": "Display Panel",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 9
+                }
+            ],
+            "products": [
+                {
+                    "slug": "lenovo-ideapad-slim-3-15",
+                    "name": "Lenovo IdeaPad Slim 3 15",
+                    "brand_slug": "lenovo",
+                    "summary": "Practical 15.6-inch student and office notebook with 16GB RAM under \u20b945,000.",
+                    "description": "Handles browsers, spreadsheets, and light photo tasks smoothly thanks to 16GB memory and a 512GB NVMe SSD. Display color gamut is basic, making it better suited to documents than color-critical media.",
+                    "price_rupees": 42999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.05,
+                    "rating_count": 7,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "ram_gb": 16,
+                        "storage_gb": 512,
+                        "display_size_in": 15.6,
+                        "battery_hours": 9.5,
+                        "weight_kg": 1.62,
+                        "refresh_rate_hz": 60,
+                        "dedicated_gpu": false,
+                        "processor": "AMD Ryzen 5 7530U",
+                        "display_panel": "IPS"
+                    }
+                },
+                {
+                    "slug": "hp-pavilion-aero-13",
+                    "name": "HP Pavilion Aero 13",
+                    "brand_slug": "hp",
+                    "summary": "Sub-1kg commuter ultrabook with bright 16:10 matte IPS display and all-day battery.",
+                    "description": "Weighs just 990 grams without sacrificing port selection or crisp keyboard feel. Suited for commuters and students carrying a laptop daily, though integrated graphics limit 3D rendering.",
+                    "price_rupees": 64999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.4,
+                    "rating_count": 8,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "ram_gb": 16,
+                        "storage_gb": 512,
+                        "display_size_in": 13.3,
+                        "battery_hours": 12,
+                        "weight_kg": 0.99,
+                        "refresh_rate_hz": 60,
+                        "dedicated_gpu": false,
+                        "processor": "AMD Ryzen 7 8840U",
+                        "display_panel": "IPS"
+                    }
+                },
+                {
+                    "slug": "asus-vivobook-16-oled-creator",
+                    "name": "ASUS Vivobook 16 OLED Creator",
+                    "brand_slug": "asus",
+                    "summary": "Creator laptop with dedicated RTX graphics, 1TB SSD, and wide-gamut 120Hz OLED.",
+                    "description": "Tailored for 4K video editing, Lightroom batches, and motion timelines under \u20b980,000. Fans ramp up audibly during long exports, and battery life drops under GPU load.",
+                    "price_rupees": 76999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.55,
+                    "rating_count": 9,
+                    "price_profile": "gradual_drop",
+                    "specs": {
+                        "ram_gb": 16,
+                        "storage_gb": 1024,
+                        "display_size_in": 16,
+                        "battery_hours": 9,
+                        "weight_kg": 1.88,
+                        "refresh_rate_hz": 120,
+                        "dedicated_gpu": true,
+                        "processor": "Intel Core Ultra 7 155H",
+                        "display_panel": "OLED"
+                    }
+                },
+                {
+                    "slug": "lenovo-yoga-slim-7-pro-14",
+                    "name": "Lenovo Yoga Slim 7 Pro 14",
+                    "brand_slug": "lenovo",
+                    "summary": "32GB RAM, 1TB SSD, and factory-calibrated OLED display under \u20b985,000.",
+                    "description": "Balances abundant 32GB memory for heavy video editing timelines and Docker workloads with a portable 1.45kg chassis. Lacks a discrete GPU, relying on fast unified memory and integrated graphics.",
+                    "price_rupees": 84999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.7,
+                    "rating_count": 10,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "ram_gb": 32,
+                        "storage_gb": 1024,
+                        "display_size_in": 14.5,
+                        "battery_hours": 11.5,
+                        "weight_kg": 1.45,
+                        "refresh_rate_hz": 120,
+                        "dedicated_gpu": false,
+                        "processor": "AMD Ryzen 7 8845HS",
+                        "display_panel": "OLED"
+                    }
+                },
+                {
+                    "slug": "asus-tuf-gaming-a15-rtx",
+                    "name": "ASUS TUF Gaming A15",
+                    "brand_slug": "asus",
+                    "summary": "High-wattage RTX gaming and 3D workstation notebook with 144Hz panel and 1TB SSD.",
+                    "description": "Excels at sustained GPU rendering, 1080p gaming, and video encoding at a sub-\u20b990,000 budget. Trades portability and quiet acoustics for strong cooling and upgradeable storage.",
+                    "price_rupees": 86999,
+                    "availability": "low_stock",
+                    "rating_avg": 4.35,
+                    "rating_count": 8,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "ram_gb": 16,
+                        "storage_gb": 1024,
+                        "display_size_in": 15.6,
+                        "battery_hours": 7.5,
+                        "weight_kg": 2.2,
+                        "refresh_rate_hz": 144,
+                        "dedicated_gpu": true,
+                        "processor": "AMD Ryzen 7 7435HS",
+                        "display_panel": "IPS"
+                    }
+                },
+                {
+                    "slug": "apple-macbook-air-13-m3",
+                    "name": "Apple MacBook Air 13 M3",
+                    "brand_slug": "apple",
+                    "summary": "Fanless aluminum ultrabook with 18-hour battery life and silent 4K video scrubbing.",
+                    "description": "Unmatched battery longevity and silent operation for developers, writers, and mobile editors under \u20b990,000. The 256GB base SSD fills fast with media projects, so external drives help.",
+                    "price_rupees": 89900,
+                    "availability": "in_stock",
+                    "rating_avg": 4.85,
+                    "rating_count": 10,
+                    "price_profile": "steady",
+                    "specs": {
+                        "ram_gb": 16,
+                        "storage_gb": 256,
+                        "display_size_in": 13.6,
+                        "battery_hours": 18,
+                        "weight_kg": 1.24,
+                        "refresh_rate_hz": 60,
+                        "dedicated_gpu": false,
+                        "processor": "Apple M3",
+                        "display_panel": "IPS"
+                    }
+                },
+                {
+                    "slug": "dell-inspiron-16-plus",
+                    "name": "Dell Inspiron 16 Plus",
+                    "brand_slug": "dell",
+                    "summary": "32GB RAM, 1TB SSD, and dedicated graphics on a spacious 16-inch anti-glare screen.",
+                    "description": "Built for creators and engineers who want both 32GB RAM and discrete GPU acceleration in a metal chassis. At just over 2kg, it works best as a desk-first machine.",
+                    "price_rupees": 96999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.3,
+                    "rating_count": 6,
+                    "price_profile": "launch_premium",
+                    "specs": {
+                        "ram_gb": 32,
+                        "storage_gb": 1024,
+                        "display_size_in": 16,
+                        "battery_hours": 10,
+                        "weight_kg": 2.05,
+                        "refresh_rate_hz": 120,
+                        "dedicated_gpu": true,
+                        "processor": "Intel Core Ultra 7 155H",
+                        "display_panel": "IPS"
+                    }
+                },
+                {
+                    "slug": "lg-gram-16-pro",
+                    "name": "LG Gram 16 Pro",
+                    "brand_slug": "lg",
+                    "summary": "Remarkably light 1.19kg 16-inch OLED notebook with 32GB RAM and 16.5-hour battery.",
+                    "description": "Pairs big-screen workspace and 32GB memory with true featherweight travel comfort. Keyboard travel is shallower than thicker ThinkPad or workstation models.",
+                    "price_rupees": 124990,
+                    "availability": "in_stock",
+                    "rating_avg": 4.5,
+                    "rating_count": 7,
+                    "price_profile": "gradual_drop",
+                    "specs": {
+                        "ram_gb": 32,
+                        "storage_gb": 1024,
+                        "display_size_in": 16,
+                        "battery_hours": 16.5,
+                        "weight_kg": 1.19,
+                        "refresh_rate_hz": 144,
+                        "dedicated_gpu": false,
+                        "processor": "Intel Core Ultra 7 255H",
+                        "display_panel": "OLED"
+                    }
+                },
+                {
+                    "slug": "samsung-galaxy-book4-pro",
+                    "name": "Samsung Galaxy Book4 Pro",
+                    "brand_slug": "samsung",
+                    "summary": "Anti-reflective 16-inch AMOLED touchscreen with thin aluminum build and crisp speakers.",
+                    "description": "Delivers glare-resistant OLED contrast and seamless file continuity across Galaxy devices. Memory is soldered at 16GB, limiting future upgrades for heavy 3D artists.",
+                    "price_rupees": 139990,
+                    "availability": "out_of_stock",
+                    "rating_avg": 4.45,
+                    "rating_count": 6,
+                    "price_profile": "rebound",
+                    "specs": {
+                        "ram_gb": 16,
+                        "storage_gb": 512,
+                        "display_size_in": 16,
+                        "battery_hours": 15,
+                        "weight_kg": 1.56,
+                        "refresh_rate_hz": 120,
+                        "dedicated_gpu": false,
+                        "processor": "Intel Core Ultra 7 155H",
+                        "display_panel": "OLED"
+                    }
+                },
+                {
+                    "slug": "apple-macbook-pro-14-m4",
+                    "name": "Apple MacBook Pro 14 M4 Pro",
+                    "brand_slug": "apple",
+                    "summary": "Reference Mini-LED 120Hz display, 24GB unified memory, and marathon 22-hour battery.",
+                    "description": "Sustains heavy multi-stream ProRes editing, code compilation, and local builds even on battery without throttling. Premium pricing puts it well above mainstream budgets.",
+                    "price_rupees": 169900,
+                    "availability": "in_stock",
+                    "rating_avg": 4.9,
+                    "rating_count": 9,
+                    "price_profile": "steady",
+                    "specs": {
+                        "ram_gb": 24,
+                        "storage_gb": 1024,
+                        "display_size_in": 14.2,
+                        "battery_hours": 22,
+                        "weight_kg": 1.55,
+                        "refresh_rate_hz": 120,
+                        "dedicated_gpu": false,
+                        "processor": "Apple M4 Pro",
+                        "display_panel": "Mini-LED"
+                    }
+                }
+            ]
+        },
+        "headphones": {
+            "spec_definitions": [
+                {
+                    "key": "battery_hours",
+                    "name": "Battery Life",
+                    "unit": "hrs",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 1
+                },
+                {
+                    "key": "driver_size_mm",
+                    "name": "Driver Size",
+                    "unit": "mm",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 2
+                },
+                {
+                    "key": "weight_g",
+                    "name": "Weight",
+                    "unit": "g",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": false,
+                    "sort_order": 3
+                },
+                {
+                    "key": "anc",
+                    "name": "Active Noise Cancellation",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 4
+                },
+                {
+                    "key": "wireless",
+                    "name": "Wireless",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 5
+                },
+                {
+                    "key": "multipoint",
+                    "name": "Multipoint Bluetooth",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 6
+                },
+                {
+                    "key": "form_factor",
+                    "name": "Form Factor",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 7
+                },
+                {
+                    "key": "water_resistance",
+                    "name": "Water Resistance",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 8
+                }
+            ],
+            "products": [
+                {
+                    "slug": "sony-wf-c700n",
+                    "name": "Sony WF-C700N Running Earbuds",
+                    "brand_slug": "sony",
+                    "summary": "Featherlight IPX4 sweatproof earbuds with secure running fit and clean ANC.",
+                    "description": "Engineered to stay locked in during tempo runs and gym circuits while blocking steady traffic noise. The compact pocket case trades wireless charging for lower weight and price.",
+                    "price_rupees": 4990,
+                    "availability": "in_stock",
+                    "rating_avg": 4.25,
+                    "rating_count": 7,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "battery_hours": 20,
+                        "driver_size_mm": 5,
+                        "weight_g": 40,
+                        "anc": true,
+                        "wireless": true,
+                        "multipoint": true,
+                        "form_factor": "In-ear",
+                        "water_resistance": "IPX4"
+                    }
+                },
+                {
+                    "slug": "nothing-ear-a",
+                    "name": "Nothing Ear (a)",
+                    "brand_slug": "nothing",
+                    "summary": "Punchy LDAC earbuds with IP54 dust protection, multipoint pairing, and 42.5h case battery.",
+                    "description": "Offers lively bass response, dependable IP54 workout durability, and seamless laptop-to-phone switching under \u20b96,000. Call clarity drops slightly in gusty outdoor wind.",
+                    "price_rupees": 5999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.4,
+                    "rating_count": 9,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "battery_hours": 42.5,
+                        "driver_size_mm": 11,
+                        "weight_g": 46,
+                        "anc": true,
+                        "wireless": true,
+                        "multipoint": true,
+                        "form_factor": "In-ear",
+                        "water_resistance": "IP54"
+                    }
+                },
+                {
+                    "slug": "sony-wh-ch720n",
+                    "name": "Sony WH-CH720N",
+                    "brand_slug": "sony",
+                    "summary": "Ultra-light 192g over-ear ANC headphones built for long workdays and student commutes.",
+                    "description": "Prioritizes all-day clamping comfort and multipoint Bluetooth at an approachable price. Does not fold flat into a rigid carry case, so backpack storage takes slightly more space.",
+                    "price_rupees": 8990,
+                    "availability": "in_stock",
+                    "rating_avg": 4.3,
+                    "rating_count": 10,
+                    "price_profile": "gradual_drop",
+                    "specs": {
+                        "battery_hours": 35,
+                        "driver_size_mm": 30,
+                        "weight_g": 192,
+                        "anc": true,
+                        "wireless": true,
+                        "multipoint": true,
+                        "form_factor": "Over-ear",
+                        "water_resistance": "None"
+                    }
+                },
+                {
+                    "slug": "oneplus-buds-pro-3",
+                    "name": "OnePlus Buds Pro 3",
+                    "brand_slug": "oneplus",
+                    "summary": "Dual-driver running and commute earbuds with IP55 rating and adaptive noise control.",
+                    "description": "Pairs crisp dual dynamic-planar drivers with sweat-resistant IP55 sealing and smooth touch volume slides on the stem. Spatial audio works best on compatible Android handsets.",
+                    "price_rupees": 9999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.55,
+                    "rating_count": 8,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "battery_hours": 43,
+                        "driver_size_mm": 11,
+                        "weight_g": 61,
+                        "anc": true,
+                        "wireless": true,
+                        "multipoint": true,
+                        "form_factor": "In-ear",
+                        "water_resistance": "IP55"
+                    }
+                },
+                {
+                    "slug": "sennheiser-hd-560s",
+                    "name": "Sennheiser HD 560S",
+                    "brand_slug": "sennheiser",
+                    "summary": "Open-back wired studio reference headphones with neutral imaging and zero latency.",
+                    "description": "Designed for critical music listening, mixing, and single-player gaming in quiet rooms where natural soundstage matters most. Open-back grilles leak sound, making them unsuitable for commutes.",
+                    "price_rupees": 14990,
+                    "availability": "in_stock",
+                    "rating_avg": 4.75,
+                    "rating_count": 9,
+                    "price_profile": "steady",
+                    "specs": {
+                        "battery_hours": 0,
+                        "driver_size_mm": 38,
+                        "weight_g": 240,
+                        "anc": false,
+                        "wireless": false,
+                        "multipoint": false,
+                        "form_factor": "Over-ear",
+                        "water_resistance": "None"
+                    }
+                },
+                {
+                    "slug": "logitech-g-pro-x-2",
+                    "name": "Logitech G Pro X 2 Lightspeed",
+                    "brand_slug": "logitech",
+                    "summary": "50mm graphene wireless gaming headset with 50-hour battery and detachable boom mic.",
+                    "description": "Built for competitive PC and console play with ultra-low-latency 2.4GHz wireless plus Bluetooth backup. Heavier 345g metal construction favors desk sessions over travel.",
+                    "price_rupees": 18995,
+                    "availability": "low_stock",
+                    "rating_avg": 4.45,
+                    "rating_count": 6,
+                    "price_profile": "launch_premium",
+                    "specs": {
+                        "battery_hours": 50,
+                        "driver_size_mm": 50,
+                        "weight_g": 345,
+                        "anc": false,
+                        "wireless": true,
+                        "multipoint": false,
+                        "form_factor": "Over-ear",
+                        "water_resistance": "None"
+                    }
+                },
+                {
+                    "slug": "sennheiser-momentum-4",
+                    "name": "Sennheiser Momentum 4 Wireless",
+                    "brand_slug": "sennheiser",
+                    "summary": "60-hour battery champion with spacious 42mm transducers and balanced acoustic tuning.",
+                    "description": "Delivers class-leading battery endurance that lasts a full work week plus transatlantic flights on one charge. Noise cancellation is strong, though slightly behind Sony and Bose on deep plane rumble.",
+                    "price_rupees": 24990,
+                    "availability": "in_stock",
+                    "rating_avg": 4.7,
+                    "rating_count": 10,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "battery_hours": 60,
+                        "driver_size_mm": 42,
+                        "weight_g": 293,
+                        "anc": true,
+                        "wireless": true,
+                        "multipoint": true,
+                        "form_factor": "Over-ear",
+                        "water_resistance": "None"
+                    }
+                },
+                {
+                    "slug": "sony-wh-1000xm5",
+                    "name": "Sony WH-1000XM5",
+                    "brand_slug": "sony",
+                    "summary": "Benchmark travel ANC over-ears with clear voice pickup and plush memory-foam pads.",
+                    "description": "Consistently silences office chatter and cabin hum while keeping weight comfortable at 250g. Earcups swivel flat rather than folding inward, requiring a slightly taller travel case.",
+                    "price_rupees": 26990,
+                    "availability": "in_stock",
+                    "rating_avg": 4.8,
+                    "rating_count": 10,
+                    "price_profile": "gradual_drop",
+                    "specs": {
+                        "battery_hours": 30,
+                        "driver_size_mm": 30,
+                        "weight_g": 250,
+                        "anc": true,
+                        "wireless": true,
+                        "multipoint": true,
+                        "form_factor": "Over-ear",
+                        "water_resistance": "None"
+                    }
+                },
+                {
+                    "slug": "bose-quietcomfort-ultra",
+                    "name": "Bose QuietComfort Ultra",
+                    "brand_slug": "bose",
+                    "summary": "Deeply cushioned folding ANC headphones tuned for maximum cabin quietness.",
+                    "description": "Folds neatly for carry-on packing and isolates low-frequency engine drone effortlessly. Battery life tops out at 24 hours with ANC active, shorter than Sennheiser rivals.",
+                    "price_rupees": 32900,
+                    "availability": "out_of_stock",
+                    "rating_avg": 4.65,
+                    "rating_count": 8,
+                    "price_profile": "rebound",
+                    "specs": {
+                        "battery_hours": 24,
+                        "driver_size_mm": 35,
+                        "weight_g": 254,
+                        "anc": true,
+                        "wireless": true,
+                        "multipoint": true,
+                        "form_factor": "Over-ear",
+                        "water_resistance": "None"
+                    }
+                },
+                {
+                    "slug": "apple-airpods-max-usbc",
+                    "name": "Apple AirPods Max (USB-C)",
+                    "brand_slug": "apple",
+                    "summary": "Anodized aluminum over-ears with lossless USB-C audio and natural transparency mode.",
+                    "description": "Stands out for build craft, breathable knit headband comfort, and lifelike pass-through audio across Apple devices. At 386g it feels heavier on neck tilts than plastic competitors.",
+                    "price_rupees": 44900,
+                    "availability": "in_stock",
+                    "rating_avg": 4.5,
+                    "rating_count": 7,
+                    "price_profile": "steady",
+                    "specs": {
+                        "battery_hours": 20,
+                        "driver_size_mm": 40,
+                        "weight_g": 386,
+                        "anc": true,
+                        "wireless": true,
+                        "multipoint": false,
+                        "form_factor": "Over-ear",
+                        "water_resistance": "None"
+                    }
+                }
+            ]
+        },
+        "monitors": {
+            "spec_definitions": [
+                {
+                    "key": "screen_size_in",
+                    "name": "Screen Size",
+                    "unit": "in",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 1
+                },
+                {
+                    "key": "refresh_rate_hz",
+                    "name": "Refresh Rate",
+                    "unit": "Hz",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 2
+                },
+                {
+                    "key": "response_time_ms",
+                    "name": "Response Time",
+                    "unit": "ms",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": false,
+                    "sort_order": 3
+                },
+                {
+                    "key": "brightness_nits",
+                    "name": "Peak Brightness",
+                    "unit": "nits",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 4
+                },
+                {
+                    "key": "usb_c_pd_w",
+                    "name": "USB-C Power Delivery",
+                    "unit": "W",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 5
+                },
+                {
+                    "key": "hdr_support",
+                    "name": "HDR Support",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 6
+                },
+                {
+                    "key": "resolution",
+                    "name": "Resolution",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 7
+                },
+                {
+                    "key": "panel_type",
+                    "name": "Panel Type",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 8
+                }
+            ],
+            "products": [
+                {
+                    "slug": "lenovo-l24i-4a",
+                    "name": "Lenovo L24i-4A 24-inch",
+                    "brand_slug": "lenovo",
+                    "summary": "Slim 100Hz 1080p IPS desk monitor suited to compact home study setups.",
+                    "description": "Brings smooth 100Hz scrolling and narrow bezels to entry-level work desks. Height adjustment is omitted on the stock stand, so a desk riser or VESA arm helps.",
+                    "price_rupees": 11999,
+                    "availability": "in_stock",
+                    "rating_avg": 0,
+                    "rating_count": 0,
+                    "price_profile": "steady",
+                    "specs": {
+                        "screen_size_in": 23.8,
+                        "refresh_rate_hz": 100,
+                        "response_time_ms": 4,
+                        "brightness_nits": 250,
+                        "usb_c_pd_w": 0,
+                        "hdr_support": false,
+                        "resolution": "1080p Full HD",
+                        "panel_type": "IPS"
+                    }
+                },
+                {
+                    "slug": "xiaomi-g27qi-gaming",
+                    "name": "Xiaomi Gaming Monitor G27Qi",
+                    "brand_slug": "xiaomi",
+                    "summary": "Value 27-inch 1440p 180Hz Fast IPS panel for smooth high-FPS PC gaming.",
+                    "description": "Delivers sharp QHD text and crisp 180Hz motion clarity well below competing gaming monitors. Ships with a tilt-only stand and skips built-in speakers.",
+                    "price_rupees": 17999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.35,
+                    "rating_count": 8,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "screen_size_in": 27,
+                        "refresh_rate_hz": 180,
+                        "response_time_ms": 1,
+                        "brightness_nits": 300,
+                        "usb_c_pd_w": 0,
+                        "hdr_support": true,
+                        "resolution": "1440p QHD",
+                        "panel_type": "IPS"
+                    }
+                },
+                {
+                    "slug": "lg-ultragear-27gr75q",
+                    "name": "LG UltraGear 27GR75Q",
+                    "brand_slug": "lg",
+                    "summary": "Ergonomic 165Hz QHD gaming display with height/pivot stand and calibrated colors.",
+                    "description": "Pairs responsive 1ms IPS overdrive with a full height-and-pivot stand out of the box. HDR peak brightness is modest, making SDR calibration the sweet spot.",
+                    "price_rupees": 22999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.6,
+                    "rating_count": 10,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "screen_size_in": 27,
+                        "refresh_rate_hz": 165,
+                        "response_time_ms": 1,
+                        "brightness_nits": 300,
+                        "usb_c_pd_w": 0,
+                        "hdr_support": true,
+                        "resolution": "1440p QHD",
+                        "panel_type": "IPS"
+                    }
+                },
+                {
+                    "slug": "benq-gw2790qt",
+                    "name": "BenQ GW2790QT Ergonomic QHD",
+                    "brand_slug": "benq",
+                    "summary": "Eye-care 27-inch QHD coding monitor with 65W USB-C single-cable laptop charging.",
+                    "description": "Simplifies hybrid desk setups with 65W USB-C power delivery, daisy-chain DisplayPort, and a noise-filtering microphone. Locked to 75Hz, so it favors coding and writing over fast games.",
+                    "price_rupees": 24990,
+                    "availability": "in_stock",
+                    "rating_avg": 4.5,
+                    "rating_count": 9,
+                    "price_profile": "gradual_drop",
+                    "specs": {
+                        "screen_size_in": 27,
+                        "refresh_rate_hz": 75,
+                        "response_time_ms": 5,
+                        "brightness_nits": 350,
+                        "usb_c_pd_w": 65,
+                        "hdr_support": false,
+                        "resolution": "1440p QHD",
+                        "panel_type": "IPS"
+                    }
+                },
+                {
+                    "slug": "dell-s2722qc-4k",
+                    "name": "Dell S2722QC 4K USB-C",
+                    "brand_slug": "dell",
+                    "summary": "Crisp 27-inch 4K monitor with 65W USB-C hub and dual HDMI inputs under \u20b930,000.",
+                    "description": "Brings razor-sharp 4K HiDPI text scaling and one-cable ultrabook charging into an accessible bracket. Standard 60Hz refresh rate keeps it focused on productivity and media.",
+                    "price_rupees": 28999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.55,
+                    "rating_count": 8,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "screen_size_in": 27,
+                        "refresh_rate_hz": 60,
+                        "response_time_ms": 4,
+                        "brightness_nits": 350,
+                        "usb_c_pd_w": 65,
+                        "hdr_support": true,
+                        "resolution": "4K UHD",
+                        "panel_type": "IPS"
+                    }
+                },
+                {
+                    "slug": "lg-27up850k-4k",
+                    "name": "LG 27UP850K 4K UHD",
+                    "brand_slug": "lg",
+                    "summary": "90W USB-C 4K IPS monitor with wide DCI-P3 coverage for photo and video workflows.",
+                    "description": "Powers larger 16-inch creator laptops over a single 90W USB-C cable while preserving 95% DCI-P3 color accuracy. Contrast ratio stays typical of IPS panels in dark rooms.",
+                    "price_rupees": 34999,
+                    "availability": "low_stock",
+                    "rating_avg": 4.65,
+                    "rating_count": 7,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "screen_size_in": 27,
+                        "refresh_rate_hz": 60,
+                        "response_time_ms": 5,
+                        "brightness_nits": 400,
+                        "usb_c_pd_w": 90,
+                        "hdr_support": true,
+                        "resolution": "4K UHD",
+                        "panel_type": "IPS"
+                    }
+                },
+                {
+                    "slug": "benq-pd2706ua-4k",
+                    "name": "BenQ PD2706UA Designer 4K",
+                    "brand_slug": "benq",
+                    "summary": "Factory-calibrated 4K monitor on a clamp ergo arm with 90W USB-C and KVM switch.",
+                    "description": "Frees up desk space with its included articulating clamp arm and speeds up dual-machine workflows via built-in KVM switching. Geared strictly for design rather than competitive esports.",
+                    "price_rupees": 46990,
+                    "availability": "in_stock",
+                    "rating_avg": 4.75,
+                    "rating_count": 9,
+                    "price_profile": "steady",
+                    "specs": {
+                        "screen_size_in": 27,
+                        "refresh_rate_hz": 60,
+                        "response_time_ms": 5,
+                        "brightness_nits": 400,
+                        "usb_c_pd_w": 90,
+                        "hdr_support": true,
+                        "resolution": "4K UHD",
+                        "panel_type": "IPS"
+                    }
+                },
+                {
+                    "slug": "samsung-odyssey-g7-32",
+                    "name": "Samsung Odyssey G7 32 4K",
+                    "brand_slug": "samsung",
+                    "summary": "Expansive 32-inch 4K 144Hz monitor built for immersive console and PC gaming.",
+                    "description": "Combines sharp 4K resolution with HDMI 2.1 bandwidth and 144Hz fluidity across a big 32-inch canvas. Omits USB-C laptop charging, focusing squarely on DisplayPort and HDMI rigs.",
+                    "price_rupees": 54999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.45,
+                    "rating_count": 7,
+                    "price_profile": "gradual_drop",
+                    "specs": {
+                        "screen_size_in": 32,
+                        "refresh_rate_hz": 144,
+                        "response_time_ms": 1,
+                        "brightness_nits": 400,
+                        "usb_c_pd_w": 0,
+                        "hdr_support": true,
+                        "resolution": "4K UHD",
+                        "panel_type": "IPS"
+                    }
+                },
+                {
+                    "slug": "dell-ultrasharp-u2723qe",
+                    "name": "Dell UltraSharp U2723QE 4K",
+                    "brand_slug": "dell",
+                    "summary": "2000:1 high-contrast 4K IPS Black hub monitor with 90W USB-C and Ethernet.",
+                    "description": "Acts as a full single-cable docking station with Gigabit Ethernet, USB-A ports, and noticeably deeper blacks than standard IPS displays. Price sits higher than consumer 4K options.",
+                    "price_rupees": 56999,
+                    "availability": "out_of_stock",
+                    "rating_avg": 4.8,
+                    "rating_count": 8,
+                    "price_profile": "rebound",
+                    "specs": {
+                        "screen_size_in": 27,
+                        "refresh_rate_hz": 60,
+                        "response_time_ms": 5,
+                        "brightness_nits": 400,
+                        "usb_c_pd_w": 90,
+                        "hdr_support": true,
+                        "resolution": "4K UHD",
+                        "panel_type": "Mini-LED IPS"
+                    }
+                },
+                {
+                    "slug": "asus-rog-swift-oled-pg27aqdm",
+                    "name": "ASUS ROG Swift OLED PG27AQDM",
+                    "brand_slug": "asus",
+                    "summary": "240Hz matte 1440p OLED monitor with instant 0.03ms pixel transitions and 1000-nit HDR.",
+                    "description": "Delivers zero-ghosting motion and true per-pixel HDR contrast for competitive shooters and dark-room cinema. Text fringing is minimal at normal viewing distances, though static UIs need pixel-care habits.",
+                    "price_rupees": 79999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.85,
+                    "rating_count": 6,
+                    "price_profile": "launch_premium",
+                    "specs": {
+                        "screen_size_in": 27,
+                        "refresh_rate_hz": 240,
+                        "response_time_ms": 0.03,
+                        "brightness_nits": 1000,
+                        "usb_c_pd_w": 0,
+                        "hdr_support": true,
+                        "resolution": "1440p QHD",
+                        "panel_type": "OLED"
+                    }
+                }
+            ]
+        },
+        "keyboards": {
+            "spec_definitions": [
+                {
+                    "key": "battery_hours",
+                    "name": "Battery Life",
+                    "unit": "hrs",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 1
+                },
+                {
+                    "key": "polling_rate_hz",
+                    "name": "Polling Rate",
+                    "unit": "Hz",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 2
+                },
+                {
+                    "key": "weight_g",
+                    "name": "Weight",
+                    "unit": "g",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": false,
+                    "sort_order": 3
+                },
+                {
+                    "key": "wireless",
+                    "name": "Wireless",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 4
+                },
+                {
+                    "key": "hot_swappable",
+                    "name": "Hot-Swappable",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 5
+                },
+                {
+                    "key": "backlight",
+                    "name": "Backlit Keys",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 6
+                },
+                {
+                    "key": "layout",
+                    "name": "Form Factor",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 7
+                },
+                {
+                    "key": "switch_type",
+                    "name": "Switch Type",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 8
+                }
+            ],
+            "products": [
+                {
+                    "slug": "logitech-pebble-keys-2",
+                    "name": "Logitech Pebble Keys 2 K380s",
+                    "brand_slug": "logitech",
+                    "summary": "Featherweight multi-device Bluetooth travel keyboard with quiet laptop-style keys.",
+                    "description": "Fits effortlessly inside tablet sleeves and switches across three devices with dedicated Easy-Switch keys. Omits backlighting and relies on replaceable coin/AAA cells rather than USB-C charging.",
+                    "price_rupees": 2999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.2,
+                    "rating_count": 10,
+                    "price_profile": "steady",
+                    "specs": {
+                        "battery_hours": 360,
+                        "polling_rate_hz": 125,
+                        "weight_g": 415,
+                        "wireless": true,
+                        "hot_swappable": false,
+                        "backlight": false,
+                        "layout": "75%",
+                        "switch_type": "Scissor"
+                    }
+                },
+                {
+                    "slug": "royal-kludge-rk61-wireless",
+                    "name": "Royal Kludge RK61 Wireless",
+                    "brand_slug": "royal-kludge",
+                    "summary": "Compact 65% hot-swappable mechanical starter keyboard with tri-mode wireless.",
+                    "description": "Gives first-time mechanical builders 2.4GHz, Bluetooth, and USB-C connectivity plus switch swapping under \u20b93,500. ABS stock keycaps shine quickly with heavy daily typing.",
+                    "price_rupees": 3499,
+                    "availability": "in_stock",
+                    "rating_avg": 4.15,
+                    "rating_count": 9,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "battery_hours": 60,
+                        "polling_rate_hz": 1000,
+                        "weight_g": 590,
+                        "wireless": true,
+                        "hot_swappable": true,
+                        "backlight": true,
+                        "layout": "65%",
+                        "switch_type": "Linear"
+                    }
+                },
+                {
+                    "slug": "keychron-c3-pro",
+                    "name": "Keychron C3 Pro Wired",
+                    "brand_slug": "keychron",
+                    "summary": "Gasket-mounted QMK/VIA wired TKL mechanical board for focused coding and gaming.",
+                    "description": "Brings soft gasket typing feel and full QMK key remapping into a sub-\u20b94,000 budget. Wired-only design avoids battery aging at the cost of desk cable routing.",
+                    "price_rupees": 3999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.45,
+                    "rating_count": 8,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "battery_hours": 0,
+                        "polling_rate_hz": 1000,
+                        "weight_g": 912,
+                        "wireless": false,
+                        "hot_swappable": true,
+                        "backlight": true,
+                        "layout": "TKL (80%)",
+                        "switch_type": "Tactile"
+                    }
+                },
+                {
+                    "slug": "keychron-k2-pro-qmk",
+                    "name": "Keychron K2 Pro QMK/VIA",
+                    "brand_slug": "keychron",
+                    "summary": "Versatile 75% wireless custom mechanical keyboard with QMK/VIA remapping and PBT keycaps.",
+                    "description": "Balances dedicated function keys and arrow navigation in a tight footprint with crisp pre-lubed tactile switches. Includes full VIA key remapping and multi-device Bluetooth switching.",
+                    "price_rupees": 8499,
+                    "availability": "in_stock",
+                    "rating_avg": 4.65,
+                    "rating_count": 10,
+                    "price_profile": "gradual_drop",
+                    "specs": {
+                        "battery_hours": 140,
+                        "polling_rate_hz": 1000,
+                        "weight_g": 890,
+                        "wireless": true,
+                        "hot_swappable": true,
+                        "backlight": true,
+                        "layout": "75%",
+                        "switch_type": "Tactile"
+                    }
+                },
+                {
+                    "slug": "logitech-mx-keys-s",
+                    "name": "Logitech MX Keys S",
+                    "brand_slug": "logitech",
+                    "summary": "Quiet full-size scissor productivity keyboard with smart proximity backlighting.",
+                    "description": "Whisper-quiet dished keycaps and full number pad make it ideal for shared offices and spreadsheet work. Non-mechanical switches cannot be swapped if you prefer deeper key travel.",
+                    "price_rupees": 10495,
+                    "availability": "in_stock",
+                    "rating_avg": 4.6,
+                    "rating_count": 8,
+                    "price_profile": "steady",
+                    "specs": {
+                        "battery_hours": 200,
+                        "polling_rate_hz": 125,
+                        "weight_g": 810,
+                        "wireless": true,
+                        "hot_swappable": false,
+                        "backlight": true,
+                        "layout": "Full-size (100%)",
+                        "switch_type": "Scissor"
+                    }
+                },
+                {
+                    "slug": "nuphy-air75-v2",
+                    "name": "NuPhy Air75 V2 Low-Profile",
+                    "brand_slug": "nuphy",
+                    "summary": "Slim low-profile 75% mechanical travel deck with 1000Hz 2.4GHz wireless and QMK.",
+                    "description": "Packs real hot-swappable mechanical switches into a slim 598g frame that rests cleanly over laptop decks. Low-profile switch options are narrower than standard MX sockets.",
+                    "price_rupees": 11999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.75,
+                    "rating_count": 9,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "battery_hours": 220,
+                        "polling_rate_hz": 1000,
+                        "weight_g": 598,
+                        "wireless": true,
+                        "hot_swappable": true,
+                        "backlight": true,
+                        "layout": "75%",
+                        "switch_type": "Low-profile Tactile"
+                    }
+                },
+                {
+                    "slug": "apple-magic-keyboard-touch-id",
+                    "name": "Apple Magic Keyboard with Touch ID",
+                    "brand_slug": "apple",
+                    "summary": "Ultra-thin 243g macOS wireless keyboard with instant Touch ID authentication.",
+                    "description": "Integrates hardware fingerprint unlock seamlessly with Apple Silicon Macs in a nearly flat profile. Touch ID does not work on Windows or Linux systems, and keys lack backlighting.",
+                    "price_rupees": 14500,
+                    "availability": "low_stock",
+                    "rating_avg": 4.35,
+                    "rating_count": 6,
+                    "price_profile": "steady",
+                    "specs": {
+                        "battery_hours": 240,
+                        "polling_rate_hz": 125,
+                        "weight_g": 243,
+                        "wireless": true,
+                        "hot_swappable": false,
+                        "backlight": false,
+                        "layout": "75%",
+                        "switch_type": "Scissor"
+                    }
+                },
+                {
+                    "slug": "keychron-q1-pro",
+                    "name": "Keychron Q1 Pro Aluminum",
+                    "brand_slug": "keychron",
+                    "summary": "CNC aluminum 75% enthusiast keyboard with rotary knob, gasket mount, and wireless.",
+                    "description": "Substantial 1.7kg machined aluminum chassis eliminates desk rattle and produces a deep, muted sound signature. Built strictly to stay planted on a desk rather than travel.",
+                    "price_rupees": 17999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.85,
+                    "rating_count": 9,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "battery_hours": 300,
+                        "polling_rate_hz": 1000,
+                        "weight_g": 1736,
+                        "wireless": true,
+                        "hot_swappable": true,
+                        "backlight": true,
+                        "layout": "75%",
+                        "switch_type": "Linear"
+                    }
+                },
+                {
+                    "slug": "asus-rog-azoth-75",
+                    "name": "ASUS ROG Azoth 75 Gaming",
+                    "brand_slug": "asus",
+                    "summary": "Enthusiast 75% wireless gaming keyboard with OLED status panel and factory-lubed switches.",
+                    "description": "Bridges custom mechanical acoustics with ultra-low-latency 2.4GHz wireless and a customizable OLED readout. Companion software is bulkier than browser-based VIA configurators.",
+                    "price_rupees": 21999,
+                    "availability": "out_of_stock",
+                    "rating_avg": 4.7,
+                    "rating_count": 7,
+                    "price_profile": "rebound",
+                    "specs": {
+                        "battery_hours": 130,
+                        "polling_rate_hz": 1000,
+                        "weight_g": 1186,
+                        "wireless": true,
+                        "hot_swappable": true,
+                        "backlight": true,
+                        "layout": "75%",
+                        "switch_type": "Optical Linear"
+                    }
+                },
+                {
+                    "slug": "logitech-g915-x-lightspeed",
+                    "name": "Logitech G915 X Lightspeed",
+                    "brand_slug": "logitech",
+                    "summary": "Full-size low-profile wireless gaming deck with aluminum top plate and media wheel.",
+                    "description": "Combines dedicated macro keys, a brushed aluminum deck, and fast Lightspeed wireless without tall keycaps. Switches are soldered rather than hot-swappable.",
+                    "price_rupees": 22995,
+                    "availability": "in_stock",
+                    "rating_avg": 0,
+                    "rating_count": 0,
+                    "price_profile": "launch_premium",
+                    "specs": {
+                        "battery_hours": 80,
+                        "polling_rate_hz": 1000,
+                        "weight_g": 1080,
+                        "wireless": true,
+                        "hot_swappable": false,
+                        "backlight": true,
+                        "layout": "Full-size (100%)",
+                        "switch_type": "Low-profile Tactile"
+                    }
+                }
+            ]
+        },
+        "smartwatches": {
+            "spec_definitions": [
+                {
+                    "key": "battery_days",
+                    "name": "Battery Life",
+                    "unit": "days",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 1
+                },
+                {
+                    "key": "display_size_mm",
+                    "name": "Case Size",
+                    "unit": "mm",
+                    "data_type": "number",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 2
+                },
+                {
+                    "key": "brightness_nits",
+                    "name": "Peak Brightness",
+                    "unit": "nits",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 3
+                },
+                {
+                    "key": "weight_g",
+                    "name": "Weight",
+                    "unit": "g",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": false,
+                    "sort_order": 4
+                },
+                {
+                    "key": "water_resistance_atm",
+                    "name": "Water Resistance",
+                    "unit": "ATM",
+                    "data_type": "number",
+                    "is_filterable": false,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 5
+                },
+                {
+                    "key": "builtin_gps",
+                    "name": "Built-in GPS",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 6
+                },
+                {
+                    "key": "cellular_lte",
+                    "name": "LTE Option",
+                    "unit": null,
+                    "data_type": "boolean",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": true,
+                    "sort_order": 7
+                },
+                {
+                    "key": "display_type",
+                    "name": "Display Type",
+                    "unit": null,
+                    "data_type": "text",
+                    "is_filterable": true,
+                    "is_comparable": true,
+                    "higher_is_better": null,
+                    "sort_order": 8
+                }
+            ],
+            "products": [
+                {
+                    "slug": "cmf-watch-pro-2",
+                    "name": "CMF Watch Pro 2",
+                    "brand_slug": "nothing",
+                    "summary": "Interchangeable aluminum bezel smartwatch with multi-system GPS and 11-day battery.",
+                    "description": "Delivers clean minimal watch faces, Bluetooth calling, and built-in GPS under \u20b94,500. Lacks third-party app installs and tap-to-pay NFC, keeping focus on essentials.",
+                    "price_rupees": 4499,
+                    "availability": "in_stock",
+                    "rating_avg": 4.1,
+                    "rating_count": 8,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "battery_days": 11,
+                        "display_size_mm": 46,
+                        "brightness_nits": 620,
+                        "weight_g": 48,
+                        "water_resistance_atm": 2,
+                        "builtin_gps": true,
+                        "cellular_lte": false,
+                        "display_type": "AMOLED"
+                    }
+                },
+                {
+                    "slug": "amazfit-bip-5-unity",
+                    "name": "Amazfit Bip 5 Unity",
+                    "brand_slug": "amazfit",
+                    "summary": "Featherlight 25g step and sleep tracker with 11-day battery and stainless frame.",
+                    "description": "Comfortably disappears on the wrist overnight for sleep and heart-rate tracking. Relies on phone GPS for outdoor run maps rather than an onboard receiver.",
+                    "price_rupees": 5999,
+                    "availability": "in_stock",
+                    "rating_avg": 3.95,
+                    "rating_count": 6,
+                    "price_profile": "steady",
+                    "specs": {
+                        "battery_days": 11,
+                        "display_size_mm": 46,
+                        "brightness_nits": 500,
+                        "weight_g": 25,
+                        "water_resistance_atm": 2,
+                        "builtin_gps": false,
+                        "cellular_lte": false,
+                        "display_type": "AMOLED"
+                    }
+                },
+                {
+                    "slug": "amazfit-active-edge",
+                    "name": "Amazfit Active Edge",
+                    "brand_slug": "amazfit",
+                    "summary": "10 ATM rugged outdoor watch with dual-band GPS and 16-day endurance under \u20b912,000.",
+                    "description": "Built for swimming, trail hikes, and long workouts without babying the bezel or carrying a charger weekly. Uses physical navigation buttons instead of a rotating crown.",
+                    "price_rupees": 11999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.3,
+                    "rating_count": 7,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "battery_days": 16,
+                        "display_size_mm": 46,
+                        "brightness_nits": 600,
+                        "weight_g": 34,
+                        "water_resistance_atm": 10,
+                        "builtin_gps": true,
+                        "cellular_lte": false,
+                        "display_type": "AMOLED"
+                    }
+                },
+                {
+                    "slug": "oneplus-watch-2r",
+                    "name": "OnePlus Watch 2R",
+                    "brand_slug": "oneplus",
+                    "summary": "Dual-engine Wear OS watch achieving up to 4 days between charges with dual GPS.",
+                    "description": "Runs full Google Wear OS apps and maps while stretching battery far beyond typical single-day smartwatches. The 46mm aluminum case wears wide on slender wrists.",
+                    "price_rupees": 14999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.45,
+                    "rating_count": 9,
+                    "price_profile": "gradual_drop",
+                    "specs": {
+                        "battery_days": 4,
+                        "display_size_mm": 46,
+                        "brightness_nits": 1000,
+                        "weight_g": 37,
+                        "water_resistance_atm": 5,
+                        "builtin_gps": true,
+                        "cellular_lte": false,
+                        "display_type": "AMOLED"
+                    }
+                },
+                {
+                    "slug": "samsung-galaxy-watch-7-44",
+                    "name": "Samsung Galaxy Watch 7 (44mm)",
+                    "brand_slug": "samsung",
+                    "summary": "2000-nit sapphire glass Wear OS smartwatch with dual-frequency GPS and LTE option.",
+                    "description": "Offers snappy app performance, body-composition estimates, and crisp outdoor readability. Expect charging every 1.5 to 2 days when always-on display is enabled.",
+                    "price_rupees": 28999,
+                    "availability": "in_stock",
+                    "rating_avg": 4.5,
+                    "rating_count": 8,
+                    "price_profile": "recent_drop",
+                    "specs": {
+                        "battery_days": 2,
+                        "display_size_mm": 44,
+                        "brightness_nits": 2000,
+                        "weight_g": 34,
+                        "water_resistance_atm": 5,
+                        "builtin_gps": true,
+                        "cellular_lte": true,
+                        "display_type": "AMOLED"
+                    }
+                },
+                {
+                    "slug": "google-pixel-watch-3-45",
+                    "name": "Google Pixel Watch 3 (45mm)",
+                    "brand_slug": "google",
+                    "summary": "Domed LTPO OLED smartwatch pairing smooth Wear OS UI with Fitbit readiness metrics.",
+                    "description": "Delivers fluid notifications, accurate heart-rate tracking, and morning readiness guidance in a larger 45mm frame. Domed glass benefits from care around gym equipment.",
+                    "price_rupees": 39900,
+                    "availability": "low_stock",
+                    "rating_avg": 4.55,
+                    "rating_count": 7,
+                    "price_profile": "launch_premium",
+                    "specs": {
+                        "battery_days": 2,
+                        "display_size_mm": 45,
+                        "brightness_nits": 2000,
+                        "weight_g": 37,
+                        "water_resistance_atm": 5,
+                        "builtin_gps": true,
+                        "cellular_lte": true,
+                        "display_type": "LTPO OLED"
+                    }
+                },
+                {
+                    "slug": "garmin-forerunner-265",
+                    "name": "Garmin Forerunner 265",
+                    "brand_slug": "garmin",
+                    "summary": "Dedicated marathon training watch with SatIQ GPS, training load, and 13-day battery.",
+                    "description": "Built for runners and triathletes who value tactile five-button lap controls in rain, detailed recovery analytics, and multi-week reliability. Skips LTE phone calling.",
+                    "price_rupees": 45990,
+                    "availability": "in_stock",
+                    "rating_avg": 4.8,
+                    "rating_count": 10,
+                    "price_profile": "steady",
+                    "specs": {
+                        "battery_days": 13,
+                        "display_size_mm": 46,
+                        "brightness_nits": 1000,
+                        "weight_g": 47,
+                        "water_resistance_atm": 5,
+                        "builtin_gps": true,
+                        "cellular_lte": false,
+                        "display_type": "AMOLED"
+                    }
+                },
+                {
+                    "slug": "apple-watch-series-10-46",
+                    "name": "Apple Watch Series 10 (46mm)",
+                    "brand_slug": "apple",
+                    "summary": "Slim wide-angle LTPO OLED smartwatch with fast charging and comprehensive iOS integration.",
+                    "description": "Bright wide-angle display stays legible at a glance during runs, and fast charging tops up 80% in 30 minutes. Requires an iPhone and benefits from daily charging.",
+                    "price_rupees": 49900,
+                    "availability": "in_stock",
+                    "rating_avg": 4.75,
+                    "rating_count": 9,
+                    "price_profile": "festival_dip",
+                    "specs": {
+                        "battery_days": 1.5,
+                        "display_size_mm": 46,
+                        "brightness_nits": 2000,
+                        "weight_g": 36,
+                        "water_resistance_atm": 5,
+                        "builtin_gps": true,
+                        "cellular_lte": true,
+                        "display_type": "LTPO OLED"
+                    }
+                },
+                {
+                    "slug": "apple-watch-ultra-2",
+                    "name": "Apple Watch Ultra 2",
+                    "brand_slug": "apple",
+                    "summary": "Titanium 49mm adventure watch with 3000-nit sapphire screen, 10 ATM rating, and LTE.",
+                    "description": "Adds dual-frequency precision GPS, dive depth gauges, and an action button in rugged titanium. Bulky 49mm sizing feels oversized for dress attire or sleep tracking.",
+                    "price_rupees": 78900,
+                    "availability": "in_stock",
+                    "rating_avg": 4.9,
+                    "rating_count": 8,
+                    "price_profile": "rebound",
+                    "specs": {
+                        "battery_days": 3,
+                        "display_size_mm": 49,
+                        "brightness_nits": 3000,
+                        "weight_g": 61,
+                        "water_resistance_atm": 10,
+                        "builtin_gps": true,
+                        "cellular_lte": true,
+                        "display_type": "LTPO OLED"
+                    }
+                },
+                {
+                    "slug": "garmin-fenix-8-47",
+                    "name": "Garmin Fenix 8 AMOLED (47mm)",
+                    "brand_slug": "garmin",
+                    "summary": "Flagship multisport expedition watch with offline topo maps and 16-day battery life.",
+                    "description": "Combines leakproof dive-rated buttons, built-in offline topographic mapping, and an LED flashlight for multi-day treks. Premium price targets dedicated endurance athletes.",
+                    "price_rupees": 79900,
+                    "availability": "out_of_stock",
+                    "rating_avg": 0,
+                    "rating_count": 0,
+                    "price_profile": "steady",
+                    "specs": {
+                        "battery_days": 16,
+                        "display_size_mm": 47,
+                        "brightness_nits": 1000,
+                        "weight_g": 73,
+                        "water_resistance_atm": 10,
+                        "builtin_gps": true,
+                        "cellular_lte": false,
+                        "display_type": "AMOLED"
+                    }
+                }
+            ]
+        }
+    }
+}
