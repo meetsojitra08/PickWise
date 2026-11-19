@@ -10,7 +10,7 @@ This repository is **Pickwise**, an AI-powered shopping decision platform (learn
 5. The other task-relevant files in `docs/` (see `docs/README.md`)
 
 **Non-negotiables**
-- Strict stack: Laravel 13, React.js, shadcn/ui, Tailwind CSS, PostgreSQL, Redis, Groq API, Docker, Git & GitHub. No substitutions. Ask before adding any library not listed in `docs/project-overview.md`.
+- Strict stack: FastAPI (Python 3.12+), React 19, shadcn/ui, Tailwind CSS, PostgreSQL 17, Redis 7, Groq API, Docker, Git & GitHub. No substitutions. Ask before adding any library not listed in `docs/project-overview.md`.
 - Work on **one step at a time**. After each step: verify, update `docs/progress-tracker.md`, propose a conventional commit message, then **stop and wait**.
 - Never commit, push or merge unless asked. Never expose secrets. The Groq API is called from the backend only.
 - UI must follow `docs/ui-context.md`. AI features must follow `docs/ai-integration.md`.
