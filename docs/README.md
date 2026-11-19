@@ -11,7 +11,7 @@ Start with `project-overview.md`, then follow the order below.
 | 5   | [database-schema.md](./database-schema.md)              | Touching the database                                                                 |
 | 6   | [api-spec.md](./api-spec.md)                            | Building or consuming endpoints                                                       |
 | 6a  | [openapi.yaml](./openapi.yaml) / [json](./openapi.json) | OpenAPI 3.1.0 machine-readable specification and interactive tool imports             |
-| 7   | [ai-integration.md](./ai-integration.md)                | Anything under `app/AI` or the assistant UI                                           |
+| 7   | [ai-integration.md](./ai-integration.md)                | Groq client, AI assistant grounding, or verdict UI                                   |
 | 8   | [ui-context.md](./ui-context.md)                        | Building any screen or component                                                      |
 | 9   | [code-standards.md](./code-standards.md)                | Before every commit                                                                   |
 | 10  | [git-workflow.md](./git-workflow.md)                    | Committing, branching, PRs                                                            |

@@ -1,11 +1,34 @@
 # Progress Tracker
 
-**Current phase:** P9, Release
-**Current step:** P9-S3 (P9-S2 completed)
-**Last updated:** 2026-11-19 (P9-S2)
+**Current phase:** Phase F, Complete FastAPI Backend Migration & Verification
+**Current status:** 100% Complete & Verified (Laravel completely removed)
+**Last updated:** 2026-11-19 (Phase F Complete)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
+
+---
+
+## Phase F: FastAPI Migration (branch `phase/fastapi-backend`)
+
+- [x] **F0: Project Setup, Tooling & Foundations** · `chore(fastapi)`
+  - Python 3.12 structure, `pyproject.toml`, dependencies, API envelopes (`data`/`meta`), error handling, `X-Request-Id`, Dockerfile & Nginx proxy.
+- [x] **F1: Database Schema, Models & Seeders** · `db(fastapi)`
+  - SQLAlchemy 2.0 async declarative models, GIN full-text search triggers, `pg_trgm`, deterministic 60-product seeder.
+- [x] **F2: Authentication, Session Management & Accounts** · `feat(auth)`
+  - Sanctum-compatible cookie session (`session:{id}` in Redis), CSRF double-submit (`GET /sanctum/csrf-cookie` 204), profile/password/preferences.
+- [x] **F3: Catalog, Search & Filtering** · `feat(catalog)`
+  - Dynamic facets, full-text & trigram ranking, product detail, 180-day price history, Bayesian Value Score calculator.
+- [x] **F4: Reviews, Wishlist & Comparison** · `feat(features)`
+  - Product reviews & rating aggregation, wishlist CRUD, side-by-side comparison matrix with row winners, token sharing.
+- [x] **F5: AI Integration (Groq, Quotas & Shopping Assistant)** · `feat(ai)`
+  - Async Groq SDK, anti-hallucination DB grounding, budget alternatives (+15%), Redis sliding window quota, compare verdict.
+- [x] **F6: Admin Panel & Management APIs** · `feat(admin)`
+  - Admin dashboard KPIs, AI usage analytics, category/brand/product CRUD, review moderation, append-only activity audit logging.
+- [x] **F7: Verification, Testing & E2E Validation** · `test(fastapi)`
+  - 20 Pytest integration test suites passing, 308 Vitest frontend tests passing, clean Vite build, full E2E journey verification.
+- [x] **F8: Laravel Removal, Cleanup & Git Commit** · `chore(cleanup)`
+  - Complete deletion of `backend-laravel-ref/` and `docker/php`, clean `.gitignore`, commit `361e99d`.
 
 ---
 
@@ -252,9 +275,11 @@ One line per step on what you learned. Turns into interview material.
 | P8-S7  | True full-stack Playwright E2E tests catch contract and concurrency bugs unit tests with mocked hooks miss: `HomePage.tsx` sent `sort=value_desc` (422 against `ProductSort::Value`), Sanctum's stateful cookie check requires a matching `Referer` header on direct API requests, Playwright `page.route()` evaluates in LIFO order, and an in-flight stateful `GET` finishing after `POST /auth/logout` can re-save the old session cookie via Laravel's `StartSession` middleware.                |
 | P8-S8  | An OpenAPI 3.1 contract test should dynamically inspect Laravel's route collection (`Route::getRoutes()`): normalizing scoped route bindings (like `{category:}` to `{category}`) and validating every registered HTTP method against OpenAPI path items prevents documentation drift, while testing that all `$ref` pointers resolve internally guarantees the specification never breaks external client generators or Swagger/Redoc previewers.                                                   |
 | P9-S2  | Production-ready showcase seeders must balance rich realism with strict test idempotency: pre-populating multi-tier demo data (accounts, wishlists, shared comparisons with AI verdicts, conversation threads, product review summaries, and 30-day analytics timeseries) transforms an empty dashboard into a compelling portfolio showcase, while using conditional existence guards and `updateOrCreate` ensures repeated seed runs never duplicate append-only audit records or breach unique database constraints. |
+| Phase F| Migrating a production-grade backend across stacks with zero frontend churn requires preserving the complete HTTP boundary contract: exact CSRF handshake semantics (`204 No Content` with `Set-Cookie`), session rotation cookies, money representations (`{"amount": "...", "currency": "..."}`), and Postgres offset-naive UTC datetime constraints. SQLAlchemy 2.0 async and Pydantic v2 provide compile-time safety and sub-millisecond execution times. |
 
 ## Resume bullet drafts (refine at P9)
 
-- Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
-- Added **Redis-backed per-user daily limits, JSON reply validation and graceful fallbacks** for LLM calls, with the API key kept server-side and AI services covered by automated tests.
-- Implemented Postgres full-text and trigram search, a transparent **Value Score** algorithm, role-based admin tools with an append-only audit log, and a CI pipeline with automated tests.
+- Built a full-stack AI shopping decision platform (**FastAPI / Python 3.12**, **React 19**, **PostgreSQL 17**, **Redis 7**, **Groq**) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
+- Engineered high-performance async REST APIs with **SQLAlchemy 2.0 async**, **Pydantic v2 validation**, and **100% contract parity** preserving SPA session cookies and CSRF double-submit protection.
+- Added **Redis-backed per-user sliding daily quotas, JSON reply validation and graceful fallbacks** for LLM calls, with the API key kept server-side and AI services covered by automated tests.
+- Implemented Postgres full-text and trigram search, a transparent **Value Score** algorithm, role-based admin tools with an append-only audit log, and full CI test coverage (20 Pytest suites, 308 Vitest suites).

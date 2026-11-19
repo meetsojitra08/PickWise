@@ -55,3 +55,14 @@ Date: _(fill)_ · Status: Accepted
 **Context:** The developer wants to learn and show Redis. It also suits expiring data (rate limits, daily AI counters, cached catalog data) better than database tables.
 **Decision:** Add Redis to the stack. Laravel uses it for cache, queue, sessions and rate limiting. PostgreSQL remains the source of truth for all real data.
 **Consequences:** One more Docker service and a PHP extension (phpredis). Better performance and a stronger portfolio story. The app must keep working if Redis is cleared.
+
+## ADR-008: Full Backend Migration from Laravel 13 to FastAPI (Python 3.12+)
+Date: 2026-11-19 · Status: Accepted (Supersedes ADR-001 backend framework)
+**Context:** The project initially used Laravel 13 (PHP 8.3). To demonstrate high-performance asynchronous Python, modern type-safe API engineering with Pydantic v2, and native async streaming integration with the Groq Python SDK, the backend was completely migrated to FastAPI, replacing Laravel entirely.
+**Decision:**
+- Replaced Laravel 13 with **Python 3.12**, **FastAPI 0.115+**, **Pydantic v2**, and **SQLAlchemy 2.0 (async)** with `asyncpg`.
+- Maintained 100% REST API contract parity at `/api/v1/...` and `/sanctum/csrf-cookie` so the React 19 frontend operates without a single breaking change.
+- Preserved PostgreSQL 17 FTS (`tsvector`), `pg_trgm` fuzzy typo-matching, and Redis 7 session & quota caching.
+- Used official async `groq` Python SDK for LLM completions with JSON mode, catalog grounding, and daily quota limits.
+- Consolidated Docker services: replaced PHP-FPM, queue, and scheduler containers with a high-concurrency Uvicorn ASGI application container running on port 8000 behind Nginx.
+**Consequences:** True non-blocking asynchronous I/O across database queries, Redis caching, and Groq LLM inference. Unified developer experience with Python type hints and Pydantic validation. Fully eliminated PHP runtime and dependencies from the repository.

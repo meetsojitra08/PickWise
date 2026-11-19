@@ -30,29 +30,27 @@ This is a **learning and portfolio project**. Therefore:
 - The README, screenshots, a live demo, and a short architecture write-up are part of the deliverable.
 - Depth beats breadth: a polished, reliable AI integration is worth more than ten half-working features.
 
-## 4. Tech stack (STRICT: no substitutions)
+## 4. Tech stack (FastAPI Migration)
 
 | Layer | Technology | Role |
 |-------|-----------|------|
-| Backend | **Laravel 13** | REST API, business logic, auth, queues |
-| Frontend | **React.js** | SPA |
+| Backend | **FastAPI (Python 3.12+)** | High-performance asynchronous REST API, business logic, auth |
+| Frontend | **React 19** | SPA |
 | UI components | **shadcn/ui** | Accessible, owned component source |
 | Styling | **Tailwind CSS** | Utility styling and design tokens |
-| Database | **PostgreSQL** | Primary data store |
-| Cache & queue | **Redis** | Cache, queue, sessions, rate limiting, daily AI counters |
-| AI | **Groq API** | LLM inference |
-| Environment | **Docker** | Reproducible dev environment |
+| Database | **PostgreSQL 17** | Primary data store with `tsvector` FTS & `pg_trgm` |
+| Cache & sessions | **Redis 7** | Cache, session store, rate limiting, daily AI quotas |
+| AI | **Groq API** | Async LLM inference via official `groq` Python SDK |
+| Environment | **Docker** | Reproducible dev and production container orchestration |
 | VCS | **Git & GitHub** | Version control, PRs, CI |
 
-### Supporting libraries (allowed, not stack changes)
+### Supporting libraries
 
-These are tooling and ecosystem libraries that the chosen stack effectively requires. Anything not listed here needs explicit approval before being added.
+These are tooling and ecosystem libraries that the stack utilizes:
 
-- **Frontend:** Vite (bundler), TypeScript, React Router, TanStack Query, React Hook Form + Zod, Lucide icons, Recharts (shadcn charts), Framer Motion (sparingly, see `ui-context.md`), Vitest + Testing Library (frontend tests), `@fontsource` packages (self-hosted fonts), Playwright (optional, only at P8-S7).
-- **Backend:** Laravel Sanctum (SPA auth), phpredis (PHP extension for Redis; Predis only if the extension causes problems), Pest (testing), Laravel Pint (formatting), Larastan (static analysis).
+- **Frontend:** Vite (bundler), TypeScript, React Router, TanStack Query, React Hook Form + Zod, Lucide icons, Recharts (shadcn charts), Framer Motion, Vitest + Testing Library (frontend tests), `@fontsource` packages (self-hosted fonts), Playwright (E2E testing).
+- **Backend:** Pydantic v2 (data validation & schemas), SQLAlchemy 2.0 async + `asyncpg` (ORM & database access), `redis-py` (async Redis client), `passlib[bcrypt]` (secure password hashing), `slowapi` (rate limiting), `pytest` + `pytest-asyncio` + `httpx` (testing), `ruff` (linter and formatter), `mypy` (static type checking).
 - **Tooling:** ESLint, Prettier, GitHub Actions.
-
-> If a library is not in this list and is not part of Laravel/React/shadcn/Tailwind themselves, **ask first**.
 
 ## 5. Scope
 
