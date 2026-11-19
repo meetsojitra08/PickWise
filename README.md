@@ -9,6 +9,7 @@ that turns *"I need a laptop for video editing under ₹90,000"* into a short li
 grounded picks — with honest reasons and trade-offs.
 
 [![CI](https://github.com/meetsojitra08/pickwise/actions/workflows/ci.yml/badge.svg)](https://github.com/meetsojitra08/pickwise/actions/workflows/ci.yml)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7.svg)](https://pickwise-api-f5fx.onrender.com/docs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -34,6 +35,18 @@ grounded picks — with honest reasons and trade-offs.
 
 > Screenshots are taken at 1440 × 900 with the Docker demo stack running.
 > See [`docs/screenshots/README.md`](docs/screenshots/README.md) for the full list.
+
+---
+
+## Live demo
+
+The Pickwise backend is deployed live on **Render** with **Neon PostgreSQL** and **Upstash Redis**:
+
+- 🌐 **Live API Base:** [`https://pickwise-api-f5fx.onrender.com`](https://pickwise-api-f5fx.onrender.com)
+- 📖 **Interactive Swagger UI:** [`https://pickwise-api-f5fx.onrender.com/docs`](https://pickwise-api-f5fx.onrender.com/docs)
+- 📑 **Interactive ReDoc:** [`https://pickwise-api-f5fx.onrender.com/redoc`](https://pickwise-api-f5fx.onrender.com/redoc)
+- 🩺 **Health Check:** [`https://pickwise-api-f5fx.onrender.com/up`](https://pickwise-api-f5fx.onrender.com/up)
+- 🛍️ **Seeded Products API:** [`https://pickwise-api-f5fx.onrender.com/api/v1/products`](https://pickwise-api-f5fx.onrender.com/api/v1/products)
 
 ---
 
@@ -160,20 +173,18 @@ loading skeleton, ready, fallback, error with retry, and daily quota exceeded.
 
 ## Tech stack
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | **FastAPI (Python 3.12+)** — REST API, async I/O, background tasks |
-| ORM & Data | **SQLAlchemy 2.0 (async)** + **Pydantic v2** + **asyncpg** |
-| Frontend | **React 19** + **TypeScript** + **Vite** |
-| UI components | **shadcn/ui** (owned, accessible component source) |
-| Styling | **Tailwind CSS** + CSS custom-property design tokens |
-| Database | **PostgreSQL 17** — `tsvector` FTS, `pg_trgm`, composite GIN indexes |
-| Cache & sessions | **Redis 7** (asyncio connection pool) |
-| AI inference | **Groq API** (`llama-3.3-70b-versatile` via official async SDK) |
-| Environment | **Docker** + Docker Compose |
-| Backend tests | **pytest** + **pytest-asyncio** + **httpx** (20/20 passed) |
-| Frontend tests | **Vitest** + **Testing Library** + **Playwright** (308/308 passed) |
-| Reverse proxy | **Nginx** (proxies `/api`, `/sanctum`, and `/storage`) |
+| Layer | Technology | Role & Architecture |
+|-------|-----------|---------------------|
+| Backend API | **FastAPI (Python 3.12+)** | REST API, async I/O, background tasks, cookie auth, CSRF protection |
+| ORM & Validation | **SQLAlchemy 2.0 (async)** + **Pydantic v2** + **asyncpg** | Type-safe schema validation, async PostgreSQL engine |
+| Frontend | **React 19** + **TypeScript** + **Vite** | Single Page Application with TanStack Query and React Hook Form |
+| UI & Design | **shadcn/ui** + **Tailwind CSS** | Accessible component source, design tokens, light/dark themes |
+| Primary Database | **PostgreSQL 17** (Local Docker & **Neon Cloud**) | `tsvector` full-text search, `pg_trgm` fuzzy matching, GIN indexes |
+| Cache & Quotas | **Redis 7** (Local Docker & **Upstash Serverless**) | Session storage, token invalidation, sliding daily AI limits |
+| Cloud Hosting | **Render** | Production Web Service with automatic git-push CI/CD and health checks |
+| AI Inference | **Groq API** (`qwen/qwen3.8-27b`) | Sub-second (~350ms) inference with database-grounded prompts |
+| Containerization | **Docker** + Docker Compose | Fully reproducible local dev & multi-stage production images |
+| Test Suites | **pytest** (backend) + **Vitest / Playwright** (frontend) | 20 Pytest async suites + 308 Vitest component tests |
 
 ---
 

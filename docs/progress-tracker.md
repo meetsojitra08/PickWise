@@ -138,7 +138,7 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - [x] **P9-S1** README: screenshots, architecture diagram, AI design notes; add MIT LICENSE · `docs`
 - [x] **P9-S2** Demo seed data and demo accounts · `db`
 - [x] **P9-S3** Production Docker config and deployment notes · `build`
-- [ ] **P9-S4** Deploy a live demo (host of your choice; document in README) · `chore`
+- [x] **P9-S4** Deploy a live demo (host of your choice; document in README) · `chore`
 - [ ] **P9-S5** Short demo video + resume bullet points · `docs`
 - [ ] **P9-S6** Tag `v1.0.0` · `chore`
 
@@ -276,6 +276,7 @@ One line per step on what you learned. Turns into interview material.
 | P8-S8  | An OpenAPI 3.1 contract test should dynamically inspect Laravel's route collection (`Route::getRoutes()`): normalizing scoped route bindings (like `{category:}` to `{category}`) and validating every registered HTTP method against OpenAPI path items prevents documentation drift, while testing that all `$ref` pointers resolve internally guarantees the specification never breaks external client generators or Swagger/Redoc previewers.                                                   |
 | P9-S2  | Production-ready showcase seeders must balance rich realism with strict test idempotency: pre-populating multi-tier demo data (accounts, wishlists, shared comparisons with AI verdicts, conversation threads, product review summaries, and 30-day analytics timeseries) transforms an empty dashboard into a compelling portfolio showcase, while using conditional existence guards and `updateOrCreate` ensures repeated seed runs never duplicate append-only audit records or breach unique database constraints. |
 | P9-S3  | Deploying an async ASGI backend on cloud platforms like Render requires adapting connection strings (normalizing postgres:// to postgresql+asyncpg://), configuring uvicorn with proxy headers (--forwarded-allow-ips='*') for SSL and real client IP propagation, mounting static public assets, and enabling configurable SameSite=None session cookies for cross-origin SPA hosting. |
+| P9-S4  | Live cloud deployment on serverless infrastructure (Render + Neon PostgreSQL + Upstash Redis) requires robust query string sanitization for `asyncpg` to strip unsupported `libpq` arguments (`channel_binding`, `target_session_attrs`) and dynamic SSL parameter mapping (`ssl=require`), coupled with pre-start idempotent database seeding. |
 | Phase F| Migrating a production-grade backend across stacks with zero frontend churn requires preserving the complete HTTP boundary contract: exact CSRF handshake semantics (`204 No Content` with `Set-Cookie`), session rotation cookies, money representations (`{"amount": "...", "currency": "..."}`), and Postgres offset-naive UTC datetime constraints. SQLAlchemy 2.0 async and Pydantic v2 provide compile-time safety and sub-millisecond execution times. |
 
 ## Resume bullet drafts (refine at P9)
