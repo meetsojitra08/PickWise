@@ -1,7 +1,6 @@
-from typing import Dict, Optional
 from fastapi import APIRouter, Depends, Query, Request, Response, status
-from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.auth import get_current_user, get_optional_user
 from app.core.response import ApiResponse, PaginatedResponse, PaginationLinks, PaginationMeta
 from app.db.session import get_db, get_redis_client
@@ -35,7 +34,7 @@ async def compare_matrix(
 async def compare_verdict(
     payload: CompareVerdictPayload,
     request: Request,
-    current_user: Optional[User] = Depends(get_optional_user),
+    current_user: User | None = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
     redis = get_redis_client()
@@ -76,12 +75,18 @@ async def list_comparisons(
             first=f"/api/v1/comparisons?page=1&per_page={per_page}",
             last=f"/api/v1/comparisons?page={last_page}&per_page={per_page}",
             prev=f"/api/v1/comparisons?page={page - 1}&per_page={per_page}" if page > 1 else None,
-            next=f"/api/v1/comparisons?page={page + 1}&per_page={per_page}" if page < last_page else None,
+            next=f"/api/v1/comparisons?page={page + 1}&per_page={per_page}"
+            if page < last_page
+            else None,
         ),
     )
 
 
-@router.post("/comparisons", response_model=ApiResponse[SavedComparisonDetailOut], status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/comparisons",
+    response_model=ApiResponse[SavedComparisonDetailOut],
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_comparison(
     payload: CreateComparisonPayload,
     current_user: User = Depends(get_current_user),
@@ -134,7 +139,7 @@ async def delete_comparison(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.post("/comparisons/{id}/share", response_model=ApiResponse[Dict[str, str]])
+@router.post("/comparisons/{id}/share", response_model=ApiResponse[dict[str, str]])
 async def share_comparison(
     id: int,
     current_user: User = Depends(get_current_user),

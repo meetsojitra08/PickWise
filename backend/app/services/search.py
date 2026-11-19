@@ -1,10 +1,10 @@
-from typing import Any, Dict, List, Optional, Tuple
-from sqlalchemy import and_, desc, func, or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
 from app.core.exceptions import NotFoundException
 from app.core.response import MoneyAmount
-from app.models import Brand, Category, PriceHistory, Product, ProductImage, ProductSpec, ReviewSummary, SpecDefinition
+from app.models import Brand, Category, PriceHistory, Product, ProductSpec, SpecDefinition
 from app.schemas.catalog import (
     AvailabilityFacetOut,
     BrandFacetOut,
@@ -43,14 +43,24 @@ def to_product_card(product: Product) -> ProductCardOut:
     primary_img = None
     for img in product.images:
         if img.is_primary:
-            primary_img = PrimaryImageOut(id=img.id, url=format_media_url(img.path), alt_text=img.alt_text)
+            primary_img = PrimaryImageOut(
+                id=img.id, url=format_media_url(img.path), alt_text=img.alt_text
+            )
             break
     if not primary_img and product.images:
-        primary_img = PrimaryImageOut(id=product.images[0].id, url=format_media_url(product.images[0].path), alt_text=product.images[0].alt_text)
+        primary_img = PrimaryImageOut(
+            id=product.images[0].id,
+            url=format_media_url(product.images[0].path),
+            alt_text=product.images[0].alt_text,
+        )
 
     cat_data = None
     if product.category:
-        cat_data = {"id": product.category.id, "name": product.category.name, "slug": product.category.slug}
+        cat_data = {
+            "id": product.category.id,
+            "name": product.category.name,
+            "slug": product.category.slug,
+        }
 
     brand_data = None
     if product.brand:
@@ -80,10 +90,12 @@ def to_product_card(product: Product) -> ProductCardOut:
 
 class CatalogService:
     @classmethod
-    async def get_category_descendant_ids(cls, db: AsyncSession, root_category_id: int) -> List[int]:
+    async def get_category_descendant_ids(
+        cls, db: AsyncSession, root_category_id: int
+    ) -> list[int]:
         cats_stmt = select(Category.id, Category.parent_id).where(Category.is_active.is_(True))
         rows = (await db.execute(cats_stmt)).all()
-        child_map: Dict[int, List[int]] = {}
+        child_map: dict[int, list[int]] = {}
         for cid, pid in rows:
             if pid:
                 child_map.setdefault(pid, []).append(cid)
@@ -98,7 +110,7 @@ class CatalogService:
         return result
 
     @classmethod
-    async def get_categories_tree(cls, db: AsyncSession) -> List[CategoryOut]:
+    async def get_categories_tree(cls, db: AsyncSession) -> list[CategoryOut]:
         prod_count_stmt = (
             select(Product.category_id, func.count(Product.id).label("count"))
             .where(Product.is_published.is_(True), Product.deleted_at.is_(None))
@@ -114,8 +126,8 @@ class CatalogService:
         )
         categories = list((await db.execute(cats_stmt)).scalars().all())
 
-        cat_dict: Dict[int, CategoryOut] = {}
-        roots: List[CategoryOut] = []
+        cat_dict: dict[int, CategoryOut] = {}
+        roots: list[CategoryOut] = []
 
         for c in categories:
             node = CategoryOut(
@@ -153,18 +165,15 @@ class CatalogService:
         category_ids = await cls.get_category_descendant_ids(db, category.id)
 
         # Price range aggregate
-        price_stmt = (
-            select(
-                func.count(Product.id),
-                func.min(Product.price),
-                func.max(Product.price),
-                func.min(Product.currency),
-            )
-            .where(
-                Product.category_id.in_(category_ids),
-                Product.is_published.is_(True),
-                Product.deleted_at.is_(None),
-            )
+        price_stmt = select(
+            func.count(Product.id),
+            func.min(Product.price),
+            func.max(Product.price),
+            func.min(Product.currency),
+        ).where(
+            Product.category_id.in_(category_ids),
+            Product.is_published.is_(True),
+            Product.deleted_at.is_(None),
         )
         price_row = (await db.execute(price_stmt)).one()
         prod_count = price_row[0] or 0
@@ -173,8 +182,12 @@ class CatalogService:
         currency = price_row[3] or "USD"
 
         price_range = PriceRangeFacetOut(
-            min=MoneyAmount(amount=f"{float(min_p):.2f}", currency=currency) if min_p is not None else None,
-            max=MoneyAmount(amount=f"{float(max_p):.2f}", currency=currency) if max_p is not None else None,
+            min=MoneyAmount(amount=f"{float(min_p):.2f}", currency=currency)
+            if min_p is not None
+            else None,
+            max=MoneyAmount(amount=f"{float(max_p):.2f}", currency=currency)
+            if max_p is not None
+            else None,
         )
 
         # Brands
@@ -233,7 +246,7 @@ class CatalogService:
         )
         spec_defs = list((await db.execute(specs_stmt)).scalars().all())
 
-        spec_facets: List[SpecFacetOut] = []
+        spec_facets: list[SpecFacetOut] = []
         for s in spec_defs:
             if s.data_type == "number":
                 num_stmt = (
@@ -347,18 +360,18 @@ class CatalogService:
     async def search_products(
         cls,
         db: AsyncSession,
-        query_text: Optional[str] = None,
-        category_slug: Optional[str] = None,
-        brand_slugs: Optional[List[str]] = None,
-        price_min: Optional[float] = None,
-        price_max: Optional[float] = None,
-        rating_min: Optional[float] = None,
-        availability: Optional[str] = None,
-        spec_filters: Optional[Dict[str, str]] = None,
+        query_text: str | None = None,
+        category_slug: str | None = None,
+        brand_slugs: list[str] | None = None,
+        price_min: float | None = None,
+        price_max: float | None = None,
+        rating_min: float | None = None,
+        availability: str | None = None,
+        spec_filters: dict[str, str] | None = None,
         sort: str = "relevance",
         page: int = 1,
         per_page: int = 24,
-    ) -> Tuple[List[ProductCardOut], int, int]:
+    ) -> tuple[list[ProductCardOut], int, int]:
         stmt = (
             select(Product)
             .where(Product.is_published.is_(True), Product.deleted_at.is_(None))
@@ -455,18 +468,28 @@ class CatalogService:
         elif sort == "price_desc":
             stmt = stmt.order_by(Product.price.desc(), Product.id.asc())
         elif sort == "rating":
-            stmt = stmt.order_by(Product.rating_avg.desc(), Product.rating_count.desc(), Product.id.asc())
+            stmt = stmt.order_by(
+                Product.rating_avg.desc(), Product.rating_count.desc(), Product.id.asc()
+            )
         elif sort == "value":
-            stmt = stmt.order_by(Product.value_score.desc().nullslast(), Product.rating_avg.desc(), Product.id.asc())
+            stmt = stmt.order_by(
+                Product.value_score.desc().nullslast(), Product.rating_avg.desc(), Product.id.asc()
+            )
         elif sort == "newest":
             stmt = stmt.order_by(Product.created_at.desc(), Product.id.asc())
         else:
             if query_text and query_text.strip():
                 clean_q = query_text.strip()
-                rank_expr = func.ts_rank(Product.search_vector, func.plainto_tsquery("english", clean_q)) + func.similarity(Product.name, clean_q)
+                rank_expr = func.ts_rank(
+                    Product.search_vector, func.plainto_tsquery("english", clean_q)
+                ) + func.similarity(Product.name, clean_q)
                 stmt = stmt.order_by(rank_expr.desc(), Product.value_score.desc().nullslast())
             else:
-                stmt = stmt.order_by(Product.value_score.desc().nullslast(), Product.rating_avg.desc(), Product.id.asc())
+                stmt = stmt.order_by(
+                    Product.value_score.desc().nullslast(),
+                    Product.rating_avg.desc(),
+                    Product.id.asc(),
+                )
 
         # Pagination
         offset = (page - 1) * per_page
@@ -482,7 +505,9 @@ class CatalogService:
     async def get_product_detail(cls, db: AsyncSession, slug: str) -> ProductDetailOut:
         stmt = (
             select(Product)
-            .where(Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None))
+            .where(
+                Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None)
+            )
             .options(
                 selectinload(Product.category),
                 selectinload(Product.brand),
@@ -514,7 +539,13 @@ class CatalogService:
                 label=s.spec_definition.label,
                 unit=s.spec_definition.unit,
                 data_type=s.spec_definition.data_type,
-                value=s.value_bool if s.spec_definition.data_type == "boolean" else (float(s.value_number) if s.spec_definition.data_type == "number" and s.value_number is not None else s.value_text),
+                value=s.value_bool
+                if s.spec_definition.data_type == "boolean"
+                else (
+                    float(s.value_number)
+                    if s.spec_definition.data_type == "number" and s.value_number is not None
+                    else s.value_text
+                ),
                 is_comparable=s.spec_definition.is_comparable,
                 higher_is_better=s.spec_definition.higher_is_better,
             )
@@ -529,7 +560,9 @@ class CatalogService:
                 cons=product.summary_rel.cons,
                 sentiment=product.summary_rel.sentiment,
                 reviews_count=product.summary_rel.reviews_count,
-                generated_at=product.summary_rel.generated_at.isoformat() if product.summary_rel.generated_at else "",
+                generated_at=product.summary_rel.generated_at.isoformat()
+                if product.summary_rel.generated_at
+                else "",
             )
 
         return ProductDetailOut(
@@ -557,7 +590,9 @@ class CatalogService:
 
     @classmethod
     async def get_price_history(cls, db: AsyncSession, slug: str) -> ProductPriceHistoryOut:
-        prod_stmt = select(Product).where(Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None))
+        prod_stmt = select(Product).where(
+            Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None)
+        )
         product = (await db.execute(prod_stmt)).scalar_one_or_none()
         if not product:
             raise NotFoundException(f"Product '{slug}' not found.")
@@ -578,8 +613,10 @@ class CatalogService:
         return ProductPriceHistoryOut(currency=product.currency, points=points)
 
     @classmethod
-    async def get_similar_products(cls, db: AsyncSession, slug: str) -> List[ProductCardOut]:
-        prod_stmt = select(Product).where(Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None))
+    async def get_similar_products(cls, db: AsyncSession, slug: str) -> list[ProductCardOut]:
+        prod_stmt = select(Product).where(
+            Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None)
+        )
         current = (await db.execute(prod_stmt)).scalar_one_or_none()
         if not current:
             raise NotFoundException(f"Product '{slug}' not found.")

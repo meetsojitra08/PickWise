@@ -1,7 +1,6 @@
 import secrets
-from typing import Optional
+
 import bcrypt
-from app.core.config import settings
 
 
 def hash_password(password: str) -> str:

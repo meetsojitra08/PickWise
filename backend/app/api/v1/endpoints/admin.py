@@ -1,11 +1,13 @@
 import os
 import shutil
 import uuid
-from typing import Any, Dict, List, Optional
-from fastapi import APIRouter, Depends, File, Form, Query, Request, Response, UploadFile, status
+from typing import Any
+
+from fastapi import APIRouter, Depends, File, Form, Query, Response, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.auth import require_admin
-from app.core.response import ApiResponse, PaginatedResponse, PaginationLinks, PaginationMeta
+from app.core.response import ApiResponse, PaginatedResponse, PaginationMeta
 from app.db.session import get_db
 from app.models import User
 from app.schemas.admin import (
@@ -46,9 +48,9 @@ async def get_dashboard(db: AsyncSession = Depends(get_db)):
 # ---------------- Categories ----------------
 @router.get("/categories", response_model=PaginatedResponse[AdminCategory])
 async def list_categories(
-    search: Optional[str] = Query(None),
-    is_active: Optional[bool] = Query(None),
-    parent_id: Optional[str] = Query(None),
+    search: str | None = Query(None),
+    is_active: bool | None = Query(None),
+    parent_id: str | None = Query(None),
     page: int = Query(1, ge=1),
     per_page: int = Query(50, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
@@ -62,7 +64,9 @@ async def list_categories(
     )
 
 
-@router.post("/categories", response_model=ApiResponse[AdminCategory], status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/categories", response_model=ApiResponse[AdminCategory], status_code=status.HTTP_201_CREATED
+)
 async def create_category(
     data: AdminCategoryFormData,
     admin: User = Depends(require_admin),
@@ -75,7 +79,7 @@ async def create_category(
 @router.patch("/categories/{id}", response_model=ApiResponse[AdminCategory])
 async def update_category(
     id: int,
-    data: Dict[str, Any],
+    data: dict[str, Any],
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
@@ -94,17 +98,23 @@ async def delete_category(
 
 
 # ---------------- Category Specs ----------------
-@router.get("/categories/{category_id}/specs", response_model=ApiResponse[List[AdminSpecDefinition]])
+@router.get(
+    "/categories/{category_id}/specs", response_model=ApiResponse[list[AdminSpecDefinition]]
+)
 async def list_category_specs(
     category_id: int,
-    search: Optional[str] = Query(None),
+    search: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     specs = await AdminService.list_category_specs(db, category_id, search=search)
     return ApiResponse(data=specs)
 
 
-@router.post("/categories/{category_id}/specs", response_model=ApiResponse[AdminSpecDefinition], status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/categories/{category_id}/specs",
+    response_model=ApiResponse[AdminSpecDefinition],
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_category_spec(
     category_id: int,
     data: AdminSpecDefinitionFormData,
@@ -115,11 +125,13 @@ async def create_category_spec(
     return ApiResponse(data=spec)
 
 
-@router.patch("/categories/{category_id}/specs/{spec_id}", response_model=ApiResponse[AdminSpecDefinition])
+@router.patch(
+    "/categories/{category_id}/specs/{spec_id}", response_model=ApiResponse[AdminSpecDefinition]
+)
 async def update_category_spec(
     category_id: int,
     spec_id: int,
-    data: Dict[str, Any],
+    data: dict[str, Any],
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
@@ -141,13 +153,15 @@ async def delete_category_spec(
 # ---------------- Brands ----------------
 @router.get("/brands", response_model=PaginatedResponse[AdminBrand])
 async def list_brands(
-    search: Optional[str] = Query(None),
-    sort: Optional[str] = Query(None),
+    search: str | None = Query(None),
+    sort: str | None = Query(None),
     page: int = Query(1, ge=1),
     per_page: int = Query(50, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):
-    items, total, last_page = await AdminService.list_brands(db, search=search, sort=sort, page=page, per_page=per_page)
+    items, total, last_page = await AdminService.list_brands(
+        db, search=search, sort=sort, page=page, per_page=per_page
+    )
     return PaginatedResponse(
         data=items,
         meta=PaginationMeta(current_page=page, per_page=per_page, total=total, last_page=last_page),
@@ -167,7 +181,7 @@ async def create_brand(
 @router.patch("/brands/{id}", response_model=ApiResponse[AdminBrand])
 async def update_brand(
     id: int,
-    data: Dict[str, Any],
+    data: dict[str, Any],
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
@@ -188,21 +202,28 @@ async def delete_brand(
 # ---------------- Products ----------------
 @router.get("/products", response_model=PaginatedResponse[AdminProduct])
 async def list_products(
-    search: Optional[str] = Query(None),
-    category_id: Optional[int] = Query(None),
-    brand_id: Optional[int] = Query(None),
-    is_published: Optional[bool] = Query(None),
-    availability: Optional[str] = Query(None),
-    trashed: Optional[str] = Query(None),
-    sort: Optional[str] = Query(None),
+    search: str | None = Query(None),
+    category_id: int | None = Query(None),
+    brand_id: int | None = Query(None),
+    is_published: bool | None = Query(None),
+    availability: str | None = Query(None),
+    trashed: str | None = Query(None),
+    sort: str | None = Query(None),
     page: int = Query(1, ge=1),
     per_page: int = Query(24, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):
     items, total, last_page = await AdminService.list_products(
-        db, search=search, category_id=category_id, brand_id=brand_id,
-        is_published=is_published, availability=availability, trashed=trashed,
-        sort=sort, page=page, per_page=per_page
+        db,
+        search=search,
+        category_id=category_id,
+        brand_id=brand_id,
+        is_published=is_published,
+        availability=availability,
+        trashed=trashed,
+        sort=sort,
+        page=page,
+        per_page=per_page,
     )
     return PaginatedResponse(
         data=items,
@@ -219,7 +240,9 @@ async def get_product(
     return ApiResponse(data=p)
 
 
-@router.post("/products", response_model=ApiResponse[AdminProduct], status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/products", response_model=ApiResponse[AdminProduct], status_code=status.HTTP_201_CREATED
+)
 async def create_product(
     data: AdminProductFormData,
     admin: User = Depends(require_admin),
@@ -242,7 +265,7 @@ async def bulk_update_product_status(
 @router.patch("/products/{id}", response_model=ApiResponse[AdminProduct])
 async def update_product(
     id: int,
-    data: Dict[str, Any],
+    data: dict[str, Any],
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
@@ -261,7 +284,7 @@ async def delete_product(
 
 
 # ---------------- Product Images ----------------
-@router.get("/products/{product_id}/images", response_model=ApiResponse[List[AdminProductImage]])
+@router.get("/products/{product_id}/images", response_model=ApiResponse[list[AdminProductImage]])
 async def list_product_images(
     product_id: int,
     db: AsyncSession = Depends(get_db),
@@ -270,7 +293,11 @@ async def list_product_images(
     return ApiResponse(data=imgs)
 
 
-@router.post("/products/{product_id}/images", response_model=ApiResponse[AdminProductImage], status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/products/{product_id}/images",
+    response_model=ApiResponse[AdminProductImage],
+    status_code=status.HTTP_201_CREATED,
+)
 async def upload_product_image(
     product_id: int,
     file: UploadFile = File(...),
@@ -295,7 +322,9 @@ async def upload_product_image(
     return ApiResponse(data=img)
 
 
-@router.patch("/products/{product_id}/images/reorder", response_model=ApiResponse[List[AdminProductImage]])
+@router.patch(
+    "/products/{product_id}/images/reorder", response_model=ApiResponse[list[AdminProductImage]]
+)
 async def reorder_product_images(
     product_id: int,
     payload: AdminProductImageReorderPayload,
@@ -308,7 +337,9 @@ async def reorder_product_images(
     return ApiResponse(data=imgs)
 
 
-@router.patch("/products/{product_id}/images/{image_id}", response_model=ApiResponse[AdminProductImage])
+@router.patch(
+    "/products/{product_id}/images/{image_id}", response_model=ApiResponse[AdminProductImage]
+)
 async def update_product_image(
     product_id: int,
     image_id: int,
@@ -317,8 +348,13 @@ async def update_product_image(
     db: AsyncSession = Depends(get_db),
 ):
     img = await AdminService.update_product_image(
-        db, admin, product_id, image_id,
-        alt_text=payload.alt_text, is_primary=payload.is_primary, sort_order=payload.sort_order
+        db,
+        admin,
+        product_id,
+        image_id,
+        alt_text=payload.alt_text,
+        is_primary=payload.is_primary,
+        sort_order=payload.sort_order,
     )
     return ApiResponse(data=img)
 
@@ -337,10 +373,10 @@ async def delete_product_image(
 # ---------------- Users ----------------
 @router.get("/users", response_model=PaginatedResponse[AdminUser])
 async def list_users(
-    search: Optional[str] = Query(None),
-    role: Optional[str] = Query(None),
-    is_active: Optional[bool] = Query(None),
-    sort: Optional[str] = Query(None),
+    search: str | None = Query(None),
+    role: str | None = Query(None),
+    is_active: bool | None = Query(None),
+    sort: str | None = Query(None),
     page: int = Query(1, ge=1),
     per_page: int = Query(25, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
@@ -361,24 +397,33 @@ async def update_user(
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    u = await AdminService.update_user(db, admin, user_id, is_active=payload.is_active, role=payload.role)
+    u = await AdminService.update_user(
+        db, admin, user_id, is_active=payload.is_active, role=payload.role
+    )
     return ApiResponse(data=u)
 
 
 # ---------------- Reviews Moderation ----------------
 @router.get("/reviews", response_model=PaginatedResponse[AdminReview])
 async def list_reviews(
-    status: Optional[str] = Query(None),
-    search: Optional[str] = Query(None),
-    rating: Optional[int] = Query(None),
-    product_id: Optional[int] = Query(None),
-    sort: Optional[str] = Query(None),
+    status: str | None = Query(None),
+    search: str | None = Query(None),
+    rating: int | None = Query(None),
+    product_id: int | None = Query(None),
+    sort: str | None = Query(None),
     page: int = Query(1, ge=1),
     per_page: int = Query(25, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):
     items, total, last_page = await AdminService.list_reviews(
-        db, status=status, search=search, rating=rating, product_id=product_id, sort=sort, page=page, per_page=per_page
+        db,
+        status=status,
+        search=search,
+        rating=rating,
+        product_id=product_id,
+        sort=sort,
+        page=page,
+        per_page=per_page,
     )
     return PaginatedResponse(
         data=items,
@@ -417,7 +462,10 @@ async def delete_review(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.post("/products/{product_id}/regenerate-summary", response_model=ApiResponse[RegenerateSummaryResponse])
+@router.post(
+    "/products/{product_id}/regenerate-summary",
+    response_model=ApiResponse[RegenerateSummaryResponse],
+)
 async def regenerate_summary(
     product_id: int,
     admin: User = Depends(require_admin),
@@ -436,37 +484,50 @@ async def regenerate_summary(
 # ---------------- AI Usage & Activity Logs ----------------
 @router.get("/ai/usage", response_model=ApiResponse[AdminAiUsageData])
 async def get_ai_usage(
-    start_date: Optional[str] = Query(None),
-    end_date: Optional[str] = Query(None),
-    feature: Optional[str] = Query(None),
-    status: Optional[str] = Query(None),
-    user_id: Optional[int] = Query(None),
+    start_date: str | None = Query(None),
+    end_date: str | None = Query(None),
+    feature: str | None = Query(None),
+    status: str | None = Query(None),
+    user_id: int | None = Query(None),
     page: int = Query(1, ge=1),
     per_page: int = Query(25, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):
     data = await AdminService.get_ai_usage(
-        db, start_date=start_date, end_date=end_date, feature=feature,
-        status=status, user_id=user_id, page=page, per_page=per_page
+        db,
+        start_date=start_date,
+        end_date=end_date,
+        feature=feature,
+        status=status,
+        user_id=user_id,
+        page=page,
+        per_page=per_page,
     )
     return ApiResponse(data=data)
 
 
 @router.get("/activity-logs", response_model=PaginatedResponse[AdminActivityItem])
 async def get_activity_logs(
-    start_date: Optional[str] = Query(None),
-    end_date: Optional[str] = Query(None),
-    admin_id: Optional[int] = Query(None),
-    action: Optional[str] = Query(None),
-    subject_type: Optional[str] = Query(None),
-    search: Optional[str] = Query(None),
+    start_date: str | None = Query(None),
+    end_date: str | None = Query(None),
+    admin_id: int | None = Query(None),
+    action: str | None = Query(None),
+    subject_type: str | None = Query(None),
+    search: str | None = Query(None),
     page: int = Query(1, ge=1),
     per_page: int = Query(25, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):
     items, total, last_page = await AdminService.get_activity_logs(
-        db, start_date=start_date, end_date=end_date, admin_id=admin_id,
-        action=action, subject_type=subject_type, search=search, page=page, per_page=per_page
+        db,
+        start_date=start_date,
+        end_date=end_date,
+        admin_id=admin_id,
+        action=action,
+        subject_type=subject_type,
+        search=search,
+        page=page,
+        per_page=per_page,
     )
     return PaginatedResponse(
         data=items,

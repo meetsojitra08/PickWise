@@ -1,4 +1,5 @@
 import pytest
+
 from app.db.session import close_redis_client, engine
 
 

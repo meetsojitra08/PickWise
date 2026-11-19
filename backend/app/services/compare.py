@@ -1,11 +1,19 @@
 import secrets
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
+
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
 from app.core.exceptions import ForbiddenException, NotFoundException, ValidationException
-from app.models import Category, Comparison, ComparisonItem, Product, ProductSpec, SpecDefinition, User
-from app.schemas.catalog import ProductCardOut
+from app.models import (
+    Comparison,
+    ComparisonItem,
+    Product,
+    ProductSpec,
+    SpecDefinition,
+    User,
+)
 from app.schemas.compare import (
     CompareCategory,
     CompareMatrixData,
@@ -23,7 +31,7 @@ class CompareService:
     async def build_compare_matrix(
         cls,
         db: AsyncSession,
-        product_ids: List[int],
+        product_ids: list[int],
     ) -> CompareMatrixData:
         if len(product_ids) < 2 or len(product_ids) > 4:
             raise ValidationException("Comparisons must contain between 2 and 4 products.")
@@ -59,7 +67,9 @@ class CompareService:
 
         for p in ordered_prods[1:]:
             if p.category_id != category.id:
-                raise ValidationException("All products in a comparison must belong to the same category.")
+                raise ValidationException(
+                    "All products in a comparison must belong to the same category."
+                )
 
         # Load comparable spec definitions
         spec_defs_stmt = (
@@ -73,19 +83,19 @@ class CompareService:
         spec_defs = list((await db.execute(spec_defs_stmt)).scalars().all())
 
         # Map specs by product and spec_definition_id
-        specs_by_prod: Dict[int, Dict[int, ProductSpec]] = {}
+        specs_by_prod: dict[int, dict[int, ProductSpec]] = {}
         for p in ordered_prods:
             specs_by_prod[p.id] = {s.spec_definition_id: s for s in p.specs}
 
-        rows: List[CompareRow] = []
+        rows: list[CompareRow] = []
 
         for defn in spec_defs:
-            row_values: List[CompareRowValue] = []
+            row_values: list[CompareRowValue] = []
             has_value = False
 
             for p in ordered_prods:
                 spec = specs_by_prod[p.id].get(defn.id)
-                val: Optional[Union[str, int, float, bool]] = None
+                val: str | int | float | bool | None = None
                 if spec:
                     if defn.data_type == "boolean":
                         val = spec.value_bool
@@ -105,10 +115,10 @@ class CompareService:
                 continue
 
             # Determine winner
-            winner_id: Optional[int] = None
+            winner_id: int | None = None
             if defn.higher_is_better is not None and defn.data_type in ("number", "boolean"):
                 best_val = None
-                best_ids: List[int] = []
+                best_ids: list[int] = []
 
                 for rv in row_values:
                     v = rv.value
@@ -123,10 +133,12 @@ class CompareService:
                     else:
                         if numeric_comp == best_val:
                             best_ids.append(rv.product_id)
-                        elif defn.higher_is_better and numeric_comp > best_val:
-                            best_val = numeric_comp
-                            best_ids = [rv.product_id]
-                        elif not defn.higher_is_better and numeric_comp < best_val:
+                        elif (
+                            defn.higher_is_better
+                            and numeric_comp > best_val
+                            or not defn.higher_is_better
+                            and numeric_comp < best_val
+                        ):
                             best_val = numeric_comp
                             best_ids = [rv.product_id]
 
@@ -157,7 +169,7 @@ class CompareService:
         user: User,
         page: int = 1,
         per_page: int = 12,
-    ) -> Tuple[List[SavedComparisonOut], int, int]:
+    ) -> tuple[list[SavedComparisonOut], int, int]:
         count_stmt = select(func.count(Comparison.id)).where(Comparison.user_id == user.id)
         total = (await db.execute(count_stmt)).scalar() or 0
 
@@ -180,7 +192,7 @@ class CompareService:
         offset = (page - 1) * per_page
         comparisons = list((await db.execute(stmt.offset(offset).limit(per_page))).scalars().all())
 
-        results: List[SavedComparisonOut] = []
+        results: list[SavedComparisonOut] = []
         for c in comparisons:
             sorted_items = sorted(c.items, key=lambda x: x.position)
             available_cards = [
@@ -215,20 +227,17 @@ class CompareService:
         db: AsyncSession,
         user: User,
         name: str,
-        product_ids: List[int],
-        ai_verdict: Optional[Dict[str, Any]] = None,
+        product_ids: list[int],
+        ai_verdict: dict[str, Any] | None = None,
     ) -> SavedComparisonDetailOut:
         if len(product_ids) < 2 or len(product_ids) > 4:
             raise ValidationException("Comparisons must contain between 2 and 4 products.")
 
         # Check products exist
-        check_stmt = (
-            select(Product.id)
-            .where(
-                Product.id.in_(product_ids),
-                Product.is_published.is_(True),
-                Product.deleted_at.is_(None),
-            )
+        check_stmt = select(Product.id).where(
+            Product.id.in_(product_ids),
+            Product.is_published.is_(True),
+            Product.deleted_at.is_(None),
         )
         found_ids = set((await db.execute(check_stmt)).scalars().all())
         if len(found_ids) != len(product_ids):
@@ -260,7 +269,7 @@ class CompareService:
         cls,
         db: AsyncSession,
         comparison_id: int,
-        user: Optional[User] = None,
+        user: User | None = None,
     ) -> SavedComparisonDetailOut:
         stmt = (
             select(Comparison)
@@ -322,8 +331,8 @@ class CompareService:
         db: AsyncSession,
         comparison_id: int,
         user: User,
-        name: Optional[str] = None,
-        product_ids: Optional[List[int]] = None,
+        name: str | None = None,
+        product_ids: list[int] | None = None,
     ) -> SavedComparisonDetailOut:
         stmt = (
             select(Comparison)
@@ -345,13 +354,10 @@ class CompareService:
                 raise ValidationException("Comparisons must contain between 2 and 4 products.")
 
             # Check products exist
-            check_stmt = (
-                select(Product.id)
-                .where(
-                    Product.id.in_(product_ids),
-                    Product.is_published.is_(True),
-                    Product.deleted_at.is_(None),
-                )
+            check_stmt = select(Product.id).where(
+                Product.id.in_(product_ids),
+                Product.is_published.is_(True),
+                Product.deleted_at.is_(None),
             )
             found_ids = set((await db.execute(check_stmt)).scalars().all())
             if len(found_ids) != len(product_ids):
@@ -405,7 +411,9 @@ class CompareService:
         return comp.share_token
 
     @classmethod
-    async def stop_sharing_comparison(cls, db: AsyncSession, comparison_id: int, user: User) -> None:
+    async def stop_sharing_comparison(
+        cls, db: AsyncSession, comparison_id: int, user: User
+    ) -> None:
         stmt = select(Comparison).where(Comparison.id == comparison_id)
         comp = (await db.execute(stmt)).scalar_one_or_none()
         if not comp:
@@ -436,7 +444,7 @@ class CompareService:
         )
         comp = (await db.execute(stmt)).scalar_one_or_none()
         if not comp:
-            raise NotFoundException(f"Shared comparison not found.")
+            raise NotFoundException("Shared comparison not found.")
 
         sorted_items = sorted(comp.items, key=lambda x: x.position)
         available_prods = [

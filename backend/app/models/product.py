@@ -1,8 +1,19 @@
-from typing import Any, Dict, List, Optional
 from datetime import date, datetime
-from sqlalchemy import BigInteger, Boolean, Date, DateTime, ForeignKey, Integer, Numeric, String, Text
+
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Date,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Text,
+)
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.base import Base, TimestampMixin
 
 
@@ -23,26 +34,40 @@ class Product(Base, TimestampMixin):
     price: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(3), default="INR", nullable=False)
     availability: Mapped[str] = mapped_column(String(20), default="in_stock", nullable=False)
-    store_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
+    store_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     rating_avg: Mapped[float] = mapped_column(Numeric(3, 2), default=0.00, nullable=False)
     rating_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    value_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    value_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_published: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     search_vector = mapped_column(TSVECTOR, nullable=True)
 
     # Relationships
     category = relationship("Category", back_populates="products")
     brand = relationship("Brand", back_populates="products")
-    images = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan", order_by="ProductImage.sort_order")
+    images = relationship(
+        "ProductImage",
+        back_populates="product",
+        cascade="all, delete-orphan",
+        order_by="ProductImage.sort_order",
+    )
     specs = relationship("ProductSpec", back_populates="product", cascade="all, delete-orphan")
     price_history = relationship(
-        "PriceHistory", back_populates="product", cascade="all, delete-orphan", order_by="PriceHistory.recorded_at"
+        "PriceHistory",
+        back_populates="product",
+        cascade="all, delete-orphan",
+        order_by="PriceHistory.recorded_at",
     )
     reviews = relationship("Review", back_populates="product", cascade="all, delete-orphan")
-    summary_rel = relationship("ReviewSummary", back_populates="product", uselist=False, cascade="all, delete-orphan")
-    wishlist_items = relationship("WishlistItem", back_populates="product", cascade="all, delete-orphan")
-    comparison_items = relationship("ComparisonItem", back_populates="product", cascade="all, delete-orphan")
+    summary_rel = relationship(
+        "ReviewSummary", back_populates="product", uselist=False, cascade="all, delete-orphan"
+    )
+    wishlist_items = relationship(
+        "WishlistItem", back_populates="product", cascade="all, delete-orphan"
+    )
+    comparison_items = relationship(
+        "ComparisonItem", back_populates="product", cascade="all, delete-orphan"
+    )
 
 
 class ProductImage(Base, TimestampMixin):

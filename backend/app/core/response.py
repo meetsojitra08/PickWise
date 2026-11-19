@@ -1,7 +1,6 @@
-from typing import Any, Dict, Generic, List, Optional, TypeVar
-from pydantic import BaseModel
+from typing import Any
 
-T = TypeVar("T")
+from pydantic import BaseModel
 
 
 class PaginationMeta(BaseModel):
@@ -12,27 +11,27 @@ class PaginationMeta(BaseModel):
 
 
 class PaginationLinks(BaseModel):
-    first: Optional[str] = None
-    last: Optional[str] = None
-    prev: Optional[str] = None
-    next: Optional[str] = None
+    first: str | None = None
+    last: str | None = None
+    prev: str | None = None
+    next: str | None = None
 
 
-class ApiResponse(BaseModel, Generic[T]):
+class ApiResponse[T](BaseModel):
     data: T
 
 
-class PaginatedResponse(BaseModel, Generic[T]):
-    data: List[T]
+class PaginatedResponse[T](BaseModel):
+    data: list[T]
     meta: PaginationMeta
-    links: Optional[PaginationLinks] = None
+    links: PaginationLinks | None = None
 
 
 class ErrorDetail(BaseModel):
     code: str
     message: str
-    details: Optional[Dict[str, Any]] = None
-    request_id: Optional[str] = None
+    details: dict[str, Any] | None = None
+    request_id: str | None = None
 
 
 class ErrorEnvelope(BaseModel):

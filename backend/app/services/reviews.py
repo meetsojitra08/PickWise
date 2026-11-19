@@ -1,7 +1,7 @@
-from typing import Optional, Tuple
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
 from app.core.exceptions import ForbiddenException, NotFoundException, ValidationException
 from app.models import Product, Review, User
 from app.schemas.reviews import (
@@ -15,13 +15,10 @@ from app.schemas.reviews import (
 class ReviewService:
     @classmethod
     async def recalculate_rating(cls, db: AsyncSession, product_id: int) -> None:
-        agg_stmt = (
-            select(
-                func.count(Review.id).label("rating_count"),
-                func.coalesce(func.avg(Review.rating), 0).label("rating_avg"),
-            )
-            .where(Review.product_id == product_id, Review.status == "approved")
-        )
+        agg_stmt = select(
+            func.count(Review.id).label("rating_count"),
+            func.coalesce(func.avg(Review.rating), 0).label("rating_avg"),
+        ).where(Review.product_id == product_id, Review.status == "approved")
         agg_res = (await db.execute(agg_stmt)).one()
         prod_stmt = select(Product).where(Product.id == product_id)
         product = (await db.execute(prod_stmt)).scalar_one_or_none()
@@ -37,9 +34,11 @@ class ReviewService:
         slug: str,
         page: int = 1,
         per_page: int = 10,
-        current_user: Optional[User] = None,
+        current_user: User | None = None,
     ) -> ProductReviewsResponse:
-        prod_stmt = select(Product).where(Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None))
+        prod_stmt = select(Product).where(
+            Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None)
+        )
         product = (await db.execute(prod_stmt)).scalar_one_or_none()
         if not product:
             raise NotFoundException(f"Product '{slug}' not found.")
@@ -100,9 +99,13 @@ class ReviewService:
                     title=pending_rev.title,
                     body=pending_rev.body,
                     status=pending_rev.status,
-                    author_name=pending_rev.user.name if pending_rev.user else (pending_rev.author_name or "Customer"),
+                    author_name=pending_rev.user.name
+                    if pending_rev.user
+                    else (pending_rev.author_name or "Customer"),
                     is_own=True,
-                    created_at=pending_rev.created_at.isoformat() if pending_rev.created_at else None,
+                    created_at=pending_rev.created_at.isoformat()
+                    if pending_rev.created_at
+                    else None,
                 )
 
         review_outs = [
@@ -139,7 +142,9 @@ class ReviewService:
         user: User,
         payload: ReviewPayload,
     ) -> ReviewOut:
-        prod_stmt = select(Product).where(Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None))
+        prod_stmt = select(Product).where(
+            Product.slug == slug, Product.is_published.is_(True), Product.deleted_at.is_(None)
+        )
         product = (await db.execute(prod_stmt)).scalar_one_or_none()
         if not product:
             raise NotFoundException(f"Product '{slug}' not found.")
@@ -149,7 +154,10 @@ class ReviewService:
             select(Review.id).where(Review.product_id == product.id, Review.user_id == user.id)
         )
         if existing.scalar_one_or_none() is not None:
-            raise ValidationException("You have already reviewed this product.", details={"review": ["You have already reviewed this product."]})
+            raise ValidationException(
+                "You have already reviewed this product.",
+                details={"review": ["You have already reviewed this product."]},
+            )
 
         review = Review(
             product_id=product.id,

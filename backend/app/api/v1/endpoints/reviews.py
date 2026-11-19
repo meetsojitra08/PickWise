@@ -1,6 +1,6 @@
-from typing import Optional
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.auth import get_current_user, get_optional_user
 from app.core.response import ApiResponse
 from app.db.session import get_db
@@ -20,7 +20,7 @@ async def list_product_reviews(
     slug: str,
     page: int = Query(1, ge=1),
     per_page: int = Query(10, ge=1, le=50),
-    current_user: Optional[User] = Depends(get_optional_user),
+    current_user: User | None = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
     return await ReviewService.get_product_reviews(
@@ -32,7 +32,11 @@ async def list_product_reviews(
     )
 
 
-@router.post("/products/{slug}/reviews", response_model=ApiResponse[ReviewOut], status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/products/{slug}/reviews",
+    response_model=ApiResponse[ReviewOut],
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_product_review(
     slug: str,
     payload: ReviewPayload,

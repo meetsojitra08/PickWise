@@ -1,6 +1,8 @@
 import uuid
+
 import pytest
 from httpx import ASGITransport, AsyncClient
+
 from app.main import app
 
 
@@ -11,7 +13,6 @@ async def test_assistant_and_verdict_flow():
         # 1. CSRF cookie
         csrf_res = await client.get("/sanctum/csrf-cookie")
         xsrf = csrf_res.cookies.get("XSRF-TOKEN")
-        headers = {"X-XSRF-TOKEN": xsrf}
 
         # 2. Check quota (guest)
         quota_res = await client.get("/api/v1/assistant/quota", headers={"X-Session-Key": sess_key})
@@ -48,7 +49,11 @@ async def test_assistant_and_verdict_flow():
         # 5. Send message
         msg_res = await client.post(
             f"/api/v1/assistant/conversations/{conv_id}/messages",
-            json={"message": "Recommend a smartphone under 100000", "category": "smartphones", "budget_max": 100000},
+            json={
+                "message": "Recommend a smartphone under 100000",
+                "category": "smartphones",
+                "budget_max": 100000,
+            },
             headers={"X-XSRF-TOKEN": xsrf, "X-Session-Key": sess_key},
         )
         assert msg_res.status_code == 201

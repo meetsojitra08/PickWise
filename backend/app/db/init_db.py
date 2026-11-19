@@ -1,26 +1,9 @@
 import asyncio
+
 from sqlalchemy import text
+
 from app.db.base import Base
 from app.db.session import engine
-from app.models import (
-    AdminActivityLog,
-    AiConversation,
-    AiMessage,
-    AiUsageLog,
-    Brand,
-    Category,
-    Comparison,
-    ComparisonItem,
-    PriceHistory,
-    Product,
-    ProductImage,
-    ProductSpec,
-    Review,
-    ReviewSummary,
-    SpecDefinition,
-    User,
-    WishlistItem,
-)
 
 
 async def init_database():
@@ -55,9 +38,15 @@ async def init_database():
 
                 RETURN
                     setweight(to_tsvector('english', unaccent(coalesce(p_name, ''))), 'A')
-                    || setweight(to_tsvector('english', unaccent(coalesce(v_brand_name, ''))), 'A')
-                    || setweight(to_tsvector('english', unaccent(coalesce(v_category_name, ''))), 'B')
-                    || setweight(to_tsvector('english', unaccent(coalesce(p_description, ''))), 'C');
+                    || setweight(
+                        to_tsvector('english', unaccent(coalesce(v_brand_name, ''))), 'A'
+                    )
+                    || setweight(
+                        to_tsvector('english', unaccent(coalesce(v_category_name, ''))), 'B'
+                    )
+                    || setweight(
+                        to_tsvector('english', unaccent(coalesce(p_description, ''))), 'C'
+                    );
             END;
             $$;
             """
@@ -103,22 +92,26 @@ async def init_database():
         # Performance and Search Indexes
         await conn.execute(
             text(
-                "CREATE INDEX IF NOT EXISTS products_search_vector_gin_idx ON products USING gin (search_vector);"
+                "CREATE INDEX IF NOT EXISTS products_search_vector_gin_idx "
+                "ON products USING gin (search_vector);"
             )
         )
         await conn.execute(
             text(
-                "CREATE INDEX IF NOT EXISTS products_name_trgm_gin_idx ON products USING gin (name gin_trgm_ops);"
+                "CREATE INDEX IF NOT EXISTS products_name_trgm_gin_idx "
+                "ON products USING gin (name gin_trgm_ops);"
             )
         )
         await conn.execute(
             text(
-                "CREATE INDEX IF NOT EXISTS brands_name_trgm_gin_idx ON brands USING gin (name gin_trgm_ops);"
+                "CREATE INDEX IF NOT EXISTS brands_name_trgm_gin_idx "
+                "ON brands USING gin (name gin_trgm_ops);"
             )
         )
         await conn.execute(
             text(
-                "CREATE INDEX IF NOT EXISTS idx_products_category_published_price ON products (category_id, is_published, price);"
+                "CREATE INDEX IF NOT EXISTS idx_products_category_published_price "
+                "ON products (category_id, is_published, price);"
             )
         )
 

@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.response import ApiResponse, PaginatedResponse, PaginationLinks, PaginationMeta
 from app.db.session import get_db
 from app.schemas.catalog import (
@@ -15,7 +15,7 @@ from app.services.search import CatalogService
 router = APIRouter()
 
 
-@router.get("/categories", response_model=ApiResponse[List[CategoryOut]])
+@router.get("/categories", response_model=ApiResponse[list[CategoryOut]])
 async def list_categories(db: AsyncSession = Depends(get_db)):
     tree = await CatalogService.get_categories_tree(db)
     return ApiResponse(data=tree)
@@ -30,19 +30,19 @@ async def get_category_filters(slug: str, db: AsyncSession = Depends(get_db)):
 @router.get("/products", response_model=PaginatedResponse[ProductCardOut])
 async def search_products(
     request: Request,
-    q: Optional[str] = Query(None),
-    category: Optional[str] = Query(None),
-    price_min: Optional[float] = Query(None),
-    price_max: Optional[float] = Query(None),
-    rating_min: Optional[float] = Query(None),
-    availability: Optional[str] = Query(None),
+    q: str | None = Query(None),
+    category: str | None = Query(None),
+    price_min: float | None = Query(None),
+    price_max: float | None = Query(None),
+    rating_min: float | None = Query(None),
+    availability: str | None = Query(None),
     sort: str = Query("relevance"),
     page: int = Query(1, ge=1),
     per_page: int = Query(24, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):
-    brand_slugs: List[str] = []
-    spec_filters: Dict[str, str] = {}
+    brand_slugs: list[str] = []
+    spec_filters: dict[str, str] = {}
 
     for k, v in request.query_params.multi_items():
         if k in ("brand", "brand[]"):
@@ -75,6 +75,7 @@ async def search_products(
         qd = dict(query_dict)
         qd["page"] = str(p)
         from urllib.parse import urlencode
+
         return f"{base_url}?{urlencode(qd)}"
 
     links = PaginationLinks(
@@ -108,7 +109,7 @@ async def get_product_price_history(slug: str, db: AsyncSession = Depends(get_db
     return ApiResponse(data=history)
 
 
-@router.get("/products/{slug}/similar", response_model=ApiResponse[List[ProductCardOut]])
+@router.get("/products/{slug}/similar", response_model=ApiResponse[list[ProductCardOut]])
 async def get_similar_products(slug: str, db: AsyncSession = Depends(get_db)):
     similar = await CatalogService.get_similar_products(db, slug)
     return ApiResponse(data=similar)

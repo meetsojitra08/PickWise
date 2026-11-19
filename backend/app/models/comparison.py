@@ -1,7 +1,9 @@
-from typing import Any, Dict, Optional
-from sqlalchemy import BigInteger, ForeignKey, Integer, SmallInteger, String, UniqueConstraint
+from typing import Any
+
+from sqlalchemy import BigInteger, ForeignKey, SmallInteger, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.base import Base, TimestampMixin
 
 
@@ -13,18 +15,23 @@ class Comparison(Base, TimestampMixin):
         BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    ai_verdict: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB, nullable=True)
-    share_token: Mapped[Optional[str]] = mapped_column(String(32), unique=True, nullable=True)
+    ai_verdict: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    share_token: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True)
 
     user = relationship("User", back_populates="comparisons")
     items = relationship(
-        "ComparisonItem", back_populates="comparison", cascade="all, delete-orphan", order_by="ComparisonItem.position"
+        "ComparisonItem",
+        back_populates="comparison",
+        cascade="all, delete-orphan",
+        order_by="ComparisonItem.position",
     )
 
 
 class ComparisonItem(Base):
     __tablename__ = "comparison_items"
-    __table_args__ = (UniqueConstraint("comparison_id", "product_id", name="uq_comparison_items_comp_prod"),)
+    __table_args__ = (
+        UniqueConstraint("comparison_id", "product_id", name="uq_comparison_items_comp_prod"),
+    )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     comparison_id: Mapped[int] = mapped_column(

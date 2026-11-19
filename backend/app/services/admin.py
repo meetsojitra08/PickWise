@@ -1,10 +1,12 @@
 import re
-from datetime import date, datetime, time, timedelta, timezone
-from typing import Any, Dict, List, Optional, Tuple
-from sqlalchemy import case, desc, func, or_, select
+from datetime import UTC, date, datetime, time, timedelta
+from typing import Any
+
+from sqlalchemy import case, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from app.core.exceptions import NotFoundException, ValidationException
+
+from app.core.exceptions import NotFoundException
 from app.models import (
     AdminActivityLog,
     AiUsageLog,
@@ -21,9 +23,7 @@ from app.models import (
 )
 from app.schemas.admin import (
     AdminActivityItem,
-    AdminAiDailyUsagePoint,
     AdminAiFeatureBreakdown,
-    AdminAiTopUserItem,
     AdminAiUsageData,
     AdminAiUsageDetailedSummary,
     AdminAiUsageLogItem,
@@ -64,10 +64,10 @@ class AdminService:
         db: AsyncSession,
         admin_id: int,
         action: str,
-        subject_type: Optional[str] = None,
-        subject_id: Optional[int] = None,
-        changes: Optional[Dict[str, Any]] = None,
-        ip_address: Optional[str] = None,
+        subject_type: str | None = None,
+        subject_id: int | None = None,
+        changes: dict[str, Any] | None = None,
+        ip_address: str | None = None,
     ) -> None:
         log = AdminActivityLog(
             admin_id=admin_id,
@@ -76,7 +76,7 @@ class AdminService:
             subject_id=subject_id,
             changes=changes,
             ip_address=ip_address,
-            created_at=datetime.now(timezone.utc).replace(tzinfo=None),
+            created_at=datetime.now(UTC).replace(tzinfo=None),
         )
         db.add(log)
         await db.flush()
@@ -84,31 +84,50 @@ class AdminService:
     @classmethod
     async def get_dashboard(cls, db: AsyncSession) -> AdminDashboardData:
         # Product counts
-        total_p = (await db.execute(select(func.count(Product.id)).where(Product.deleted_at.is_(None)))).scalar() or 0
-        pub_p = (await db.execute(select(func.count(Product.id)).where(Product.deleted_at.is_(None), Product.is_published.is_(True)))).scalar() or 0
+        total_p = (
+            await db.execute(select(func.count(Product.id)).where(Product.deleted_at.is_(None)))
+        ).scalar() or 0
+        pub_p = (
+            await db.execute(
+                select(func.count(Product.id)).where(
+                    Product.deleted_at.is_(None), Product.is_published.is_(True)
+                )
+            )
+        ).scalar() or 0
         unpub_p = total_p - pub_p
 
         # User counts
         total_u = (await db.execute(select(func.count(User.id)))).scalar() or 0
-        act_u = (await db.execute(select(func.count(User.id)).where(User.is_active.is_(True)))).scalar() or 0
-        cust_u = (await db.execute(select(func.count(User.id)).where(User.role == "customer"))).scalar() or 0
-        admin_u = (await db.execute(select(func.count(User.id)).where(User.role == "admin"))).scalar() or 0
+        act_u = (
+            await db.execute(select(func.count(User.id)).where(User.is_active.is_(True)))
+        ).scalar() or 0
+        cust_u = (
+            await db.execute(select(func.count(User.id)).where(User.role == "customer"))
+        ).scalar() or 0
+        admin_u = (
+            await db.execute(select(func.count(User.id)).where(User.role == "admin"))
+        ).scalar() or 0
 
         # Pending reviews
-        pend_r = (await db.execute(select(func.count(Review.id)).where(Review.status == "pending"))).scalar() or 0
+        pend_r = (
+            await db.execute(select(func.count(Review.id)).where(Review.status == "pending"))
+        ).scalar() or 0
 
         # AI calls today
-        today_start = datetime.combine(datetime.now(timezone.utc).date(), time.min)
-        ai_today_stmt = (
-            select(
-                func.count(AiUsageLog.id).label("total"),
-                func.coalesce(func.sum(case((AiUsageLog.status == "ok", 1), else_=0)), 0).label("success"),
-                func.coalesce(func.sum(case((AiUsageLog.status != "ok", 1), else_=0)), 0).label("failed"),
-                func.coalesce(func.sum(AiUsageLog.prompt_tokens + AiUsageLog.completion_tokens), 0).label("tokens"),
-                func.coalesce(func.avg(AiUsageLog.latency_ms), 0).label("avg_lat"),
-            )
-            .where(AiUsageLog.created_at >= today_start)
-        )
+        today_start = datetime.combine(datetime.now(UTC).date(), time.min)
+        ai_today_stmt = select(
+            func.count(AiUsageLog.id).label("total"),
+            func.coalesce(func.sum(case((AiUsageLog.status == "ok", 1), else_=0)), 0).label(
+                "success"
+            ),
+            func.coalesce(func.sum(case((AiUsageLog.status != "ok", 1), else_=0)), 0).label(
+                "failed"
+            ),
+            func.coalesce(
+                func.sum(AiUsageLog.prompt_tokens + AiUsageLog.completion_tokens), 0
+            ).label("tokens"),
+            func.coalesce(func.avg(AiUsageLog.latency_ms), 0).label("avg_lat"),
+        ).where(AiUsageLog.created_at >= today_start)
         ai_row = (await db.execute(ai_today_stmt)).one()
 
         # Recent activity
@@ -122,7 +141,9 @@ class AdminService:
         recent_activity = [
             AdminActivityItem(
                 id=a.id,
-                admin={"id": a.admin.id, "name": a.admin.name, "email": a.admin.email} if a.admin else None,
+                admin={"id": a.admin.id, "name": a.admin.name, "email": a.admin.email}
+                if a.admin
+                else None,
                 action=a.action,
                 subject_type=a.subject_type,
                 subject_id=a.subject_id,
@@ -145,7 +166,9 @@ class AdminService:
         pending_reviews = [
             AdminPendingReviewItem(
                 id=r.id,
-                product={"id": r.product.id, "name": r.product.name, "slug": r.product.slug} if r.product else None,
+                product={"id": r.product.id, "name": r.product.name, "slug": r.product.slug}
+                if r.product
+                else None,
                 author_name=r.user.name if r.user else (r.author_name or "Customer"),
                 rating=r.rating,
                 title=r.title,
@@ -178,12 +201,12 @@ class AdminService:
     async def list_categories(
         cls,
         db: AsyncSession,
-        search: Optional[str] = None,
-        is_active: Optional[bool] = None,
-        parent_id: Optional[str] = None,
+        search: str | None = None,
+        is_active: bool | None = None,
+        parent_id: str | None = None,
         page: int = 1,
         per_page: int = 50,
-    ) -> Tuple[List[AdminCategory], int, int]:
+    ) -> tuple[list[AdminCategory], int, int]:
         stmt = select(Category).options(selectinload(Category.parent))
         if search:
             stmt = stmt.where(Category.name.ilike(f"%{search}%"))
@@ -204,20 +227,32 @@ class AdminService:
 
         # Product & Spec & Children counts
         cat_ids = [c.id for c in categories]
-        prod_counts: Dict[int, int] = {}
-        spec_counts: Dict[int, int] = {}
-        child_counts: Dict[int, int] = {}
+        prod_counts: dict[int, int] = {}
+        spec_counts: dict[int, int] = {}
+        child_counts: dict[int, int] = {}
 
         if cat_ids:
-            pc_stmt = select(Product.category_id, func.count(Product.id)).where(Product.category_id.in_(cat_ids), Product.deleted_at.is_(None)).group_by(Product.category_id)
+            pc_stmt = (
+                select(Product.category_id, func.count(Product.id))
+                .where(Product.category_id.in_(cat_ids), Product.deleted_at.is_(None))
+                .group_by(Product.category_id)
+            )
             for cid, cnt in (await db.execute(pc_stmt)).all():
                 prod_counts[cid] = cnt
 
-            sc_stmt = select(SpecDefinition.category_id, func.count(SpecDefinition.id)).where(SpecDefinition.category_id.in_(cat_ids)).group_by(SpecDefinition.category_id)
+            sc_stmt = (
+                select(SpecDefinition.category_id, func.count(SpecDefinition.id))
+                .where(SpecDefinition.category_id.in_(cat_ids))
+                .group_by(SpecDefinition.category_id)
+            )
             for cid, cnt in (await db.execute(sc_stmt)).all():
                 spec_counts[cid] = cnt
 
-            cc_stmt = select(Category.parent_id, func.count(Category.id)).where(Category.parent_id.in_(cat_ids)).group_by(Category.parent_id)
+            cc_stmt = (
+                select(Category.parent_id, func.count(Category.id))
+                .where(Category.parent_id.in_(cat_ids))
+                .group_by(Category.parent_id)
+            )
             for pid, cnt in (await db.execute(cc_stmt)).all():
                 child_counts[pid] = cnt
 
@@ -225,7 +260,9 @@ class AdminService:
             AdminCategory(
                 id=c.id,
                 parent_id=c.parent_id,
-                parent={"id": c.parent.id, "name": c.parent.name, "slug": c.parent.slug} if c.parent else None,
+                parent={"id": c.parent.id, "name": c.parent.name, "slug": c.parent.slug}
+                if c.parent
+                else None,
                 name=c.name,
                 slug=c.slug,
                 description=c.description,
@@ -245,7 +282,9 @@ class AdminService:
         return result, total, last_page
 
     @classmethod
-    async def create_category(cls, db: AsyncSession, admin: User, data: AdminCategoryFormData) -> AdminCategory:
+    async def create_category(
+        cls, db: AsyncSession, admin: User, data: AdminCategoryFormData
+    ) -> AdminCategory:
         slug = data.slug or slugify(data.name)
         cat = Category(
             name=data.name,
@@ -263,7 +302,9 @@ class AdminService:
         return cats[0]
 
     @classmethod
-    async def update_category(cls, db: AsyncSession, admin: User, cat_id: int, data: Dict[str, Any]) -> AdminCategory:
+    async def update_category(
+        cls, db: AsyncSession, admin: User, cat_id: int, data: dict[str, Any]
+    ) -> AdminCategory:
         stmt = select(Category).where(Category.id == cat_id)
         cat = (await db.execute(stmt)).scalar_one_or_none()
         if not cat:
@@ -292,18 +333,29 @@ class AdminService:
 
     # ---------------- Category Specs CRUD ----------------
     @classmethod
-    async def list_category_specs(cls, db: AsyncSession, category_id: int, search: Optional[str] = None) -> List[AdminSpecDefinition]:
+    async def list_category_specs(
+        cls, db: AsyncSession, category_id: int, search: str | None = None
+    ) -> list[AdminSpecDefinition]:
         stmt = select(SpecDefinition).where(SpecDefinition.category_id == category_id)
         if search:
-            stmt = stmt.where(or_(SpecDefinition.label.ilike(f"%{search}%"), SpecDefinition.key.ilike(f"%{search}%")))
+            stmt = stmt.where(
+                or_(
+                    SpecDefinition.label.ilike(f"%{search}%"),
+                    SpecDefinition.key.ilike(f"%{search}%"),
+                )
+            )
         stmt = stmt.order_by(SpecDefinition.sort_order, SpecDefinition.label)
         specs = list((await db.execute(stmt)).scalars().all())
 
         # Count product_specs
         spec_ids = [s.id for s in specs]
-        ps_counts: Dict[int, int] = {}
+        ps_counts: dict[int, int] = {}
         if spec_ids:
-            pc_stmt = select(ProductSpec.spec_definition_id, func.count(ProductSpec.id)).where(ProductSpec.spec_definition_id.in_(spec_ids)).group_by(ProductSpec.spec_definition_id)
+            pc_stmt = (
+                select(ProductSpec.spec_definition_id, func.count(ProductSpec.id))
+                .where(ProductSpec.spec_definition_id.in_(spec_ids))
+                .group_by(ProductSpec.spec_definition_id)
+            )
             for sid, cnt in (await db.execute(pc_stmt)).all():
                 ps_counts[sid] = cnt
 
@@ -327,7 +379,9 @@ class AdminService:
         ]
 
     @classmethod
-    async def create_spec(cls, db: AsyncSession, admin: User, category_id: int, data: AdminSpecDefinitionFormData) -> AdminSpecDefinition:
+    async def create_spec(
+        cls, db: AsyncSession, admin: User, category_id: int, data: AdminSpecDefinitionFormData
+    ) -> AdminSpecDefinition:
         spec = SpecDefinition(
             category_id=category_id,
             key=data.key,
@@ -342,13 +396,19 @@ class AdminService:
         db.add(spec)
         await db.commit()
         await db.refresh(spec)
-        await cls.log_activity(db, admin.id, "created", "spec_definition", spec.id, {"key": spec.key})
+        await cls.log_activity(
+            db, admin.id, "created", "spec_definition", spec.id, {"key": spec.key}
+        )
         specs = await cls.list_category_specs(db, category_id, search=spec.key)
         return specs[0]
 
     @classmethod
-    async def update_spec(cls, db: AsyncSession, admin: User, category_id: int, spec_id: int, data: Dict[str, Any]) -> AdminSpecDefinition:
-        stmt = select(SpecDefinition).where(SpecDefinition.id == spec_id, SpecDefinition.category_id == category_id)
+    async def update_spec(
+        cls, db: AsyncSession, admin: User, category_id: int, spec_id: int, data: dict[str, Any]
+    ) -> AdminSpecDefinition:
+        stmt = select(SpecDefinition).where(
+            SpecDefinition.id == spec_id, SpecDefinition.category_id == category_id
+        )
         spec = (await db.execute(stmt)).scalar_one_or_none()
         if not spec:
             raise NotFoundException(f"Spec '{spec_id}' not found.")
@@ -361,12 +421,18 @@ class AdminService:
         return specs[0]
 
     @classmethod
-    async def delete_spec(cls, db: AsyncSession, admin: User, category_id: int, spec_id: int) -> None:
-        stmt = select(SpecDefinition).where(SpecDefinition.id == spec_id, SpecDefinition.category_id == category_id)
+    async def delete_spec(
+        cls, db: AsyncSession, admin: User, category_id: int, spec_id: int
+    ) -> None:
+        stmt = select(SpecDefinition).where(
+            SpecDefinition.id == spec_id, SpecDefinition.category_id == category_id
+        )
         spec = (await db.execute(stmt)).scalar_one_or_none()
         if not spec:
             raise NotFoundException(f"Spec '{spec_id}' not found.")
-        await cls.log_activity(db, admin.id, "deleted", "spec_definition", spec.id, {"key": spec.key})
+        await cls.log_activity(
+            db, admin.id, "deleted", "spec_definition", spec.id, {"key": spec.key}
+        )
         await db.delete(spec)
         await db.commit()
 
@@ -375,11 +441,11 @@ class AdminService:
     async def list_brands(
         cls,
         db: AsyncSession,
-        search: Optional[str] = None,
-        sort: Optional[str] = None,
+        search: str | None = None,
+        sort: str | None = None,
         page: int = 1,
         per_page: int = 50,
-    ) -> Tuple[List[AdminBrand], int, int]:
+    ) -> tuple[list[AdminBrand], int, int]:
         stmt = select(Brand)
         if search:
             stmt = stmt.where(Brand.name.ilike(f"%{search}%"))
@@ -391,9 +457,13 @@ class AdminService:
         brands = list((await db.execute(stmt.offset(offset).limit(per_page))).scalars().all())
 
         brand_ids = [b.id for b in brands]
-        prod_counts: Dict[int, int] = {}
+        prod_counts: dict[int, int] = {}
         if brand_ids:
-            pc_stmt = select(Product.brand_id, func.count(Product.id)).where(Product.brand_id.in_(brand_ids), Product.deleted_at.is_(None)).group_by(Product.brand_id)
+            pc_stmt = (
+                select(Product.brand_id, func.count(Product.id))
+                .where(Product.brand_id.in_(brand_ids), Product.deleted_at.is_(None))
+                .group_by(Product.brand_id)
+            )
             for bid, cnt in (await db.execute(pc_stmt)).all():
                 prod_counts[bid] = cnt
 
@@ -414,7 +484,9 @@ class AdminService:
         return result, total, last_page
 
     @classmethod
-    async def create_brand(cls, db: AsyncSession, admin: User, data: AdminBrandFormData) -> AdminBrand:
+    async def create_brand(
+        cls, db: AsyncSession, admin: User, data: AdminBrandFormData
+    ) -> AdminBrand:
         slug = data.slug or slugify(data.name)
         brand = Brand(name=data.name, slug=slug, logo_path=data.logo_path)
         db.add(brand)
@@ -425,7 +497,9 @@ class AdminService:
         return brands[0]
 
     @classmethod
-    async def update_brand(cls, db: AsyncSession, admin: User, brand_id: int, data: Dict[str, Any]) -> AdminBrand:
+    async def update_brand(
+        cls, db: AsyncSession, admin: User, brand_id: int, data: dict[str, Any]
+    ) -> AdminBrand:
         stmt = select(Brand).where(Brand.id == brand_id)
         brand = (await db.execute(stmt)).scalar_one_or_none()
         if not brand:
@@ -455,25 +529,22 @@ class AdminService:
     async def list_products(
         cls,
         db: AsyncSession,
-        search: Optional[str] = None,
-        category_id: Optional[int] = None,
-        brand_id: Optional[int] = None,
-        is_published: Optional[bool] = None,
-        availability: Optional[str] = None,
-        trashed: Optional[str] = None,
-        sort: Optional[str] = None,
+        search: str | None = None,
+        category_id: int | None = None,
+        brand_id: int | None = None,
+        is_published: bool | None = None,
+        availability: str | None = None,
+        trashed: str | None = None,
+        sort: str | None = None,
         page: int = 1,
         per_page: int = 24,
-    ) -> Tuple[List[AdminProduct], int, int]:
-        stmt = (
-            select(Product)
-            .options(
-                selectinload(Product.category),
-                selectinload(Product.brand),
-                selectinload(Product.images),
-                selectinload(Product.specs).selectinload(ProductSpec.spec_definition),
-                selectinload(Product.price_history),
-            )
+    ) -> tuple[list[AdminProduct], int, int]:
+        stmt = select(Product).options(
+            selectinload(Product.category),
+            selectinload(Product.brand),
+            selectinload(Product.images),
+            selectinload(Product.specs).selectinload(ProductSpec.spec_definition),
+            selectinload(Product.price_history),
         )
 
         if trashed == "only":
@@ -516,10 +587,18 @@ class AdminService:
         primary_img = None
         for img in p.images:
             if img.is_primary:
-                primary_img = {"id": img.id, "url": format_media_url(img.path), "alt_text": img.alt_text}
+                primary_img = {
+                    "id": img.id,
+                    "url": format_media_url(img.path),
+                    "alt_text": img.alt_text,
+                }
                 break
         if not primary_img and p.images:
-            primary_img = {"id": p.images[0].id, "url": format_media_url(p.images[0].path), "alt_text": p.images[0].alt_text}
+            primary_img = {
+                "id": p.images[0].id,
+                "url": format_media_url(p.images[0].path),
+                "alt_text": p.images[0].alt_text,
+            }
 
         imgs = [
             AdminProductImage(
@@ -540,7 +619,13 @@ class AdminService:
                 label=s.spec_definition.label,
                 unit=s.spec_definition.unit,
                 data_type=s.spec_definition.data_type,
-                value=s.value_bool if s.spec_definition.data_type == "boolean" else (float(s.value_number) if s.spec_definition.data_type == "number" and s.value_number is not None else s.value_text),
+                value=s.value_bool
+                if s.spec_definition.data_type == "boolean"
+                else (
+                    float(s.value_number)
+                    if s.spec_definition.data_type == "number" and s.value_number is not None
+                    else s.value_text
+                ),
                 is_filterable=s.spec_definition.is_filterable,
                 is_comparable=s.spec_definition.is_comparable,
                 higher_is_better=s.spec_definition.higher_is_better,
@@ -583,8 +668,12 @@ class AdminService:
             value_score=p.value_score,
             is_published=p.is_published,
             is_deleted=p.deleted_at is not None,
-            category={"id": p.category.id, "name": p.category.name, "slug": p.category.slug} if p.category else None,
-            brand={"id": p.brand.id, "name": p.brand.name, "slug": p.brand.slug} if p.brand else None,
+            category={"id": p.category.id, "name": p.category.name, "slug": p.category.slug}
+            if p.category
+            else None,
+            brand={"id": p.brand.id, "name": p.brand.name, "slug": p.brand.slug}
+            if p.brand
+            else None,
             primary_image=primary_img,
             images=imgs,
             specs=specs,
@@ -613,7 +702,9 @@ class AdminService:
         return cls._to_admin_product(p)
 
     @classmethod
-    async def create_product(cls, db: AsyncSession, admin: User, data: AdminProductFormData) -> AdminProduct:
+    async def create_product(
+        cls, db: AsyncSession, admin: User, data: AdminProductFormData
+    ) -> AdminProduct:
         slug = data.slug or slugify(data.name)
         p = Product(
             category_id=data.category_id,
@@ -647,8 +738,12 @@ class AdminService:
                         product_id=p.id,
                         spec_definition_id=defn.id,
                         value_bool=bool(val) if defn.data_type == "boolean" else None,
-                        value_number=float(val) if defn.data_type == "number" and val is not None else None,
-                        value_text=str(val) if defn.data_type == "text" and val is not None else None,
+                        value_number=float(val)
+                        if defn.data_type == "number" and val is not None
+                        else None,
+                        value_text=str(val)
+                        if defn.data_type == "text" and val is not None
+                        else None,
                     )
                     db.add(ps)
 
@@ -658,7 +753,9 @@ class AdminService:
         return await cls.get_product(db, p.id)
 
     @classmethod
-    async def update_product(cls, db: AsyncSession, admin: User, product_id: int, data: Dict[str, Any]) -> AdminProduct:
+    async def update_product(
+        cls, db: AsyncSession, admin: User, product_id: int, data: dict[str, Any]
+    ) -> AdminProduct:
         stmt = select(Product).where(Product.id == product_id)
         p = (await db.execute(stmt)).scalar_one_or_none()
         if not p:
@@ -681,25 +778,37 @@ class AdminService:
                 defn_stmt = select(SpecDefinition).where(SpecDefinition.id == defn_id)
                 defn = (await db.execute(defn_stmt)).scalar_one_or_none()
                 if defn:
-                    spec_stmt = select(ProductSpec).where(ProductSpec.product_id == p.id, ProductSpec.spec_definition_id == defn.id)
+                    spec_stmt = select(ProductSpec).where(
+                        ProductSpec.product_id == p.id, ProductSpec.spec_definition_id == defn.id
+                    )
                     existing = (await db.execute(spec_stmt)).scalar_one_or_none()
                     if existing:
                         existing.value_bool = bool(val) if defn.data_type == "boolean" else None
-                        existing.value_number = float(val) if defn.data_type == "number" and val is not None else None
-                        existing.value_text = str(val) if defn.data_type == "text" and val is not None else None
+                        existing.value_number = (
+                            float(val) if defn.data_type == "number" and val is not None else None
+                        )
+                        existing.value_text = (
+                            str(val) if defn.data_type == "text" and val is not None else None
+                        )
                     else:
                         ps = ProductSpec(
                             product_id=p.id,
                             spec_definition_id=defn.id,
                             value_bool=bool(val) if defn.data_type == "boolean" else None,
-                            value_number=float(val) if defn.data_type == "number" and val is not None else None,
-                            value_text=str(val) if defn.data_type == "text" and val is not None else None,
+                            value_number=float(val)
+                            if defn.data_type == "number" and val is not None
+                            else None,
+                            value_text=str(val)
+                            if defn.data_type == "text" and val is not None
+                            else None,
                         )
                         db.add(ps)
 
         await db.commit()
         await ValueScoreCalculator.recalculate_for_product(db, p.id)
-        await cls.log_activity(db, admin.id, "updated", "product", p.id, {"updated_fields": list(data.keys())})
+        await cls.log_activity(
+            db, admin.id, "updated", "product", p.id, {"updated_fields": list(data.keys())}
+        )
         return await cls.get_product(db, p.id)
 
     @classmethod
@@ -708,23 +817,38 @@ class AdminService:
         p = (await db.execute(stmt)).scalar_one_or_none()
         if not p:
             raise NotFoundException(f"Product '{product_id}' not found.")
-        p.deleted_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        p.deleted_at = datetime.now(UTC).replace(tzinfo=None)
         await db.commit()
         await cls.log_activity(db, admin.id, "deleted", "product", p.id, {"name": p.name})
 
     @classmethod
-    async def bulk_product_status(cls, db: AsyncSession, admin: User, product_ids: List[int], is_published: bool) -> None:
+    async def bulk_product_status(
+        cls, db: AsyncSession, admin: User, product_ids: list[int], is_published: bool
+    ) -> None:
         stmt = select(Product).where(Product.id.in_(product_ids))
         products = list((await db.execute(stmt)).scalars().all())
         for p in products:
             p.is_published = is_published
         await db.commit()
-        await cls.log_activity(db, admin.id, "bulk_status", "product", None, {"count": len(products), "is_published": is_published})
+        await cls.log_activity(
+            db,
+            admin.id,
+            "bulk_status",
+            "product",
+            None,
+            {"count": len(products), "is_published": is_published},
+        )
 
     # ---------------- Product Images CRUD ----------------
     @classmethod
-    async def list_product_images(cls, db: AsyncSession, product_id: int) -> List[AdminProductImage]:
-        stmt = select(ProductImage).where(ProductImage.product_id == product_id).order_by(ProductImage.sort_order, ProductImage.id)
+    async def list_product_images(
+        cls, db: AsyncSession, product_id: int
+    ) -> list[AdminProductImage]:
+        stmt = (
+            select(ProductImage)
+            .where(ProductImage.product_id == product_id)
+            .order_by(ProductImage.sort_order, ProductImage.id)
+        )
         imgs = list((await db.execute(stmt)).scalars().all())
         return [
             AdminProductImage(
@@ -763,7 +887,9 @@ class AdminService:
         db.add(img)
         await db.commit()
         await db.refresh(img)
-        await cls.log_activity(db, admin.id, "image_uploaded", "product", product_id, {"image_id": img.id})
+        await cls.log_activity(
+            db, admin.id, "image_uploaded", "product", product_id, {"image_id": img.id}
+        )
         return AdminProductImage(
             id=img.id,
             url=format_media_url(img.path),
@@ -778,9 +904,9 @@ class AdminService:
         db: AsyncSession,
         admin: User,
         product_id: int,
-        image_ids: List[int],
-        primary_id: Optional[int] = None,
-    ) -> List[AdminProductImage]:
+        image_ids: list[int],
+        primary_id: int | None = None,
+    ) -> list[AdminProductImage]:
         stmt = select(ProductImage).where(ProductImage.product_id == product_id)
         imgs = {img.id: img for img in (await db.execute(stmt)).scalars().all()}
 
@@ -788,7 +914,7 @@ class AdminService:
             if img_id in imgs:
                 imgs[img_id].sort_order = idx
                 if primary_id is not None:
-                    imgs[img_id].is_primary = (img_id == primary_id)
+                    imgs[img_id].is_primary = img_id == primary_id
 
         await db.commit()
         await cls.log_activity(db, admin.id, "images_reordered", "product", product_id)
@@ -801,11 +927,13 @@ class AdminService:
         admin: User,
         product_id: int,
         image_id: int,
-        alt_text: Optional[str] = None,
-        is_primary: Optional[bool] = None,
-        sort_order: Optional[int] = None,
+        alt_text: str | None = None,
+        is_primary: bool | None = None,
+        sort_order: int | None = None,
     ) -> AdminProductImage:
-        stmt = select(ProductImage).where(ProductImage.id == image_id, ProductImage.product_id == product_id)
+        stmt = select(ProductImage).where(
+            ProductImage.id == image_id, ProductImage.product_id == product_id
+        )
         img = (await db.execute(stmt)).scalar_one_or_none()
         if not img:
             raise NotFoundException(f"Product image '{image_id}' not found.")
@@ -824,7 +952,9 @@ class AdminService:
             img.sort_order = sort_order
 
         await db.commit()
-        await cls.log_activity(db, admin.id, "image_updated", "product", product_id, {"image_id": image_id})
+        await cls.log_activity(
+            db, admin.id, "image_updated", "product", product_id, {"image_id": image_id}
+        )
         return AdminProductImage(
             id=img.id,
             url=format_media_url(img.path),
@@ -834,27 +964,33 @@ class AdminService:
         )
 
     @classmethod
-    async def delete_product_image(cls, db: AsyncSession, admin: User, product_id: int, image_id: int) -> None:
-        stmt = select(ProductImage).where(ProductImage.id == image_id, ProductImage.product_id == product_id)
+    async def delete_product_image(
+        cls, db: AsyncSession, admin: User, product_id: int, image_id: int
+    ) -> None:
+        stmt = select(ProductImage).where(
+            ProductImage.id == image_id, ProductImage.product_id == product_id
+        )
         img = (await db.execute(stmt)).scalar_one_or_none()
         if not img:
             raise NotFoundException(f"Product image '{image_id}' not found.")
         await db.delete(img)
         await db.commit()
-        await cls.log_activity(db, admin.id, "image_deleted", "product", product_id, {"image_id": image_id})
+        await cls.log_activity(
+            db, admin.id, "image_deleted", "product", product_id, {"image_id": image_id}
+        )
 
     # ---------------- Users CRUD ----------------
     @classmethod
     async def list_users(
         cls,
         db: AsyncSession,
-        search: Optional[str] = None,
-        role: Optional[str] = None,
-        is_active: Optional[bool] = None,
-        sort: Optional[str] = None,
+        search: str | None = None,
+        role: str | None = None,
+        is_active: bool | None = None,
+        sort: str | None = None,
         page: int = 1,
         per_page: int = 25,
-    ) -> Tuple[List[AdminUser], int, int]:
+    ) -> tuple[list[AdminUser], int, int]:
         stmt = select(User)
         if search:
             stmt = stmt.where(or_(User.name.ilike(f"%{search}%"), User.email.ilike(f"%{search}%")))
@@ -871,9 +1007,13 @@ class AdminService:
         users = list((await db.execute(stmt.offset(offset).limit(per_page))).scalars().all())
 
         user_ids = [u.id for u in users]
-        rev_counts: Dict[int, int] = {}
+        rev_counts: dict[int, int] = {}
         if user_ids:
-            rc_stmt = select(Review.user_id, func.count(Review.id)).where(Review.user_id.in_(user_ids)).group_by(Review.user_id)
+            rc_stmt = (
+                select(Review.user_id, func.count(Review.id))
+                .where(Review.user_id.in_(user_ids))
+                .group_by(Review.user_id)
+            )
             for uid, cnt in (await db.execute(rc_stmt)).all():
                 rev_counts[uid] = cnt
 
@@ -894,7 +1034,14 @@ class AdminService:
         return items, total, last_page
 
     @classmethod
-    async def update_user(cls, db: AsyncSession, admin: User, user_id: int, is_active: Optional[bool] = None, role: Optional[str] = None) -> AdminUser:
+    async def update_user(
+        cls,
+        db: AsyncSession,
+        admin: User,
+        user_id: int,
+        is_active: bool | None = None,
+        role: str | None = None,
+    ) -> AdminUser:
         stmt = select(User).where(User.id == user_id)
         user = (await db.execute(stmt)).scalar_one_or_none()
         if not user:
@@ -904,7 +1051,9 @@ class AdminService:
         if role is not None:
             user.role = role
         await db.commit()
-        await cls.log_activity(db, admin.id, "updated", "user", user.id, {"is_active": is_active, "role": role})
+        await cls.log_activity(
+            db, admin.id, "updated", "user", user.id, {"is_active": is_active, "role": role}
+        )
         users, _, _ = await cls.list_users(db, search=user.email)
         return users[0]
 
@@ -913,21 +1062,18 @@ class AdminService:
     async def list_reviews(
         cls,
         db: AsyncSession,
-        status: Optional[str] = None,
-        search: Optional[str] = None,
-        rating: Optional[int] = None,
-        product_id: Optional[int] = None,
-        sort: Optional[str] = None,
+        status: str | None = None,
+        search: str | None = None,
+        rating: int | None = None,
+        product_id: int | None = None,
+        sort: str | None = None,
         page: int = 1,
         per_page: int = 25,
-    ) -> Tuple[List[AdminReview], int, int]:
-        stmt = (
-            select(Review)
-            .options(
-                selectinload(Review.product),
-                selectinload(Review.user),
-                selectinload(Review.moderator),
-            )
+    ) -> tuple[list[AdminReview], int, int]:
+        stmt = select(Review).options(
+            selectinload(Review.product),
+            selectinload(Review.user),
+            selectinload(Review.moderator),
         )
         if status and status != "all":
             stmt = stmt.where(Review.status == status)
@@ -936,7 +1082,9 @@ class AdminService:
         if product_id:
             stmt = stmt.where(Review.product_id == product_id)
         if search:
-            stmt = stmt.where(or_(Review.title.ilike(f"%{search}%"), Review.body.ilike(f"%{search}%")))
+            stmt = stmt.where(
+                or_(Review.title.ilike(f"%{search}%"), Review.body.ilike(f"%{search}%"))
+            )
 
         count_stmt = select(func.count()).select_from(stmt.order_by(None).subquery())
         total = (await db.execute(count_stmt)).scalar() or 0
@@ -948,14 +1096,31 @@ class AdminService:
         items = [
             AdminReview(
                 id=r.id,
-                product={"id": r.product.id, "name": r.product.name, "slug": r.product.slug, "is_published": r.product.is_published, "rating_avg": float(r.product.rating_avg), "rating_count": r.product.rating_count} if r.product else None,
-                user={"id": r.user.id, "name": r.user.name, "email": r.user.email} if r.user else None,
+                product={
+                    "id": r.product.id,
+                    "name": r.product.name,
+                    "slug": r.product.slug,
+                    "is_published": r.product.is_published,
+                    "rating_avg": float(r.product.rating_avg),
+                    "rating_count": r.product.rating_count,
+                }
+                if r.product
+                else None,
+                user={"id": r.user.id, "name": r.user.name, "email": r.user.email}
+                if r.user
+                else None,
                 author_name=r.user.name if r.user else (r.author_name or "Customer"),
                 rating=r.rating,
                 title=r.title,
                 body=r.body,
                 status=r.status,
-                moderator={"id": r.moderator.id, "name": r.moderator.name, "email": r.moderator.email} if r.moderator else None,
+                moderator={
+                    "id": r.moderator.id,
+                    "name": r.moderator.name,
+                    "email": r.moderator.email,
+                }
+                if r.moderator
+                else None,
                 moderated_by=r.moderated_by,
                 moderated_at=r.moderated_at.isoformat() if r.moderated_at else None,
                 created_at=r.created_at.isoformat() if r.created_at else "",
@@ -967,7 +1132,9 @@ class AdminService:
         return items, total, last_page
 
     @classmethod
-    async def moderate_review(cls, db: AsyncSession, admin: User, review_id: int, status: str) -> AdminReview:
+    async def moderate_review(
+        cls, db: AsyncSession, admin: User, review_id: int, status: str
+    ) -> AdminReview:
         stmt = select(Review).where(Review.id == review_id)
         r = (await db.execute(stmt)).scalar_one_or_none()
         if not r:
@@ -975,7 +1142,7 @@ class AdminService:
 
         r.status = status
         r.moderated_by = admin.id
-        r.moderated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        r.moderated_at = datetime.now(UTC).replace(tzinfo=None)
         await db.commit()
 
         # Recalculate product rating
@@ -988,21 +1155,25 @@ class AdminService:
         return reviews[0]
 
     @classmethod
-    async def bulk_moderate_reviews(cls, db: AsyncSession, admin: User, review_ids: List[int], status: str) -> int:
+    async def bulk_moderate_reviews(
+        cls, db: AsyncSession, admin: User, review_ids: list[int], status: str
+    ) -> int:
         stmt = select(Review).where(Review.id.in_(review_ids))
         reviews = list((await db.execute(stmt)).scalars().all())
         affected_prods = set()
         for r in reviews:
             r.status = status
             r.moderated_by = admin.id
-            r.moderated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            r.moderated_at = datetime.now(UTC).replace(tzinfo=None)
             affected_prods.add(r.product_id)
         await db.commit()
 
         for pid in affected_prods:
             await ReviewService.recalculate_rating(db, pid)
 
-        await cls.log_activity(db, admin.id, f"bulk_review_{status}", "review", None, {"count": len(reviews)})
+        await cls.log_activity(
+            db, admin.id, f"bulk_review_{status}", "review", None, {"count": len(reviews)}
+        )
         return len(reviews)
 
     @classmethod
@@ -1018,19 +1189,28 @@ class AdminService:
         await cls.log_activity(db, admin.id, "deleted", "review", review_id)
 
     @classmethod
-    async def regenerate_review_summary(cls, db: AsyncSession, admin: User, product_id: int) -> None:
-        revs_stmt = select(Review).where(Review.product_id == product_id, Review.status == "approved")
+    async def regenerate_review_summary(
+        cls, db: AsyncSession, admin: User, product_id: int
+    ) -> None:
+        revs_stmt = select(Review).where(
+            Review.product_id == product_id, Review.status == "approved"
+        )
         revs = list((await db.execute(revs_stmt)).scalars().all())
         if not revs:
             return
 
         pos = [r for r in revs if r.rating >= 4]
         neg = [r for r in revs if r.rating <= 2]
-        sentiment = "positive" if len(pos) > len(neg) else ("negative" if len(neg) > len(pos) else "mixed")
+        sentiment = (
+            "positive" if len(pos) > len(neg) else ("negative" if len(neg) > len(pos) else "mixed")
+        )
 
         pros = [r.title for r in pos[:3]] or ["Reliable performance", "Great build quality"]
         cons = [r.title for r in neg[:2]] or ["Standard battery life"]
-        summary_text = f"Customers generally praise the product's quality and features with a {sentiment} reception overall."
+        summary_text = (
+            "Customers generally praise the product's quality and features "
+            f"with a {sentiment} reception overall."
+        )
 
         sum_stmt = select(ReviewSummary).where(ReviewSummary.product_id == product_id)
         existing = (await db.execute(sum_stmt)).scalar_one_or_none()
@@ -1040,7 +1220,7 @@ class AdminService:
             existing.cons = cons
             existing.sentiment = sentiment
             existing.reviews_count = len(revs)
-            existing.generated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+            existing.generated_at = datetime.now(UTC).replace(tzinfo=None)
         else:
             rs = ReviewSummary(
                 product_id=product_id,
@@ -1049,7 +1229,7 @@ class AdminService:
                 cons=cons,
                 sentiment=sentiment,
                 reviews_count=len(revs),
-                generated_at=datetime.now(timezone.utc).replace(tzinfo=None),
+                generated_at=datetime.now(UTC).replace(tzinfo=None),
             )
             db.add(rs)
         await db.commit()
@@ -1060,19 +1240,29 @@ class AdminService:
     async def get_ai_usage(
         cls,
         db: AsyncSession,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        feature: Optional[str] = None,
-        status: Optional[str] = None,
-        user_id: Optional[int] = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        feature: str | None = None,
+        status: str | None = None,
+        user_id: int | None = None,
         page: int = 1,
         per_page: int = 25,
     ) -> AdminAiUsageData:
-        now_naive = datetime.now(timezone.utc).replace(tzinfo=None)
-        start_dt = datetime.strptime(start_date, "%Y-%m-%d") if start_date else now_naive - timedelta(days=30)
-        end_dt = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1) if end_date else now_naive + timedelta(days=1)
+        now_naive = datetime.now(UTC).replace(tzinfo=None)
+        start_dt = (
+            datetime.strptime(start_date, "%Y-%m-%d")
+            if start_date
+            else now_naive - timedelta(days=30)
+        )
+        end_dt = (
+            datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            if end_date
+            else now_naive + timedelta(days=1)
+        )
 
-        stmt = select(AiUsageLog).where(AiUsageLog.created_at >= start_dt, AiUsageLog.created_at <= end_dt)
+        stmt = select(AiUsageLog).where(
+            AiUsageLog.created_at >= start_dt, AiUsageLog.created_at <= end_dt
+        )
         if feature and feature != "all":
             stmt = stmt.where(AiUsageLog.feature == feature)
         if status and status != "all":
@@ -1081,19 +1271,24 @@ class AdminService:
             stmt = stmt.where(AiUsageLog.user_id == user_id)
 
         # Detailed summary
-        sum_stmt = (
-            select(
-                func.count(AiUsageLog.id).label("total"),
-                func.coalesce(func.sum(case((AiUsageLog.status == "ok", 1), else_=0)), 0).label("success"),
-                func.coalesce(func.sum(case((AiUsageLog.status != "ok", 1), else_=0)), 0).label("failed"),
-                func.coalesce(func.sum(case((AiUsageLog.status == "error", 1), else_=0)), 0).label("error_calls"),
-                func.coalesce(func.sum(case((AiUsageLog.status == "rate_limited", 1), else_=0)), 0).label("rate_limited_calls"),
-                func.coalesce(func.sum(AiUsageLog.prompt_tokens), 0).label("p_tokens"),
-                func.coalesce(func.sum(AiUsageLog.completion_tokens), 0).label("c_tokens"),
-                func.coalesce(func.avg(AiUsageLog.latency_ms), 0).label("avg_lat"),
-            )
-            .where(AiUsageLog.created_at >= start_dt, AiUsageLog.created_at <= end_dt)
-        )
+        sum_stmt = select(
+            func.count(AiUsageLog.id).label("total"),
+            func.coalesce(func.sum(case((AiUsageLog.status == "ok", 1), else_=0)), 0).label(
+                "success"
+            ),
+            func.coalesce(func.sum(case((AiUsageLog.status != "ok", 1), else_=0)), 0).label(
+                "failed"
+            ),
+            func.coalesce(func.sum(case((AiUsageLog.status == "error", 1), else_=0)), 0).label(
+                "error_calls"
+            ),
+            func.coalesce(
+                func.sum(case((AiUsageLog.status == "rate_limited", 1), else_=0)), 0
+            ).label("rate_limited_calls"),
+            func.coalesce(func.sum(AiUsageLog.prompt_tokens), 0).label("p_tokens"),
+            func.coalesce(func.sum(AiUsageLog.completion_tokens), 0).label("c_tokens"),
+            func.coalesce(func.avg(AiUsageLog.latency_ms), 0).label("avg_lat"),
+        ).where(AiUsageLog.created_at >= start_dt, AiUsageLog.created_at <= end_dt)
         row = (await db.execute(sum_stmt)).one()
         total_calls = int(row.total or 0)
         failed_calls = int(row.failed or 0)
@@ -1117,9 +1312,15 @@ class AdminService:
             select(
                 AiUsageLog.feature,
                 func.count(AiUsageLog.id).label("total"),
-                func.coalesce(func.sum(case((AiUsageLog.status == "ok", 1), else_=0)), 0).label("success"),
-                func.coalesce(func.sum(case((AiUsageLog.status != "ok", 1), else_=0)), 0).label("failed"),
-                func.coalesce(func.sum(AiUsageLog.prompt_tokens + AiUsageLog.completion_tokens), 0).label("tokens"),
+                func.coalesce(func.sum(case((AiUsageLog.status == "ok", 1), else_=0)), 0).label(
+                    "success"
+                ),
+                func.coalesce(func.sum(case((AiUsageLog.status != "ok", 1), else_=0)), 0).label(
+                    "failed"
+                ),
+                func.coalesce(
+                    func.sum(AiUsageLog.prompt_tokens + AiUsageLog.completion_tokens), 0
+                ).label("tokens"),
                 func.coalesce(func.avg(AiUsageLog.latency_ms), 0).label("avg_lat"),
             )
             .where(AiUsageLog.created_at >= start_dt, AiUsageLog.created_at <= end_dt)
@@ -1139,7 +1340,11 @@ class AdminService:
         ]
 
         # Guest calls
-        guest_stmt = select(func.count(AiUsageLog.id)).where(AiUsageLog.created_at >= start_dt, AiUsageLog.created_at <= end_dt, AiUsageLog.user_id.is_(None))
+        guest_stmt = select(func.count(AiUsageLog.id)).where(
+            AiUsageLog.created_at >= start_dt,
+            AiUsageLog.created_at <= end_dt,
+            AiUsageLog.user_id.is_(None),
+        )
         guest_calls = (await db.execute(guest_stmt)).scalar() or 0
 
         # Paginated logs
@@ -1150,7 +1355,7 @@ class AdminService:
         logs_stmt = stmt.order_by(AiUsageLog.created_at.desc()).offset(offset).limit(per_page)
         logs = list((await db.execute(logs_stmt)).scalars().all())
 
-        user_ids = [l.user_id for l in logs if l.user_id]
+        user_ids = [entry.user_id for entry in logs if entry.user_id]
         users_map = {}
         if user_ids:
             u_stmt = select(User).where(User.id.in_(user_ids))
@@ -1159,19 +1364,19 @@ class AdminService:
 
         log_items = [
             AdminAiUsageLogItem(
-                id=l.id,
-                user=users_map.get(l.user_id),
-                feature=l.feature,
-                model=l.model,
-                prompt_tokens=l.prompt_tokens,
-                completion_tokens=l.completion_tokens,
-                total_tokens=(l.prompt_tokens or 0) + (l.completion_tokens or 0),
-                latency_ms=l.latency_ms,
-                status=l.status,
-                error_code=l.error_code,
-                created_at=l.created_at.isoformat(),
+                id=entry.id,
+                user=users_map.get(entry.user_id),
+                feature=entry.feature,
+                model=entry.model,
+                prompt_tokens=entry.prompt_tokens,
+                completion_tokens=entry.completion_tokens,
+                total_tokens=(entry.prompt_tokens or 0) + (entry.completion_tokens or 0),
+                latency_ms=entry.latency_ms,
+                status=entry.status,
+                error_code=entry.error_code,
+                created_at=entry.created_at.isoformat(),
             )
-            for l in logs
+            for entry in logs
         ]
 
         last_p = max(1, (total_logs + per_page - 1) // per_page)
@@ -1200,20 +1405,25 @@ class AdminService:
     async def get_activity_logs(
         cls,
         db: AsyncSession,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        admin_id: Optional[int] = None,
-        action: Optional[str] = None,
-        subject_type: Optional[str] = None,
-        search: Optional[str] = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        admin_id: int | None = None,
+        action: str | None = None,
+        subject_type: str | None = None,
+        search: str | None = None,
         page: int = 1,
         per_page: int = 25,
-    ) -> Tuple[List[AdminActivityItem], int, int]:
+    ) -> tuple[list[AdminActivityItem], int, int]:
         stmt = select(AdminActivityLog).options(selectinload(AdminActivityLog.admin))
         if start_date:
-            stmt = stmt.where(AdminActivityLog.created_at >= datetime.strptime(start_date, "%Y-%m-%d"))
+            stmt = stmt.where(
+                AdminActivityLog.created_at >= datetime.strptime(start_date, "%Y-%m-%d")
+            )
         if end_date:
-            stmt = stmt.where(AdminActivityLog.created_at <= datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1))
+            stmt = stmt.where(
+                AdminActivityLog.created_at
+                <= datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            )
         if admin_id:
             stmt = stmt.where(AdminActivityLog.admin_id == admin_id)
         if action and action != "all":
@@ -1233,7 +1443,9 @@ class AdminService:
         items = [
             AdminActivityItem(
                 id=a.id,
-                admin={"id": a.admin.id, "name": a.admin.name, "email": a.admin.email} if a.admin else None,
+                admin={"id": a.admin.id, "name": a.admin.name, "email": a.admin.email}
+                if a.admin
+                else None,
                 action=a.action,
                 subject_type=a.subject_type,
                 subject_id=a.subject_id,

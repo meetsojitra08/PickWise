@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.auth import get_current_user
 from app.core.exceptions import ValidationException
 from app.core.security import hash_password, verify_password
@@ -25,9 +26,7 @@ async def update_profile(
     email_clean = payload.email.lower()
     if email_clean != user.email:
         existing = (
-            await db.execute(
-                select(User).where(User.email == email_clean, User.id != user.id)
-            )
+            await db.execute(select(User).where(User.email == email_clean, User.id != user.id))
         ).scalar_one_or_none()
         if existing:
             raise ValidationException(
@@ -49,15 +48,11 @@ async def update_password(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    if payload.current_password and not verify_password(
-        payload.current_password, user.password
-    ):
+    if payload.current_password and not verify_password(payload.current_password, user.password):
         raise ValidationException(
             "The provided password does not match your current password.",
             details={
-                "current_password": [
-                    "The provided password does not match your current password."
-                ]
+                "current_password": ["The provided password does not match your current password."]
             },
         )
 

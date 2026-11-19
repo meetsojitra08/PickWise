@@ -1,4 +1,3 @@
-import pytest
 from app.services.value_score import ValueScoreCalculator
 
 

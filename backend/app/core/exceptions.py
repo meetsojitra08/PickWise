@@ -1,17 +1,18 @@
-from typing import Any, Dict, Optional
+from typing import Any
+
 from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
-class AppException(Exception):
+class AppError(Exception):
     def __init__(
         self,
         code: str,
         message: str,
         status_code: int = status.HTTP_400_BAD_REQUEST,
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         self.code = code
         self.message = message
@@ -20,8 +21,11 @@ class AppException(Exception):
         super().__init__(message)
 
 
+AppException = AppError
+
+
 class NotFoundException(AppException):
-    def __init__(self, message: str = "Resource not found", details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str = "Resource not found", details: dict[str, Any] | None = None):
         super().__init__(
             code="not_found",
             message=message,
@@ -31,7 +35,7 @@ class NotFoundException(AppException):
 
 
 class UnauthorizedException(AppException):
-    def __init__(self, message: str = "Unauthenticated", details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str = "Unauthenticated", details: dict[str, Any] | None = None):
         super().__init__(
             code="unauthenticated",
             message=message,
@@ -41,7 +45,7 @@ class UnauthorizedException(AppException):
 
 
 class ForbiddenException(AppException):
-    def __init__(self, message: str = "Forbidden", details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str = "Forbidden", details: dict[str, Any] | None = None):
         super().__init__(
             code="forbidden",
             message=message,
@@ -51,7 +55,7 @@ class ForbiddenException(AppException):
 
 
 class ValidationException(AppException):
-    def __init__(self, message: str = "Validation failed", details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str = "Validation failed", details: dict[str, Any] | None = None):
         super().__init__(
             code="validation_failed",
             message=message,
@@ -61,7 +65,7 @@ class ValidationException(AppException):
 
 
 class RateLimitedException(AppException):
-    def __init__(self, message: str = "Too many requests", details: Optional[Dict[str, Any]] = None):
+    def __init__(self, message: str = "Too many requests", details: dict[str, Any] | None = None):
         super().__init__(
             code="rate_limited",
             message=message,
@@ -71,7 +75,9 @@ class RateLimitedException(AppException):
 
 
 class AiQuotaExceededException(AppException):
-    def __init__(self, message: str = "Daily AI quota exceeded", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self, message: str = "Daily AI quota exceeded", details: dict[str, Any] | None = None
+    ):
         super().__init__(
             code="ai_quota_exceeded",
             message=message,
@@ -81,7 +87,11 @@ class AiQuotaExceededException(AppException):
 
 
 class AiUnavailableException(AppException):
-    def __init__(self, message: str = "AI service temporarily unavailable", details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str = "AI service temporarily unavailable",
+        details: dict[str, Any] | None = None,
+    ):
         super().__init__(
             code="ai_unavailable",
             message=message,
@@ -90,7 +100,7 @@ class AiUnavailableException(AppException):
         )
 
 
-def get_request_id(request: Request) -> Optional[str]:
+def get_request_id(request: Request) -> str | None:
     return getattr(request.state, "request_id", None) or request.headers.get("X-Request-Id")
 
 
@@ -108,8 +118,10 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
     )
 
 
-async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-    details: Dict[str, list[str]] = {}
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    details: dict[str, list[str]] = {}
     for error in exc.errors():
         loc = error.get("loc", [])
         # Skip 'body' or 'query' prefix if present

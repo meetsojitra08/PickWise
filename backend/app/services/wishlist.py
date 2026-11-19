@@ -1,9 +1,8 @@
-from typing import List, Optional, Tuple
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
 from app.core.exceptions import NotFoundException
-from app.core.response import PaginationLinks, PaginationMeta
 from app.models import Product, User, WishlistItem
 from app.schemas.wishlist import WishlistItemOut
 from app.services.search import to_product_card
@@ -17,7 +16,7 @@ class WishlistService:
         user: User,
         page: int = 1,
         per_page: int = 48,
-    ) -> Tuple[List[WishlistItemOut], int, int]:
+    ) -> tuple[list[WishlistItemOut], int, int]:
         count_stmt = (
             select(func.count(WishlistItem.id))
             .join(Product, Product.id == WishlistItem.product_id)
@@ -64,8 +63,10 @@ class WishlistService:
         db: AsyncSession,
         user: User,
         product_id: int,
-    ) -> Tuple[WishlistItemOut, bool]:
-        prod_stmt = select(Product).where(Product.id == product_id, Product.is_published.is_(True), Product.deleted_at.is_(None))
+    ) -> tuple[WishlistItemOut, bool]:
+        prod_stmt = select(Product).where(
+            Product.id == product_id, Product.is_published.is_(True), Product.deleted_at.is_(None)
+        )
         product = (await db.execute(prod_stmt)).scalar_one_or_none()
         if not product:
             raise NotFoundException(f"Product '{product_id}' not found.")

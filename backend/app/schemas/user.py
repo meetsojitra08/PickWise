@@ -1,5 +1,5 @@
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 EMAIL_REGEX = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
@@ -10,10 +10,10 @@ class UserOut(BaseModel):
     name: str
     email: str
     role: str
-    preferences: Optional[Dict[str, Any]] = None
+    preferences: dict[str, Any] | None = None
     is_active: bool
-    email_verified_at: Optional[str] = None
-    created_at: Optional[str] = None
+    email_verified_at: str | None = None
+    created_at: str | None = None
 
     @classmethod
     def from_orm(cls, user: Any) -> "UserOut":
@@ -24,7 +24,9 @@ class UserOut(BaseModel):
             role=user.role,
             preferences=user.preferences,
             is_active=user.is_active,
-            email_verified_at=user.email_verified_at.isoformat() if user.email_verified_at else None,
+            email_verified_at=user.email_verified_at.isoformat()
+            if user.email_verified_at
+            else None,
             created_at=user.created_at.isoformat() if user.created_at else None,
         )
 
@@ -47,11 +49,11 @@ class UpdateProfileRequest(BaseModel):
 
 
 class UpdatePasswordRequest(BaseModel):
-    current_password: Optional[str] = None
+    current_password: str | None = None
     password: str = Field(..., min_length=8)
 
 
 class UpdatePreferencesRequest(BaseModel):
-    budget_default: Optional[float] = None
-    favourite_categories: Optional[List[str]] = Field(default_factory=list)
-    priorities: Optional[List[str]] = Field(default_factory=list)
+    budget_default: float | None = None
+    favourite_categories: list[str] | None = Field(default_factory=list)
+    priorities: list[str] | None = Field(default_factory=list)

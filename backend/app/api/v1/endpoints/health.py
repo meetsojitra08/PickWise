@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.exceptions import get_request_id
+
 from app.db.session import get_db, get_redis_client
 
 router = APIRouter()

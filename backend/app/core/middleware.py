@@ -1,8 +1,10 @@
 import uuid
-from typing import Callable
+from collections.abc import Callable
+
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
+
 from app.core.config import settings
 
 MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}

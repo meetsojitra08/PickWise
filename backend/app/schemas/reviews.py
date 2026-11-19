@@ -1,5 +1,5 @@
-from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
+
 from app.core.response import PaginationLinks, PaginationMeta
 
 
@@ -17,16 +17,16 @@ class ReviewOut(BaseModel):
     status: str
     author_name: str
     is_own: bool = False
-    created_at: Optional[str] = None
+    created_at: str | None = None
 
 
 class ProductReviewsMeta(PaginationMeta):
-    rating_distribution: Dict[int, int]
-    own_pending_review: Optional[ReviewOut] = None
+    rating_distribution: dict[int, int]
+    own_pending_review: ReviewOut | None = None
     has_reviewed: bool = False
 
 
 class ProductReviewsResponse(BaseModel):
-    data: List[ReviewOut]
+    data: list[ReviewOut]
     meta: ProductReviewsMeta
-    links: Optional[PaginationLinks] = None
+    links: PaginationLinks | None = None

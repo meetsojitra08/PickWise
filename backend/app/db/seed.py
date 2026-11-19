@@ -1,9 +1,10 @@
 import asyncio
-from datetime import datetime, timedelta, timezone
 import json
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Dict, List
+
 from sqlalchemy import select
+
 from app.core.security import generate_share_token, hash_password
 from app.db.init_db import init_database
 from app.db.session import AsyncSessionLocal
@@ -55,12 +56,14 @@ async def seed_all():
         print(f"Error: {seed_file} not found!")
         return
 
-    with open(seed_file, "r", encoding="utf-8") as f:
+    with open(seed_file, encoding="utf-8") as f:
         data = json.load(f)
 
     async with AsyncSessionLocal() as db:
         print("Seeding Users...")
-        admin = (await db.execute(select(User).where(User.email == "admin@pickwise.test"))).scalar_one_or_none()
+        admin = (
+            await db.execute(select(User).where(User.email == "admin@pickwise.test"))
+        ).scalar_one_or_none()
         if not admin:
             admin = User(
                 name="Demo Admin",
@@ -68,11 +71,13 @@ async def seed_all():
                 password=hash_password("password"),
                 role="admin",
                 is_active=True,
-                email_verified_at=datetime.now(timezone.utc),
+                email_verified_at=datetime.now(UTC),
             )
             db.add(admin)
 
-        customer = (await db.execute(select(User).where(User.email == "customer@pickwise.test"))).scalar_one_or_none()
+        customer = (
+            await db.execute(select(User).where(User.email == "customer@pickwise.test"))
+        ).scalar_one_or_none()
         if not customer:
             customer = User(
                 name="Demo Customer",
@@ -85,11 +90,13 @@ async def seed_all():
                     "favourite_categories": ["laptops", "smartphones", "headphones"],
                     "priorities": ["battery_life", "performance", "value_for_money"],
                 },
-                email_verified_at=datetime.now(timezone.utc),
+                email_verified_at=datetime.now(UTC),
             )
             db.add(customer)
 
-        test_user = (await db.execute(select(User).where(User.email == "test@example.com"))).scalar_one_or_none()
+        test_user = (
+            await db.execute(select(User).where(User.email == "test@example.com"))
+        ).scalar_one_or_none()
         if not test_user:
             test_user = User(
                 name="Test User",
@@ -97,7 +104,7 @@ async def seed_all():
                 password=hash_password("password"),
                 role="customer",
                 is_active=True,
-                email_verified_at=datetime.now(timezone.utc),
+                email_verified_at=datetime.now(UTC),
             )
             db.add(test_user)
 
@@ -107,21 +114,25 @@ async def seed_all():
         await db.refresh(test_user)
 
         print("Seeding Brands...")
-        brand_map: Dict[str, Brand] = {}
+        brand_map: dict[str, Brand] = {}
         for b_data in data["brands"]:
             slug = b_data["slug"]
             brand = (await db.execute(select(Brand).where(Brand.slug == slug))).scalar_one_or_none()
             if not brand:
-                brand = Brand(name=b_data["name"], slug=slug, logo_path=f"/storage/brands/{slug}.svg")
+                brand = Brand(
+                    name=b_data["name"], slug=slug, logo_path=f"/storage/brands/{slug}.svg"
+                )
                 db.add(brand)
                 await db.flush()
             brand_map[slug] = brand
 
         print("Seeding Categories & Spec Definitions...")
-        cat_map: Dict[str, Category] = {}
+        cat_map: dict[str, Category] = {}
         for c_data in data["categories"]:
             slug = c_data["slug"]
-            cat = (await db.execute(select(Category).where(Category.slug == slug))).scalar_one_or_none()
+            cat = (
+                await db.execute(select(Category).where(Category.slug == slug))
+            ).scalar_one_or_none()
             if not cat:
                 cat = Category(
                     name=c_data["name"],
@@ -139,15 +150,15 @@ async def seed_all():
 
         # Seed Catalog Products
         print("Seeding Products, Specs, Media & Price Histories...")
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         today = now.date()
-        seeded_products: List[Product] = []
+        seeded_products: list[Product] = []
 
         for cat_slug, cat_catalog in data["catalog"].items():
             category = cat_map[cat_slug]
 
             # Seed Specs
-            spec_def_map: Dict[str, SpecDefinition] = {}
+            spec_def_map: dict[str, SpecDefinition] = {}
             for s_data in cat_catalog["spec_definitions"]:
                 key = s_data["key"]
                 spec_def = (
@@ -177,7 +188,9 @@ async def seed_all():
             for p_data in cat_catalog["products"]:
                 slug = p_data["slug"]
                 brand = brand_map[p_data["brand_slug"]]
-                product = (await db.execute(select(Product).where(Product.slug == slug))).scalar_one_or_none()
+                product = (
+                    await db.execute(select(Product).where(Product.slug == slug))
+                ).scalar_one_or_none()
 
                 price_rupees = float(p_data["price_rupees"])
 
@@ -188,7 +201,9 @@ async def seed_all():
                         name=p_data["name"],
                         slug=slug,
                         summary=p_data.get("summary") or p_data.get("name"),
-                        description=p_data.get("description") or p_data.get("summary") or p_data.get("name"),
+                        description=p_data.get("description")
+                        or p_data.get("summary")
+                        or p_data.get("name"),
                         price=price_rupees,
                         currency="INR",
                         availability=p_data.get("availability", "in_stock"),
@@ -216,13 +231,23 @@ async def seed_all():
                             continue
                         defn = spec_def_map[spec_key]
                         raw_val = str(spec_val)
-                        num_val = float(spec_val) if defn.data_type == "number" and isinstance(spec_val, (int, float)) else None
-                        bool_val = bool(spec_val) if defn.data_type == "boolean" and isinstance(spec_val, bool) else None
+                        num_val = (
+                            float(spec_val)
+                            if defn.data_type == "number" and isinstance(spec_val, (int, float))
+                            else None
+                        )
+                        bool_val = (
+                            bool(spec_val)
+                            if defn.data_type == "boolean" and isinstance(spec_val, bool)
+                            else None
+                        )
 
                         ps = ProductSpec(
                             product_id=product.id,
                             spec_definition_id=defn.id,
-                            value_text=raw_val if defn.data_type not in ("number", "boolean") else None,
+                            value_text=raw_val
+                            if defn.data_type not in ("number", "boolean")
+                            else None,
                             value_number=num_val,
                             value_bool=bool_val,
                         )
@@ -267,17 +292,31 @@ async def seed_all():
                     author_name=customer.name,
                     rating=int(round(float(product.rating_avg))) or 5,
                     title="Impressive value and solid build",
-                    body=f"Been using the {product.name} daily. The build quality, display clarity, and speed match the advertised specs perfectly.",
+                    body=(
+                        f"Been using the {product.name} daily. The build quality, "
+                        "display clarity, and speed match the advertised specs perfectly."
+                    ),
                     status="approved",
                 )
                 db.add(review)
 
-            summ = (await db.execute(select(ReviewSummary).where(ReviewSummary.product_id == product.id))).scalar_one_or_none()
+            summ = (
+                await db.execute(
+                    select(ReviewSummary).where(ReviewSummary.product_id == product.id)
+                )
+            ).scalar_one_or_none()
             if not summ:
                 summ = ReviewSummary(
                     product_id=product.id,
-                    summary=f"The {product.name} delivers standout capability and everyday value, making it an easy recommendation.",
-                    pros=["Premium design and materials", "Responsive performance for heavy tasks", "Sharp and color-accurate display"],
+                    summary=(
+                        f"The {product.name} delivers standout capability and everyday value, "
+                        "making it an easy recommendation."
+                    ),
+                    pros=[
+                        "Premium design and materials",
+                        "Responsive performance for heavy tasks",
+                        "Sharp and color-accurate display",
+                    ],
                     cons=["Slightly warm under sustained maximum load", "Charger brick is bulky"],
                     sentiment="positive",
                     reviews_count=product.rating_count or 8,
@@ -287,12 +326,20 @@ async def seed_all():
 
         # Seed Wishlist for Customer
         for prod in seeded_products[:3]:
-            existing_wl = (await db.execute(select(WishlistItem).where(WishlistItem.user_id == customer.id, WishlistItem.product_id == prod.id))).first()
+            existing_wl = (
+                await db.execute(
+                    select(WishlistItem).where(
+                        WishlistItem.user_id == customer.id, WishlistItem.product_id == prod.id
+                    )
+                )
+            ).first()
             if not existing_wl:
                 db.add(WishlistItem(user_id=customer.id, product_id=prod.id))
 
         # Seed Comparison for Customer
-        comp = (await db.execute(select(Comparison).where(Comparison.user_id == customer.id))).scalar_one_or_none()
+        comp = (
+            await db.execute(select(Comparison).where(Comparison.user_id == customer.id))
+        ).scalar_one_or_none()
         if not comp and len(seeded_products) >= 3:
             comp = Comparison(
                 user_id=customer.id,
@@ -305,7 +352,10 @@ async def seed_all():
                 db.add(ComparisonItem(comparison_id=comp.id, product_id=p.id, position=idx + 1))
 
         await db.commit()
-        print("Database seed completed successfully! 60 products seeded with specs, prices, and AI summaries.")
+        print(
+            "Database seed completed successfully! "
+            "60 products seeded with specs, prices, and AI summaries."
+        )
 
 
 if __name__ == "__main__":

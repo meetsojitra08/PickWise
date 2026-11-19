@@ -1,8 +1,8 @@
-from typing import Optional
 from fastapi import Depends, Request, Response
 from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.config import settings
 from app.core.exceptions import ForbiddenException, UnauthorizedException
 from app.core.security import generate_csrf_token, generate_secure_token
@@ -16,9 +16,7 @@ async def create_user_session(
     user_id: int, response: Response, redis: Redis, remember: bool = False
 ) -> str:
     session_id = generate_secure_token(32)
-    ttl_seconds = (
-        (30 * 24 * 3600) if remember else (settings.SESSION_LIFETIME_MINUTES * 60)
-    )
+    ttl_seconds = (30 * 24 * 3600) if remember else (settings.SESSION_LIFETIME_MINUTES * 60)
 
     await redis.set(f"{SESSION_PREFIX}{session_id}", str(user_id), ex=ttl_seconds)
 
@@ -48,9 +46,7 @@ async def create_user_session(
     return session_id
 
 
-async def destroy_user_session(
-    session_id: Optional[str], response: Response, redis: Redis
-) -> None:
+async def destroy_user_session(session_id: str | None, response: Response, redis: Redis) -> None:
     if session_id:
         await redis.delete(f"{SESSION_PREFIX}{session_id}")
 
@@ -61,7 +57,7 @@ async def destroy_user_session(
 async def get_optional_user(
     request: Request,
     db: AsyncSession = Depends(get_db),
-) -> Optional[User]:
+) -> User | None:
     session_id = request.cookies.get(settings.SESSION_COOKIE_NAME)
     if not session_id:
         return None
@@ -82,14 +78,12 @@ async def get_optional_user(
         return None
 
     # Sliding session renewal
-    await redis.expire(
-        f"{SESSION_PREFIX}{session_id}", settings.SESSION_LIFETIME_MINUTES * 60
-    )
+    await redis.expire(f"{SESSION_PREFIX}{session_id}", settings.SESSION_LIFETIME_MINUTES * 60)
     return user
 
 
 async def get_current_user(
-    user: Optional[User] = Depends(get_optional_user),
+    user: User | None = Depends(get_optional_user),
 ) -> User:
     if not user:
         raise UnauthorizedException("Unauthenticated.")

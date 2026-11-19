@@ -1,9 +1,9 @@
-from typing import Dict, List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
 from app.models.product import Product
-from app.models.spec_definition import ProductSpec, SpecDefinition
+from app.models.spec_definition import ProductSpec
 
 
 class ValueScoreCalculator:
@@ -14,13 +14,17 @@ class ValueScoreCalculator:
     RATING_PRIOR_COUNT = 5
 
     @classmethod
-    async def recalculate_category(cls, db: AsyncSession, category_id: int) -> Dict[int, Optional[int]]:
+    async def recalculate_category(
+        cls, db: AsyncSession, category_id: int
+    ) -> dict[int, int | None]:
         stmt = (
             select(Product)
-            .where(Product.category_id == category_id, Product.is_published.is_(True), Product.deleted_at.is_(None))
-            .options(
-                selectinload(Product.specs).selectinload(ProductSpec.spec_definition)
+            .where(
+                Product.category_id == category_id,
+                Product.is_published.is_(True),
+                Product.deleted_at.is_(None),
             )
+            .options(selectinload(Product.specs).selectinload(ProductSpec.spec_definition))
             .order_by(Product.id)
         )
         result = await db.execute(stmt)
@@ -29,8 +33,8 @@ class ValueScoreCalculator:
         if not products:
             return {}
 
-        spec_values: Dict[str, Dict[int, float]] = {}
-        directions_by_key: Dict[str, bool] = {}
+        spec_values: dict[str, dict[int, float]] = {}
+        directions_by_key: dict[str, bool] = {}
 
         for product in products:
             for spec in product.specs:
@@ -48,7 +52,7 @@ class ValueScoreCalculator:
                 spec_values[defn.key][product.id] = float(spec.value_number)
                 directions_by_key[defn.key] = defn.higher_is_better
 
-        percentiles_by_product: Dict[int, List[float]] = {}
+        percentiles_by_product: dict[int, list[float]] = {}
         for defn_key, values_by_prod in spec_values.items():
             all_vals = list(values_by_prod.values())
             for prod_id, val in values_by_prod.items():
@@ -58,18 +62,18 @@ class ValueScoreCalculator:
                     percentiles_by_product[prod_id] = []
                 percentiles_by_product[prod_id].append(score_contrib)
 
-        strength_by_product: Dict[int, float] = {}
+        strength_by_product: dict[int, float] = {}
         for prod_id, pctls in percentiles_by_product.items():
             strength_by_product[prod_id] = sum(pctls) / len(pctls)
 
-        efficiencies: Dict[int, float] = {}
+        efficiencies: dict[int, float] = {}
         for product in products:
             strength = strength_by_product.get(product.id)
             price = float(product.price)
             if strength is not None and price > 0:
                 efficiencies[product.id] = strength / price
 
-        scores: Dict[int, Optional[int]] = {}
+        scores: dict[int, int | None] = {}
         all_efficiencies = list(efficiencies.values())
 
         for product in products:
@@ -108,7 +112,7 @@ class ValueScoreCalculator:
         return adjusted / 5.0
 
     @staticmethod
-    def percentile(value: float, values: List[float]) -> float:
+    def percentile(value: float, values: list[float]) -> float:
         count = len(values)
         if count <= 1:
             return 0.5

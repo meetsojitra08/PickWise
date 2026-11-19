@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.auth import get_current_user
 from app.core.response import ApiResponse, PaginatedResponse, PaginationLinks, PaginationMeta
 from app.db.session import get_db
@@ -35,7 +36,9 @@ async def get_wishlist(
             first=f"/api/v1/wishlist?page=1&per_page={per_page}",
             last=f"/api/v1/wishlist?page={last_page}&per_page={per_page}",
             prev=f"/api/v1/wishlist?page={page - 1}&per_page={per_page}" if page > 1 else None,
-            next=f"/api/v1/wishlist?page={page + 1}&per_page={per_page}" if page < last_page else None,
+            next=f"/api/v1/wishlist?page={page + 1}&per_page={per_page}"
+            if page < last_page
+            else None,
         ),
     )
 
@@ -57,15 +60,15 @@ async def add_wishlist_item(
     return ApiResponse(data=item)
 
 
-@router.delete("/wishlist/{productId}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/wishlist/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_wishlist_item(
-    productId: int,
+    product_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     await WishlistService.remove_item(
         db=db,
         user=current_user,
-        product_id=productId,
+        product_id=product_id,
     )
     return Response(status_code=status.HTTP_204_NO_CONTENT)

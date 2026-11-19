@@ -1,13 +1,12 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
+
 from app.main import app
 
 
 @pytest.mark.asyncio
 async def test_auth_full_flow():
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # 1. Fetch CSRF cookie
         csrf_res = await client.get("/sanctum/csrf-cookie")
         assert csrf_res.status_code == 204
@@ -61,9 +60,7 @@ async def test_auth_full_flow():
 
 @pytest.mark.asyncio
 async def test_invalid_login():
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         res = await client.post(
             "/api/v1/auth/login",
             json={"email": "nonexistent@pickwise.test", "password": "wrong"},

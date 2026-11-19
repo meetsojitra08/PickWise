@@ -1,4 +1,3 @@
-from typing import List, Optional
 from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -36,7 +35,7 @@ class Settings(BaseSettings):
     # Redis
     REDIS_HOST: str = "redis"
     REDIS_PORT: int = 6379
-    REDIS_PASSWORD: Optional[str] = None
+    REDIS_PASSWORD: str | None = None
 
     @computed_field
     @property
@@ -46,7 +45,7 @@ class Settings(BaseSettings):
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/0"
 
     # AI / Groq
-    GROQ_API_KEY: Optional[str] = None
+    GROQ_API_KEY: str | None = None
     GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
     GROQ_MODEL: str = "llama-3.3-70b-versatile"
     GROQ_TIMEOUT_SECONDS: int = 20
@@ -59,7 +58,7 @@ class Settings(BaseSettings):
     XSRF_COOKIE_NAME: str = "XSRF-TOKEN"
     XSRF_HEADER_NAME: str = "x-xsrf-token"
 
-    CORS_ALLOWED_ORIGINS: List[str] = [
+    CORS_ALLOWED_ORIGINS: list[str] = [
         "http://localhost:8080",
         "http://localhost:5173",
         "http://127.0.0.1:8080",

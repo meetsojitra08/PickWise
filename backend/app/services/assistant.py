@@ -1,12 +1,14 @@
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple, Union
+from datetime import UTC, datetime
+from typing import Any
+
 from fastapi import Request
 from redis.asyncio import Redis
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from app.core.exceptions import ForbiddenException, NotFoundException, ValidationException
-from app.models import AiConversation, AiMessage, AiUsageLog, Category, Product, ProductSpec, SpecDefinition, User
+
+from app.core.exceptions import ForbiddenException, NotFoundException
+from app.models import AiConversation, AiMessage, AiUsageLog, Category, Product, ProductSpec, User
 from app.schemas.assistant import (
     AiConversationDetailOut,
     AiConversationSummaryOut,
@@ -32,12 +34,14 @@ class AssistantService:
     async def list_conversations(
         cls,
         db: AsyncSession,
-        user: Optional[User],
+        user: User | None,
         session_key: str,
         page: int = 1,
         per_page: int = 20,
-    ) -> Tuple[List[AiConversationSummaryOut], int, int]:
-        condition = AiConversation.user_id == user.id if user else AiConversation.session_key == session_key
+    ) -> tuple[list[AiConversationSummaryOut], int, int]:
+        condition = (
+            AiConversation.user_id == user.id if user else AiConversation.session_key == session_key
+        )
 
         count_stmt = select(func.count(AiConversation.id)).where(condition)
         total = (await db.execute(count_stmt)).scalar() or 0
@@ -51,7 +55,11 @@ class AssistantService:
             .where(condition)
             .group_by(AiConversation.id)
             .order_by(
-                func.coalesce(AiConversation.last_message_at, AiConversation.updated_at, AiConversation.created_at).desc(),
+                func.coalesce(
+                    AiConversation.last_message_at,
+                    AiConversation.updated_at,
+                    AiConversation.created_at,
+                ).desc(),
                 AiConversation.id.desc(),
             )
         )
@@ -76,9 +84,9 @@ class AssistantService:
     async def create_conversation(
         cls,
         db: AsyncSession,
-        user: Optional[User],
+        user: User | None,
         session_key: str,
-        title: Optional[str] = None,
+        title: str | None = None,
     ) -> AiConversationDetailOut:
         conv = AiConversation(
             user_id=user.id if user else None,
@@ -103,7 +111,7 @@ class AssistantService:
         cls,
         db: AsyncSession,
         conversation_id: int,
-        user: Optional[User],
+        user: User | None,
         session_key: str,
     ) -> AiConversationDetailOut:
         stmt = (
@@ -130,7 +138,7 @@ class AssistantService:
                     all_product_ids.add(int(item["product_id"]))
 
         # Load products
-        prod_map: Dict[int, Any] = {}
+        prod_map: dict[int, Any] = {}
         if all_product_ids:
             p_stmt = (
                 select(Product)
@@ -144,10 +152,10 @@ class AssistantService:
             prods = list((await db.execute(p_stmt)).scalars().all())
             prod_map = {p.id: to_product_card(p) for p in prods}
 
-        messages_out: List[AssistantMessageOut] = []
+        messages_out: list[AssistantMessageOut] = []
         for msg in conv.messages:
             payload = msg.payload or {}
-            recs_out: List[AssistantRecommendationItemOut] = []
+            recs_out: list[AssistantRecommendationItemOut] = []
             for r in payload.get("recommendations", []):
                 pid = r.get("product_id")
                 recs_out.append(
@@ -159,7 +167,7 @@ class AssistantService:
                     )
                 )
 
-            alts_out: List[AssistantRecommendationItemOut] = []
+            alts_out: list[AssistantRecommendationItemOut] = []
             for a in payload.get("alternatives", []):
                 pid = a.get("product_id")
                 alts_out.append(
@@ -197,7 +205,7 @@ class AssistantService:
         cls,
         db: AsyncSession,
         conversation_id: int,
-        user: Optional[User],
+        user: User | None,
         session_key: str,
     ) -> None:
         stmt = select(AiConversation).where(AiConversation.id == conversation_id)
@@ -219,7 +227,7 @@ class AssistantService:
         db: AsyncSession,
         redis: Redis,
         conversation_id: int,
-        user: Optional[User],
+        user: User | None,
         session_key: str,
         payload: SendMessagePayload,
         request: Request,
@@ -253,7 +261,7 @@ class AssistantService:
             conv.title = payload.message[:60].strip()
 
         # 2. Retrieve grounded candidates
-        budget_val: Optional[float] = None
+        budget_val: float | None = None
         if payload.budget_max is not None and str(payload.budget_max).strip():
             try:
                 budget_val = float(str(payload.budget_max).strip())
@@ -288,7 +296,7 @@ class AssistantService:
         candidates = list((await db.execute(candidate_stmt)).scalars().all())
 
         # If no candidates under budget, look for alternatives within +15%
-        alternatives: List[Product] = []
+        alternatives: list[Product] = []
         if not candidates and budget_val is not None:
             alt_stmt = (
                 select(Product)
@@ -310,16 +318,24 @@ class AssistantService:
 
         # 3. AI call or fallback
         assistant_content = ""
-        recommendations_data: List[Dict[str, Any]] = []
-        alternatives_data: List[Dict[str, Any]] = []
+        recommendations_data: list[dict[str, Any]] = []
+        alternatives_data: list[dict[str, Any]] = []
         status_val = "ok"
 
         if not candidates:
             if alternatives:
-                assistant_content = "Nothing fits your budget exactly. These options are up to 15% over budget, but worth a look."
-                alternatives_data = [{"product_id": a.id, "reason": None, "tradeoffs": []} for a in alternatives]
+                assistant_content = (
+                    "Nothing fits your budget exactly. These options are up to 15% over budget, "
+                    "but worth a look."
+                )
+                alternatives_data = [
+                    {"product_id": a.id, "reason": None, "tradeoffs": []} for a in alternatives
+                ]
             else:
-                assistant_content = "No products match those filters yet. Try a higher budget, a different category, or a broader request."
+                assistant_content = (
+                    "No products match those filters yet. Try a higher budget, a different "
+                    "category, or a broader request."
+                )
         else:
             # Candidates exist: try Groq if configured
             groq_success = False
@@ -327,12 +343,16 @@ class AssistantService:
 
             if GroqClient.get_client() is not None:
                 system_prompt = (
-                    "You are the Pickwise shopping assistant. You help shoppers choose a product from the candidate list supplied with each request.\n\n"
+                    "You are the Pickwise shopping assistant. You help shoppers choose a product "
+                    "from the candidate list supplied with each request.\n\n"
                     "Rules:\n"
-                    "- Only recommend products from the candidate list, using their exact product_id. Never invent a product, price, or specification.\n"
-                    "- Recommend at most 3 products. Use an empty recommendations array when no candidate fits.\n"
+                    "- Only recommend products from the candidate list, using their exact "
+                    "product_id. Never invent a product, price, or specification.\n"
+                    "- Recommend at most 3 products. Use an empty recommendations array when no "
+                    "candidate fits.\n"
                     "- Reply with JSON only, using exactly this shape:\n"
-                    '{"message":"1 to 3 short sentences","recommendations":[{"product_id":14,"reason":"why it fits","tradeoffs":["one drawback"]}]}'
+                    '{"message":"1 to 3 short sentences","recommendations":['
+                    '{"product_id":14,"reason":"why it fits","tradeoffs":["one drawback"]}]}'
                 )
 
                 prompt_lines = [
@@ -343,14 +363,19 @@ class AssistantService:
                 ]
                 for c in candidates:
                     prompt_lines.append(
-                        f"- ID {c.id}: {c.name} | Price: {c.price} {c.currency} | Rating: {c.rating_avg}/5 | Summary: {c.summary}"
+                        f"- ID {c.id}: {c.name} | Price: {c.price} {c.currency} | "
+                        f"Rating: {c.rating_avg}/5 | Summary: {c.summary}"
                     )
 
                 user_prompt = "\n".join(prompt_lines)
 
                 try:
-                    parsed, p_tokens, c_tokens, lat_ms = await GroqClient.complete_json(system_prompt, user_prompt)
-                    assistant_content = parsed.get("message", "Here are the top recommendations matching your request.")
+                    parsed, p_tokens, c_tokens, lat_ms = await GroqClient.complete_json(
+                        system_prompt, user_prompt
+                    )
+                    assistant_content = parsed.get(
+                        "message", "Here are the top recommendations matching your request."
+                    )
                     raw_recs = parsed.get("recommendations", [])
                     for r in raw_recs:
                         pid = r.get("product_id")
@@ -376,7 +401,7 @@ class AssistantService:
                         completion_tokens=c_tokens,
                         latency_ms=lat_ms,
                         status="ok",
-                        created_at=datetime.now(timezone.utc).replace(tzinfo=None),
+                        created_at=datetime.now(UTC).replace(tzinfo=None),
                     )
                     db.add(usage_log)
                 except Exception:
@@ -406,12 +431,14 @@ class AssistantService:
             status=status_val,
         )
         db.add(asst_msg)
-        conv.last_message_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        conv.last_message_at = datetime.now(UTC).replace(tzinfo=None)
         await db.commit()
         await db.refresh(asst_msg)
 
         # Build response item
-        all_ids = [r["product_id"] for r in recommendations_data] + [a["product_id"] for a in alternatives_data]
+        all_ids = [r["product_id"] for r in recommendations_data] + [
+            a["product_id"] for a in alternatives_data
+        ]
         prod_map = {}
         if all_ids:
             p_stmt = (

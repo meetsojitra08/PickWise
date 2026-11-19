@@ -1,5 +1,5 @@
-from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Field
+
 from app.schemas.catalog import ProductCardOut
 
 
@@ -12,64 +12,64 @@ class AiQuotaOut(BaseModel):
 
 class AssistantRecommendationItemOut(BaseModel):
     product_id: int
-    product: Optional[ProductCardOut] = None
-    reason: Optional[str] = None
-    tradeoffs: List[str] = []
+    product: ProductCardOut | None = None
+    reason: str | None = None
+    tradeoffs: list[str] = []
 
 
 class AssistantMessageOut(BaseModel):
     id: int
     role: str
     content: str
-    recommendations: List[AssistantRecommendationItemOut] = []
-    alternatives: List[AssistantRecommendationItemOut] = []
+    recommendations: list[AssistantRecommendationItemOut] = []
+    alternatives: list[AssistantRecommendationItemOut] = []
     status: str = "ok"
-    created_at: Optional[str] = None
+    created_at: str | None = None
 
 
 class AiConversationSummaryOut(BaseModel):
     id: int
-    title: Optional[str] = None
-    last_message_at: Optional[str] = None
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
-    messages_count: Optional[int] = None
+    title: str | None = None
+    last_message_at: str | None = None
+    created_at: str | None = None
+    updated_at: str | None = None
+    messages_count: int | None = None
 
 
 class AiConversationDetailOut(BaseModel):
     id: int
-    title: Optional[str] = None
-    last_message_at: Optional[str] = None
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
-    messages: List[AssistantMessageOut] = []
+    title: str | None = None
+    last_message_at: str | None = None
+    created_at: str | None = None
+    updated_at: str | None = None
+    messages: list[AssistantMessageOut] = []
 
 
 class SendMessagePayload(BaseModel):
     message: str = Field(..., min_length=1, max_length=1000)
-    category: Optional[str] = None
-    budget_max: Optional[Union[float, int, str]] = None
+    category: str | None = None
+    budget_max: float | int | str | None = None
 
 
 class CreateConversationPayload(BaseModel):
-    title: Optional[str] = None
+    title: str | None = None
 
 
 class CompareVerdictProductOut(BaseModel):
     product_id: int
     name: str
-    strengths: List[str] = []
-    weaknesses: List[str] = []
+    strengths: list[str] = []
+    weaknesses: list[str] = []
 
 
 class CompareVerdictOut(BaseModel):
     verdict: str
-    products: List[CompareVerdictProductOut] = []
+    products: list[CompareVerdictProductOut] = []
     quota: AiQuotaOut
-    comparison_id: Optional[int] = None
+    comparison_id: int | None = None
 
 
 class CompareVerdictPayload(BaseModel):
-    product_ids: List[int] = Field(..., min_length=2, max_length=4)
-    priority: Optional[str] = None
-    comparison_id: Optional[int] = None
+    product_ids: list[int] = Field(..., min_length=2, max_length=4)
+    priority: str | None = None
+    comparison_id: int | None = None
