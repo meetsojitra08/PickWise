@@ -48,6 +48,8 @@ final class GenerateOpenApiSpecCommand extends Command
             return self::SUCCESS;
         }
 
+        File::ensureDirectoryExists($docsPath);
+
         $jsonFile = $docsPath.'/openapi.json';
         $yamlFile = $docsPath.'/openapi.yaml';
 

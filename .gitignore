@@ -6,6 +6,7 @@
 # PHP / Laravel
 vendor/
 auth.json
+/backend/docs/
 /backend/bootstrap/cache/*.php
 !/backend/bootstrap/cache/.gitignore
 /backend/public/hot
