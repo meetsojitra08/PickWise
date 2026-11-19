@@ -94,7 +94,17 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def assemble_redis_url(self) -> "Settings":
-        if not self.REDIS_URL:
+        if self.REDIS_URL and self.REDIS_URL.strip():
+            url = self.REDIS_URL.strip().strip("'\"")
+            if url.startswith("https://"):
+                url = "rediss://" + url[8:]
+            elif url.startswith("http://"):
+                url = "redis://" + url[7:]
+            elif not any(url.startswith(s) for s in ("redis://", "rediss://", "unix://")):
+                scheme = "rediss://" if "upstash.io" in url else "redis://"
+                url = f"{scheme}{url}"
+            self.REDIS_URL = url
+        else:
             if self.REDIS_PASSWORD:
                 self.REDIS_URL = (
                     f"redis://:{self.REDIS_PASSWORD}@{self.REDIS_HOST}:{self.REDIS_PORT}/0"
