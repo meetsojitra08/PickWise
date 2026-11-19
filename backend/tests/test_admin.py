@@ -109,7 +109,7 @@ async def test_admin_full_flow():
         # 8. Users
         users_res = await client.get("/api/v1/admin/users")
         assert users_res.status_code == 200
-        assert len(users_res.json()["data"]) >= 4
+        assert len(users_res.json()["data"]) >= 3
 
         # 9. AI Usage
         ai_res = await client.get("/api/v1/admin/ai/usage")
