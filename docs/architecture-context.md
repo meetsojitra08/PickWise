@@ -51,7 +51,6 @@
 ```
 pickwise/
 ├── README.md
-├── TASK.md
 ├── docker-compose.yml
 ├── docker/
 │   ├── nginx/default.conf       # Reverse proxy, security headers, routing
