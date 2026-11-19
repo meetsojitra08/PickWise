@@ -55,6 +55,23 @@ describe('ReviewSummaryCard', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('renders loading skeleton with status role when isLoading is true', () => {
+    render(
+      <ReviewSummaryCard
+        summary={null}
+        approvedReviewCount={5}
+        isLoading={true}
+      />,
+    );
+
+    const statusEl = screen.getByRole('status');
+    expect(statusEl).toBeInTheDocument();
+    expect(statusEl).toHaveAttribute('aria-busy', 'true');
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'What buyers say' }),
+    ).toBeInTheDocument();
+  });
+
   it.each([
     ['positive', 'Mostly positive'],
     ['mixed', 'Mixed'],

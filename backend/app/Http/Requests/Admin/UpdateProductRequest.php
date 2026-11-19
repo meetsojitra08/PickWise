@@ -58,7 +58,7 @@ class UpdateProductRequest extends FormRequest
             'price' => ['sometimes', 'required', 'numeric', 'gt:0'],
             'currency' => ['nullable', 'string', 'size:3'],
             'availability' => ['sometimes', 'required', Rule::enum(ProductAvailability::class)],
-            'store_url' => ['nullable', 'url', 'max:2048'],
+            'store_url' => ['nullable', 'url:http,https', 'max:2048'],
             'is_published' => ['sometimes', 'required', 'boolean'],
             'specs' => ['nullable', 'array'],
             'specs.*.spec_definition_id' => [

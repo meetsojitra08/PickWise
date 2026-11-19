@@ -276,13 +276,18 @@ export function AdminReviewsPage() {
       <Card className="border border-border bg-card">
         <CardContent className="space-y-4 pt-6">
           {/* Status Tabs */}
-          <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
+          <div
+            role="group"
+            aria-label="Filter by review status"
+            className="flex flex-wrap items-center gap-2 border-b border-border pb-4"
+          >
             <span className="mr-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               Status:
             </span>
             <Button
               type="button"
               variant={statusFilter === 'pending' ? 'default' : 'outline'}
+              aria-pressed={statusFilter === 'pending'}
               size="sm"
               onClick={() => {
                 setStatusFilter('pending');
@@ -296,6 +301,7 @@ export function AdminReviewsPage() {
             <Button
               type="button"
               variant={statusFilter === 'approved' ? 'default' : 'outline'}
+              aria-pressed={statusFilter === 'approved'}
               size="sm"
               onClick={() => {
                 setStatusFilter('approved');
@@ -309,6 +315,7 @@ export function AdminReviewsPage() {
             <Button
               type="button"
               variant={statusFilter === 'rejected' ? 'default' : 'outline'}
+              aria-pressed={statusFilter === 'rejected'}
               size="sm"
               onClick={() => {
                 setStatusFilter('rejected');
@@ -322,6 +329,7 @@ export function AdminReviewsPage() {
             <Button
               type="button"
               variant={statusFilter === 'all' ? 'default' : 'outline'}
+              aria-pressed={statusFilter === 'all'}
               size="sm"
               onClick={() => {
                 setStatusFilter('all');
@@ -460,7 +468,7 @@ export function AdminReviewsPage() {
 
       {/* Main Review List */}
       <Card className="border border-border bg-card">
-        <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-3">
           <div className="flex items-center gap-3">
             <input
               type="checkbox"
@@ -630,7 +638,7 @@ export function AdminReviewsPage() {
                         {review.status === 'pending' && (
                           <Badge
                             variant="outline"
-                            className="border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                            className="border-warning/35 bg-warning-subtle text-foreground dark:text-warning"
                           >
                             Pending
                           </Badge>
@@ -662,7 +670,7 @@ export function AdminReviewsPage() {
                     </div>
 
                     {/* Review Title and Body */}
-                    <div className="pl-7">
+                    <div className="pl-0 sm:pl-7">
                       <h3 className="text-sm font-semibold text-foreground">
                         {review.title}
                       </h3>
@@ -680,12 +688,13 @@ export function AdminReviewsPage() {
                     </div>
 
                     {/* Action Bar per Review */}
-                    <div className="flex flex-wrap items-center justify-end gap-2 pl-7 pt-1">
+                    <div className="flex flex-wrap items-center justify-end gap-2 pl-0 pt-1 sm:pl-7">
                       {review.status !== 'approved' && (
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
+                          title={`Approve review by ${review.author_name} for ${review.product?.name ?? 'product'}`}
                           onClick={() => void handleApproveSingle(review)}
                           disabled={isSubmitting}
                           className="text-positive hover:bg-positive/10 hover:text-positive"
@@ -703,6 +712,7 @@ export function AdminReviewsPage() {
                           type="button"
                           variant="outline"
                           size="sm"
+                          title={`Reject review by ${review.author_name} for ${review.product?.name ?? 'product'}`}
                           onClick={() => handleOpenRejectSingle(review)}
                           disabled={isSubmitting}
                           className="text-destructive hover:bg-destructive/10 hover:text-destructive"

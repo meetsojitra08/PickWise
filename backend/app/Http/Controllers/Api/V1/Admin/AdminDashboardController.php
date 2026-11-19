@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Actions\Admin\GetAdminDashboardStats;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\AdminDashboardResource;
+use Illuminate\Support\Facades\Gate;
 
 final class AdminDashboardController extends Controller
 {
@@ -15,6 +16,8 @@ final class AdminDashboardController extends Controller
      */
     public function __invoke(GetAdminDashboardStats $getAdminDashboardStats): AdminDashboardResource
     {
+        Gate::authorize('access-admin');
+
         return new AdminDashboardResource($getAdminDashboardStats->execute());
     }
 }

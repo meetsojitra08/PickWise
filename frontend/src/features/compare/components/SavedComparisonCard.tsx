@@ -81,13 +81,23 @@ export function SavedComparisonCard({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Button type="button" size="sm" onClick={handleOpen}>
+          <Button
+            type="button"
+            size="sm"
+            title={`Open comparison: ${comparison.name}`}
+            onClick={handleOpen}
+          >
             Open comparison
           </Button>
           <Button
             type="button"
             variant={confirmingDelete ? 'destructive' : 'outline'}
             size="sm"
+            title={
+              confirmingDelete
+                ? `Confirm deletion of ${comparison.name}`
+                : `Delete comparison: ${comparison.name}`
+            }
             disabled={deleteComparison.isPending}
             onClick={handleDelete}
           >

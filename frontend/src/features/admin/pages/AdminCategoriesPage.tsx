@@ -117,7 +117,7 @@ export function AdminCategoriesPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
             variant="outline"
@@ -169,11 +169,11 @@ export function AdminCategoriesPage() {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-muted-foreground shrink-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="shrink-0 text-xs font-medium text-muted-foreground">
                 Status:
               </span>
-              <div className="inline-flex rounded-control border border-input p-0.5 bg-muted/30">
+              <div className="inline-flex rounded-control border border-input bg-muted/30 p-0.5">
                 {(['all', 'active', 'inactive'] as const).map((filter) => (
                   <button
                     key={filter}
@@ -255,37 +255,55 @@ export function AdminCategoriesPage() {
         </Card>
       ) : (
         <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border bg-muted/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="md:overflow-x-auto">
+            <table className="block w-full text-left text-sm md:table">
+              <caption className="sr-only">Category catalog hierarchy</caption>
+              <thead className="hidden border-b border-border bg-muted/40 text-xs font-semibold tracking-wider text-muted-foreground uppercase md:table-header-group">
                 <tr>
-                  <th className="px-4 py-3 sm:px-6">Category</th>
-                  <th className="px-4 py-3">Hierarchy</th>
-                  <th className="px-4 py-3 text-center">Order</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Products</th>
-                  <th className="px-4 py-3">Specs</th>
-                  <th className="px-4 py-3 text-right sm:px-6">Actions</th>
+                  <th scope="col" className="px-4 py-3 sm:px-6">
+                    Category
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Hierarchy
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center">
+                    Order
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Status
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Products
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Specs
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-right sm:px-6">
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="block divide-y divide-border md:table-row-group">
                 {categories.map((cat) => (
                   <tr
                     key={cat.id}
-                    className="hover:bg-muted/30 transition-colors"
+                    className="block space-y-2.5 p-4 transition-colors hover:bg-muted/30 md:table-row md:space-y-0 md:p-0"
                   >
-                    <td className="px-4 py-3.5 sm:px-6">
+                    <td className="block p-0 md:table-cell md:px-4 md:py-3.5 lg:px-6">
                       <div className="flex flex-col">
                         <span className="font-medium text-foreground">
                           {cat.name}
                         </span>
-                        <code className="text-[11px] font-mono text-muted-foreground">
+                        <code className="font-mono text-[11px] text-muted-foreground">
                           /{cat.slug}
                         </code>
                       </div>
                     </td>
 
-                    <td className="px-4 py-3.5 text-xs text-muted-foreground">
+                    <td className="flex items-center justify-between gap-2 p-0 text-xs text-muted-foreground md:table-cell md:px-4 md:py-3.5">
+                      <span className="font-medium text-muted-foreground md:hidden">
+                        Hierarchy
+                      </span>
                       {cat.parent ? (
                         <span className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 font-medium text-foreground">
                           Child of {cat.parent.name}
@@ -295,34 +313,49 @@ export function AdminCategoriesPage() {
                       )}
                     </td>
 
-                    <td className="px-4 py-3.5 text-center font-mono text-xs">
-                      {cat.sort_order}
+                    <td className="flex items-center justify-between gap-2 p-0 font-mono text-xs md:table-cell md:px-4 md:py-3.5 md:text-center">
+                      <span className="font-sans font-medium text-muted-foreground md:hidden">
+                        Order
+                      </span>
+                      <span>{cat.sort_order}</span>
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3.5">
+                      <span className="text-xs font-medium text-muted-foreground md:hidden">
+                        Status
+                      </span>
                       <Badge
                         variant={cat.is_active ? 'default' : 'secondary'}
-                        className="text-[10px] uppercase font-semibold tracking-wider"
+                        className="text-[10px] font-semibold tracking-wider uppercase"
                       >
                         {cat.is_active ? 'Active' : 'Inactive'}
                       </Badge>
                     </td>
 
-                    <td className="px-4 py-3.5 text-xs">
-                      <span className="font-medium text-foreground">
-                        {cat.products_count}
-                      </span>{' '}
-                      <span className="text-muted-foreground">
-                        product{cat.products_count === 1 ? '' : 's'}
+                    <td className="flex items-center justify-between gap-2 p-0 text-xs md:table-cell md:px-4 md:py-3.5">
+                      <span className="font-medium text-muted-foreground md:hidden">
+                        Products
+                      </span>
+                      <span>
+                        <span className="font-medium text-foreground">
+                          {cat.products_count}
+                        </span>{' '}
+                        <span className="text-muted-foreground">
+                          product{cat.products_count === 1 ? '' : 's'}
+                        </span>
                       </span>
                     </td>
 
-                    <td className="px-4 py-3.5 text-xs">
+                    <td className="flex items-center justify-between gap-2 p-0 text-xs md:table-cell md:px-4 md:py-3.5">
+                      <span className="font-medium text-muted-foreground md:hidden">
+                        Specs
+                      </span>
                       <Button
                         type="button"
                         variant="outline"
                         size="xs"
                         onClick={() => handleOpenSpecs(cat)}
+                        title={`Configure specs for ${cat.name}`}
                         className="gap-1.5"
                       >
                         <Sliders className="size-3 text-primary" />
@@ -330,13 +363,14 @@ export function AdminCategoriesPage() {
                       </Button>
                     </td>
 
-                    <td className="px-4 py-3.5 text-right sm:px-6">
-                      <div className="flex items-center justify-end gap-1.5">
+                    <td className="block border-t border-border/50 pt-2.5 text-right md:table-cell md:border-t-0 md:px-4 md:py-3.5 lg:px-6">
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
                         <Button
                           type="button"
                           variant="ghost"
                           size="xs"
                           onClick={() => handleStartEdit(cat)}
+                          title={`Edit ${cat.name}`}
                         >
                           Edit
                         </Button>
@@ -402,7 +436,7 @@ export function AdminCategoriesPage() {
           {deletingCategory && deletingCategory.products_count > 0 ? (
             <div
               role="alert"
-              className="rounded-panel border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300 space-y-1"
+              className="space-y-1 rounded-control border border-warning/35 bg-warning-subtle p-3 text-xs text-foreground dark:text-warning"
             >
               <p className="font-semibold">Category contains products</p>
               <p>

@@ -74,10 +74,10 @@ export function AdminAiByFeatureCard({ features }: AdminAiByFeatureCardProps) {
               className="rounded-control border border-border/60 bg-muted/20 p-3.5 transition-colors hover:bg-muted/40"
               data-testid={`feature-breakdown-${item.feature}`}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
                   <div
-                    className={`flex size-9 items-center justify-center rounded-control ${config.bg} ${config.color}`}
+                    className={`flex size-9 shrink-0 items-center justify-center rounded-control ${config.bg} ${config.color}`}
                   >
                     <Icon
                       className="size-4"
@@ -85,7 +85,7 @@ export function AdminAiByFeatureCard({ features }: AdminAiByFeatureCardProps) {
                       aria-hidden="true"
                     />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-sm font-semibold text-foreground">
                       {config.title}
                     </h3>
@@ -95,7 +95,7 @@ export function AdminAiByFeatureCard({ features }: AdminAiByFeatureCardProps) {
                   </div>
                 </div>
 
-                <div className="text-right">
+                <div className="shrink-0 text-right">
                   <div className="text-sm font-bold text-foreground">
                     {item.total_calls.toLocaleString('en-US')}{' '}
                     <span className="text-xs font-normal text-muted-foreground">
@@ -118,7 +118,7 @@ export function AdminAiByFeatureCard({ features }: AdminAiByFeatureCardProps) {
                 />
               </div>
 
-              <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
                 <span>
                   Tokens:{' '}
                   <strong className="text-foreground">

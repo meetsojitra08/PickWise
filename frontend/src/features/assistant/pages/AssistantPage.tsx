@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { History, Sparkles } from 'lucide-react';
 import { useSearchParams } from 'react-router';
-import { toast } from 'sonner';
 import { QuotaMeter } from '@/components/shared/QuotaMeter';
 import { Button } from '@/components/ui/button';
 import {
@@ -88,14 +87,19 @@ export function AssistantPage() {
     (initialBudgetVal === undefined && userBudgetPreference !== undefined);
 
   const { data: quota, isLoading: isQuotaLoading } = useAiQuota();
-  const { data: conversationsResponse, isLoading: isConversationsLoading } =
-    useConversations();
+  const {
+    data: conversationsResponse,
+    isLoading: isConversationsLoading,
+    isError: isConversationsError,
+    refetch: refetchConversations,
+  } = useConversations();
   const conversations = conversationsResponse?.data ?? [];
 
   const {
     data: activeConversation,
     isLoading: isConversationLoading,
     isError: isConversationError,
+    refetch: refetchConversation,
   } = useConversation(activeConversationId);
 
   useEffect(() => {
@@ -107,21 +111,8 @@ export function AssistantPage() {
     }
   }, [conversationParam]);
 
-  const conversationErrorHandledRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (
-      isConversationError &&
-      activeConversationId !== null &&
-      conversationErrorHandledRef.current !== activeConversationId
-    ) {
-      conversationErrorHandledRef.current = activeConversationId;
-      toast.error('This conversation could not be loaded or no longer exists.');
-      queueMicrotask(() => {
-        setActiveConversationId(null);
-      });
-    }
-  }, [isConversationError, activeConversationId]);
+  // When conversation error occurs, keep the ID active so AssistantThread can display
+  // the ErrorState with retry and start new chat options.
 
   const createConversationMutation = useCreateConversation();
   const deleteConversationMutation = useDeleteConversation();
@@ -257,13 +248,13 @@ export function AssistantPage() {
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       {/* Top Bar with Assistant Brand & Quota */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/80 bg-card px-4 sm:px-6">
-        <div className="flex items-center gap-3">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-2xs">
+      <header className="flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/80 bg-card px-3 py-2 sm:flex-nowrap sm:px-6 sm:py-0">
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-2xs">
             <Sparkles className="size-4" />
           </div>
-          <div>
-            <h1 className="font-heading text-sm font-bold tracking-tight text-foreground sm:text-base">
+          <div className="min-w-0">
+            <h1 className="truncate font-heading text-sm font-bold tracking-tight text-foreground sm:text-base">
               Shopping Assistant
             </h1>
             <p className="hidden text-[11px] text-muted-foreground sm:block">
@@ -273,20 +264,20 @@ export function AssistantPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Mobile conversation history button */}
           <Sheet open={mobileDrawerOpen} onOpenChange={setMobileDrawerOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8 gap-1.5 rounded-full text-xs md:hidden"
+                className="min-h-10 gap-1.5 rounded-full text-xs sm:h-8 md:hidden"
               >
                 <History className="size-3.5" />
                 <span>History</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-80 p-4">
+            <SheetContent side="left" className="w-[min(20rem,88vw)] p-4">
               <SheetHeader className="text-left pb-3">
                 <SheetTitle className="font-heading text-base font-bold">
                   Conversations
@@ -299,6 +290,8 @@ export function AssistantPage() {
                 onNewConversation={handleNewConversation}
                 onDeleteConversation={handleDeleteConversation}
                 isLoading={isConversationsLoading}
+                isError={isConversationsError}
+                onRetry={() => void refetchConversations()}
               />
             </SheetContent>
           </Sheet>
@@ -318,14 +311,19 @@ export function AssistantPage() {
             onNewConversation={handleNewConversation}
             onDeleteConversation={handleDeleteConversation}
             isLoading={isConversationsLoading}
+            isError={isConversationsError}
+            onRetry={() => void refetchConversations()}
           />
         </div>
 
         {/* Right Main Column: Thread + Floating/Docked Input Bar */}
-        <div className="flex flex-1 flex-col overflow-hidden bg-background">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-background">
           <AssistantThread
             messages={activeConversation?.messages ?? []}
             isLoadingConversation={isConversationLoading}
+            isConversationError={isConversationError}
+            onRetryConversation={() => void refetchConversation()}
+            onNewChat={handleNewConversation}
             isSendingMessage={isSending}
             sendError={
               sendMessageMutation.error ??
@@ -338,6 +336,7 @@ export function AssistantPage() {
                 : undefined
             }
             onSelectPrompt={handlePromptSelect}
+            isQuotaExhausted={isQuotaExhausted}
             className="flex-1"
           />
 

@@ -10,19 +10,23 @@ use App\Enums\ApiErrorCode;
 use App\Http\Responses\ApiResponse;
 use App\Models\AdminActivityLog;
 use App\Models\AiConversation;
+use App\Models\AiUsageLog;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Comparison;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Review;
 use App\Models\SpecDefinition;
 use App\Models\User;
 use App\Models\WishlistItem;
 use App\Policies\AdminActivityLogPolicy;
 use App\Policies\AiConversationPolicy;
+use App\Policies\AiUsageLogPolicy;
 use App\Policies\BrandPolicy;
 use App\Policies\CategoryPolicy;
 use App\Policies\ComparisonPolicy;
+use App\Policies\ProductImagePolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\ReviewPolicy;
 use App\Policies\SpecDefinitionPolicy;
@@ -31,6 +35,7 @@ use App\Policies\WishlistItemPolicy;
 use App\Queries\Catalog\ActiveCategoryScope;
 use Closure;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -57,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Model::preventLazyLoading(! $this->app->isProduction());
         Route::model('conversation', AiConversation::class);
         $this->configureRateLimiting();
         $this->configureAuthorization();
@@ -124,10 +130,12 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(SpecDefinition::class, SpecDefinitionPolicy::class);
         Gate::policy(Brand::class, BrandPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);
+        Gate::policy(ProductImage::class, ProductImagePolicy::class);
         Gate::policy(Review::class, ReviewPolicy::class);
         Gate::policy(WishlistItem::class, WishlistItemPolicy::class);
         Gate::policy(Comparison::class, ComparisonPolicy::class);
         Gate::policy(AiConversation::class, AiConversationPolicy::class);
+        Gate::policy(AiUsageLog::class, AiUsageLogPolicy::class);
         Gate::policy(AdminActivityLog::class, AdminActivityLogPolicy::class);
 
         Gate::define(

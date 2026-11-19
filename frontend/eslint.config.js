@@ -7,7 +7,14 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage', 'node_modules']),
+  globalIgnores([
+    'dist',
+    'coverage',
+    'node_modules',
+    'playwright-report',
+    'test-results',
+    'e2e/.auth',
+  ]),
   {
     files: ['**/*.{js,mjs}'],
     extends: [js.configs.recommended],
@@ -33,6 +40,19 @@ export default defineConfig([
     files: ['*.config.ts'],
     languageOptions: {
       globals: globals.node,
+    },
+  },
+  {
+    files: ['e2e/**/*.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
+    },
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+      'react-refresh/only-export-components': 'off',
     },
   },
   {

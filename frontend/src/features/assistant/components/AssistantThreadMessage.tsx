@@ -1,5 +1,6 @@
-import { AlertTriangle, Columns3, Sparkles } from 'lucide-react';
+import { AlertTriangle, Columns3 } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { AiMark } from '@/components/shared/VerdictPanel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { ProductSummary } from '@/features/catalog/types/catalog';
@@ -62,21 +63,27 @@ export function AssistantThreadMessage({
   return (
     <div
       className={cn(
-        'flex items-start gap-3.5 animate-in fade-in slide-in-from-bottom-2 duration-300',
+        'flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300 sm:flex-row sm:items-start sm:gap-3.5',
         className,
       )}
     >
-      {/* Advisor Avatar */}
+      {/* Advisor Avatar (side rail on sm+) */}
       <div
-        className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent shadow-xs"
+        className="hidden size-9 shrink-0 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-accent shadow-xs sm:mt-1 sm:flex"
         aria-hidden="true"
       >
-        <Sparkles className="size-4.5 text-accent" />
+        <AiMark className="size-4.5 text-accent" />
       </div>
 
       <div className="min-w-0 flex-1 space-y-4">
         {/* Advisor identity header */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <div
+            className="flex size-6 shrink-0 items-center justify-center rounded-lg border border-accent/40 bg-accent/15 text-accent shadow-xs sm:hidden"
+            aria-hidden="true"
+          >
+            <AiMark className="size-3.5 text-accent" />
+          </div>
           <span className="font-heading text-xs font-bold text-foreground">
             Pickwise Advisor
           </span>
@@ -89,7 +96,7 @@ export function AssistantThreadMessage({
         {isFallback && (
           <div
             role="status"
-            className="flex items-start gap-2.5 rounded-xl border border-warning/40 bg-warning/10 p-3.5 text-xs text-warning-foreground shadow-2xs"
+            className="flex items-start gap-2.5 rounded-xl border border-warning/40 bg-warning-subtle p-3.5 text-xs text-foreground shadow-2xs"
           >
             <AlertTriangle
               className="mt-0.5 size-4 shrink-0 text-warning"

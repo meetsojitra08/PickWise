@@ -47,7 +47,7 @@ export function AdminKpiTiles({ counts, aiUsage }: AdminKpiTilesProps) {
       icon: MessageSquareAlert,
       badgeText: hasPendingReviews ? 'Action needed' : 'Clear',
       badgeClass: hasPendingReviews
-        ? 'bg-accent/20 text-accent-foreground font-medium'
+        ? 'bg-accent/20 text-foreground dark:text-accent font-medium'
         : 'bg-muted text-muted-foreground',
       highlight: hasPendingReviews,
     },
@@ -92,7 +92,7 @@ export function AdminKpiTiles({ counts, aiUsage }: AdminKpiTilesProps) {
                     className={cn(
                       'flex size-8 items-center justify-center rounded-control border border-border/60 bg-muted/50 text-foreground transition-colors group-hover:border-primary/30 group-hover:text-primary',
                       tile.highlight &&
-                        'border-accent/40 text-accent-foreground',
+                        'border-accent/40 bg-accent/15 text-warning dark:text-accent',
                     )}
                   >
                     <Icon
@@ -111,7 +111,7 @@ export function AdminKpiTiles({ counts, aiUsage }: AdminKpiTilesProps) {
                 <div className="text-3xl font-bold tracking-tight text-foreground tabular-nums">
                   {tile.value.toLocaleString()}
                 </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
                   <span>{tile.subtitle}</span>
                   <span
                     className={cn(

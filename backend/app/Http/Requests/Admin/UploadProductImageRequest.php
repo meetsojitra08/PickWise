@@ -31,6 +31,7 @@ class UploadProductImageRequest extends FormRequest
                 'file',
                 'image',
                 'mimes:jpeg,jpg,png,webp',
+                'extensions:jpeg,jpg,png,webp',
                 'max:5120',
             ],
             'alt_text' => ['required', 'string', 'min:2', 'max:255'],

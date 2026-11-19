@@ -77,6 +77,7 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-warning-subtle: var(--warning-subtle);
   --color-verdict-surface: var(--verdict-surface);
+  --color-overlay: var(--overlay);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -113,7 +114,7 @@
   --muted-foreground: #5b6773;
   --accent: #f2b134;
   --accent-foreground: #17212b;
-  --positive: #2e7d4f;
+  --positive: #246b41;
   --positive-foreground: #ffffff;
   --positive-subtle: #edf6f0;
   --negative: #c0482f;
@@ -121,10 +122,11 @@
   --negative-subtle: #fcf2ef;
   --destructive: var(--negative);
   --destructive-foreground: var(--negative-foreground);
-  --warning: #b7791f;
+  --warning: #9e6412;
   --warning-foreground: #ffffff;
   --warning-subtle: #fdf6e9;
   --verdict-surface: #fdfaf2;
+  --overlay: rgb(23 33 43 / 0.35);
   --border: #e2e6e3;
   --input: #cfd6d2;
   --ring: #0f5e5a;
@@ -171,7 +173,8 @@
   --warning: #e0a33a;
   --warning-foreground: #0f1519;
   --warning-subtle: #2b2213;
-  --verdict-surface: #1b211d;
+  --verdict-surface: #222018;
+  --overlay: rgb(4 8 11 / 0.72);
   --border: #26323a;
   --input: #32414b;
   --ring: #3fb6ae;
@@ -208,6 +211,12 @@
 
   body {
     @apply bg-background text-foreground font-sans text-base antialiased;
+  }
+
+  option,
+  optgroup {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
   }
 
   h1,

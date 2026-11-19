@@ -50,7 +50,7 @@ class StoreProductRequest extends FormRequest
             'price' => ['required', 'numeric', 'gt:0'],
             'currency' => ['nullable', 'string', 'size:3'],
             'availability' => ['nullable', Rule::enum(ProductAvailability::class)],
-            'store_url' => ['nullable', 'url', 'max:2048'],
+            'store_url' => ['nullable', 'url:http,https', 'max:2048'],
             'is_published' => ['nullable', 'boolean'],
             'specs' => ['nullable', 'array'],
             'specs.*.spec_definition_id' => [

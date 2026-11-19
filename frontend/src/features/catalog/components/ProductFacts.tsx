@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PriceTag } from '@/components/shared/PriceTag';
 import { RatingStars } from '@/components/shared/RatingStars';
 import type { ProductDetail } from '@/features/catalog/types/catalog-api';
+import { getSafeExternalUrl } from '@/lib/safe-url';
 
 interface ProductFactsProps {
   product: ProductDetail;
@@ -30,6 +31,8 @@ export function ProductFacts({
   onWishlistToggle,
   onCompareToggle,
 }: ProductFactsProps) {
+  const safeStoreUrl = getSafeExternalUrl(product.store_url);
+
   return (
     <section className="min-w-0 lg:sticky lg:top-6 lg:self-start">
       <div className="flex flex-wrap items-center gap-2">
@@ -78,56 +81,60 @@ export function ProductFacts({
         </Badge>
       </div>
 
-      <div className="mt-6 hidden gap-3 md:flex">
-        {product.store_url ? (
-          <Button asChild size="lg" className="flex-1">
-            <a
-              href={product.store_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+      <div className="mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
+        {safeStoreUrl ? (
+          <Button asChild size="lg" className="hidden flex-1 md:inline-flex">
+            <a href={safeStoreUrl} target="_blank" rel="noopener noreferrer">
               View on store
               <ExternalLink aria-hidden="true" />
             </a>
           </Button>
         ) : (
-          <Button size="lg" className="flex-1" disabled>
+          <Button size="lg" className="hidden flex-1 md:inline-flex" disabled>
             Store link unavailable
           </Button>
         )}
         <Button
           type="button"
           variant={isWishlisted ? 'secondary' : 'outline'}
-          size="icon-lg"
+          size="lg"
           disabled={wishlistPending}
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           aria-pressed={isWishlisted}
           onClick={onWishlistToggle}
+          className="flex-1 md:size-11 md:flex-initial md:px-0"
         >
           <Heart
             className={isWishlisted ? 'fill-negative text-negative' : ''}
             aria-hidden="true"
           />
+          <span className="md:hidden">
+            {isWishlisted ? 'Wishlisted' : 'Wishlist'}
+          </span>
         </Button>
         <Button
           type="button"
           variant={isCompared ? 'secondary' : 'outline'}
-          size="icon-lg"
+          size="lg"
           disabled={compareDisabled && !isCompared}
           aria-label={
             isCompared ? 'Remove from comparison' : 'Add to comparison'
           }
           aria-pressed={isCompared}
           onClick={onCompareToggle}
+          className="flex-1 md:size-11 md:flex-initial md:px-0"
         >
           {isCompared ? (
             <Check aria-hidden="true" />
           ) : (
             <Columns3 aria-hidden="true" />
           )}
+          <span className="md:hidden">
+            {isCompared ? 'Comparing' : 'Compare'}
+          </span>
         </Button>
       </div>
-      <p className="mt-3 hidden text-xs text-muted-foreground md:block">
+      <p className="mt-3 text-xs text-muted-foreground">
         Wishlist saves to your account. Compare selections stay on this device.
       </p>
     </section>

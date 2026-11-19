@@ -204,7 +204,7 @@ export function AdminUsersPage() {
               </div>
 
               {/* Sort */}
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <label
                   htmlFor="users-sort"
                   className="whitespace-nowrap text-xs font-medium text-muted-foreground"
@@ -218,7 +218,7 @@ export function AdminUsersPage() {
                     setSort(e.target.value);
                     setPage(1);
                   }}
-                  className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="h-10 min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring sm:h-9 sm:flex-initial"
                   data-testid="admin-users-sort"
                 >
                   <option value="-created_at">Newest First</option>
@@ -232,15 +232,20 @@ export function AdminUsersPage() {
             </div>
 
             {/* Filter Pills */}
-            <div className="flex flex-wrap items-center gap-4 pt-2 border-t">
+            <div className="flex flex-wrap items-center gap-3 border-t pt-2 sm:gap-4">
               {/* Role Filter */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                   Role:
                 </span>
-                <div className="flex rounded-md bg-muted p-0.5">
+                <div
+                  role="group"
+                  aria-label="Filter by user role"
+                  className="flex flex-wrap rounded-md bg-muted p-0.5"
+                >
                   <button
                     type="button"
+                    aria-pressed={roleFilter === 'all'}
                     onClick={() => {
                       setRoleFilter('all');
                       setPage(1);
@@ -255,6 +260,7 @@ export function AdminUsersPage() {
                   </button>
                   <button
                     type="button"
+                    aria-pressed={roleFilter === 'customer'}
                     onClick={() => {
                       setRoleFilter('customer');
                       setPage(1);
@@ -269,6 +275,7 @@ export function AdminUsersPage() {
                   </button>
                   <button
                     type="button"
+                    aria-pressed={roleFilter === 'admin'}
                     onClick={() => {
                       setRoleFilter('admin');
                       setPage(1);
@@ -285,13 +292,18 @@ export function AdminUsersPage() {
               </div>
 
               {/* Status Filter */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                   Status:
                 </span>
-                <div className="flex rounded-md bg-muted p-0.5">
+                <div
+                  role="group"
+                  aria-label="Filter by user status"
+                  className="flex flex-wrap rounded-md bg-muted p-0.5"
+                >
                   <button
                     type="button"
+                    aria-pressed={statusFilter === 'all'}
                     onClick={() => {
                       setStatusFilter('all');
                       setPage(1);
@@ -306,6 +318,7 @@ export function AdminUsersPage() {
                   </button>
                   <button
                     type="button"
+                    aria-pressed={statusFilter === 'active'}
                     onClick={() => {
                       setStatusFilter('active');
                       setPage(1);
@@ -320,6 +333,7 @@ export function AdminUsersPage() {
                   </button>
                   <button
                     type="button"
+                    aria-pressed={statusFilter === 'inactive'}
                     onClick={() => {
                       setStatusFilter('inactive');
                       setPage(1);
@@ -385,52 +399,72 @@ export function AdminUsersPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 sm:p-6">
-            <div className="overflow-x-auto">
+            <div className="md:overflow-x-auto">
               <table
-                className="w-full text-left text-sm"
+                className="block w-full text-left text-sm md:table"
                 data-testid="admin-users-table"
               >
-                <thead className="border-b bg-muted/40 text-xs uppercase text-muted-foreground">
+                <caption className="sr-only">User accounts management</caption>
+                <thead className="hidden border-b bg-muted/40 text-xs text-muted-foreground uppercase md:table-header-group">
                   <tr>
-                    <th className="px-4 py-3 font-semibold">User</th>
-                    <th className="px-4 py-3 font-semibold">Role</th>
-                    <th className="px-4 py-3 font-semibold">Status</th>
-                    <th className="px-4 py-3 font-semibold">Reviews</th>
-                    <th className="px-4 py-3 font-semibold">Joined</th>
-                    <th className="px-4 py-3 text-right font-semibold">
+                    <th scope="col" className="px-4 py-3 font-semibold">
+                      User
+                    </th>
+                    <th scope="col" className="px-4 py-3 font-semibold">
+                      Role
+                    </th>
+                    <th scope="col" className="px-4 py-3 font-semibold">
+                      Status
+                    </th>
+                    <th scope="col" className="px-4 py-3 font-semibold">
+                      Reviews
+                    </th>
+                    <th scope="col" className="px-4 py-3 font-semibold">
+                      Joined
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-4 py-3 text-right font-semibold"
+                    >
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="block divide-y divide-border md:table-row-group">
                   {isLoading &&
                     Array.from({ length: 5 }).map((_, i) => (
-                      <tr key={`skeleton-${i}`}>
-                        <td className="px-4 py-3.5">
-                          <Skeleton className="h-4 w-36 mb-1" />
-                          <Skeleton className="h-3 w-48" />
+                      <tr
+                        key={`skeleton-${i}`}
+                        className="block space-y-2 p-4 md:table-row md:space-y-0 md:p-0"
+                      >
+                        <td className="block p-0 md:table-cell md:px-4 md:py-3.5">
+                          <Skeleton className="mb-1 h-4 w-36" />
+                          <Skeleton className="h-3 w-48 max-w-full" />
                         </td>
-                        <td className="px-4 py-3.5">
+                        <td className="block p-0 md:table-cell md:px-4 md:py-3.5">
                           <Skeleton className="h-5 w-16" />
                         </td>
-                        <td className="px-4 py-3.5">
+                        <td className="block p-0 md:table-cell md:px-4 md:py-3.5">
                           <Skeleton className="h-5 w-16" />
                         </td>
-                        <td className="px-4 py-3.5">
+                        <td className="block p-0 md:table-cell md:px-4 md:py-3.5">
                           <Skeleton className="h-4 w-12" />
                         </td>
-                        <td className="px-4 py-3.5">
+                        <td className="block p-0 md:table-cell md:px-4 md:py-3.5">
                           <Skeleton className="h-4 w-24" />
                         </td>
-                        <td className="px-4 py-3.5 text-right">
-                          <Skeleton className="h-8 w-24 ml-auto" />
+                        <td className="block p-0 md:table-cell md:px-4 md:py-3.5 md:text-right">
+                          <Skeleton className="h-8 w-24 md:ml-auto" />
                         </td>
                       </tr>
                     ))}
 
                   {!isLoading && users.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="px-4 py-12 text-center">
+                    <tr className="block md:table-row">
+                      <td
+                        colSpan={6}
+                        className="block px-4 py-12 text-center md:table-cell"
+                      >
                         <Users className="mx-auto h-10 w-10 text-muted-foreground" />
                         <h4 className="mt-3 text-sm font-semibold text-foreground">
                           No users found
@@ -465,40 +499,43 @@ export function AdminUsersPage() {
                       return (
                         <tr
                           key={targetUser.id}
-                          className="hover:bg-muted/30 transition-colors"
+                          className="block space-y-2.5 p-4 transition-colors hover:bg-muted/30 md:table-row md:space-y-0 md:p-0"
                           data-testid={`user-row-${targetUser.id}`}
                         >
                           {/* Name and Email */}
-                          <td className="px-4 py-3.5">
-                            <div className="flex items-center gap-2">
+                          <td className="block p-0 md:table-cell md:px-4 md:py-3.5">
+                            <div className="flex flex-wrap items-center gap-2">
                               <span className="font-medium text-foreground">
                                 {targetUser.name}
                               </span>
                               {isSelf && (
                                 <Badge
                                   variant="secondary"
-                                  className="text-[10px] px-1.5 py-0 font-normal"
+                                  className="px-1.5 py-0 text-[10px] font-normal"
                                 >
                                   You
                                 </Badge>
                               )}
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="truncate text-xs text-muted-foreground">
                               {targetUser.email}
                             </div>
                           </td>
 
                           {/* Role */}
-                          <td className="px-4 py-3.5">
+                          <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3.5">
+                            <span className="text-xs font-medium text-muted-foreground md:hidden">
+                              Role
+                            </span>
                             {targetUser.role === 'admin' ? (
-                              <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border-purple-200 dark:border-purple-800 flex items-center gap-1 w-fit">
+                              <Badge className="flex w-fit items-center gap-1 border-purple-200 bg-purple-100 text-purple-800 dark:border-purple-800 dark:bg-purple-900/40 dark:text-purple-300">
                                 <ShieldCheck className="h-3 w-3" />
                                 <span>Admin</span>
                               </Badge>
                             ) : (
                               <Badge
                                 variant="outline"
-                                className="text-muted-foreground flex items-center gap-1 w-fit"
+                                className="flex w-fit items-center gap-1 text-muted-foreground"
                               >
                                 <Users className="h-3 w-3" />
                                 <span>Customer</span>
@@ -507,11 +544,14 @@ export function AdminUsersPage() {
                           </td>
 
                           {/* Status */}
-                          <td className="px-4 py-3.5">
+                          <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3.5">
+                            <span className="text-xs font-medium text-muted-foreground md:hidden">
+                              Status
+                            </span>
                             {targetUser.is_active ? (
                               <Badge
                                 variant="positive"
-                                className="flex items-center gap-1 w-fit"
+                                className="flex w-fit items-center gap-1"
                               >
                                 <CheckCircle className="h-3 w-3" />
                                 <span>Active</span>
@@ -519,7 +559,7 @@ export function AdminUsersPage() {
                             ) : (
                               <Badge
                                 variant="negative"
-                                className="flex items-center gap-1 w-fit"
+                                className="flex w-fit items-center gap-1"
                               >
                                 <UserX className="h-3 w-3" />
                                 <span>Deactivated</span>
@@ -528,7 +568,10 @@ export function AdminUsersPage() {
                           </td>
 
                           {/* Reviews Count */}
-                          <td className="px-4 py-3.5">
+                          <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3.5">
+                            <span className="text-xs font-medium text-muted-foreground md:hidden">
+                              Reviews
+                            </span>
                             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                               <MessageSquare className="h-3.5 w-3.5" />
                               <span>{targetUser.reviews_count}</span>
@@ -536,20 +579,24 @@ export function AdminUsersPage() {
                           </td>
 
                           {/* Join Date */}
-                          <td className="px-4 py-3.5 text-xs text-muted-foreground whitespace-nowrap">
-                            {new Date(targetUser.created_at).toLocaleDateString(
-                              undefined,
-                              {
+                          <td className="flex items-center justify-between gap-2 p-0 text-xs whitespace-nowrap text-muted-foreground md:table-cell md:px-4 md:py-3.5">
+                            <span className="font-medium text-muted-foreground md:hidden">
+                              Joined
+                            </span>
+                            <span>
+                              {new Date(
+                                targetUser.created_at,
+                              ).toLocaleDateString(undefined, {
                                 year: 'numeric',
                                 month: 'short',
                                 day: 'numeric',
-                              },
-                            )}
+                              })}
+                            </span>
                           </td>
 
                           {/* Actions */}
-                          <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                            <div className="flex items-center justify-end gap-1.5">
+                          <td className="block border-t border-border/50 pt-2.5 text-right md:table-cell md:border-t-0 md:px-4 md:py-3.5 md:whitespace-nowrap">
+                            <div className="flex flex-wrap items-center justify-end gap-1.5">
                               {/* Role Button */}
                               <Button
                                 variant="ghost"
@@ -563,11 +610,16 @@ export function AdminUsersPage() {
                                       ? 'Demote to Customer'
                                       : 'Promote to Admin'
                                 }
+                                aria-label={
+                                  targetUser.role === 'admin'
+                                    ? `Remove admin role from ${targetUser.name}`
+                                    : `Make ${targetUser.name} admin`
+                                }
                                 data-testid={`toggle-role-btn-${targetUser.id}`}
-                                className="h-8 px-2 text-xs gap-1"
+                                className="h-9 gap-1 px-2 text-xs md:h-8"
                               >
                                 <Shield className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">
+                                <span>
                                   {targetUser.role === 'admin'
                                     ? 'Remove Admin'
                                     : 'Make Admin'}
@@ -588,13 +640,12 @@ export function AdminUsersPage() {
                                       ? 'You cannot deactivate your own account.'
                                       : 'Deactivate User'
                                   }
+                                  aria-label={`Deactivate account for ${targetUser.name}`}
                                   data-testid={`toggle-status-btn-${targetUser.id}`}
-                                  className="h-8 px-2 text-xs text-destructive hover:bg-destructive/10 gap-1"
+                                  className="h-9 gap-1 px-2 text-xs text-destructive hover:bg-destructive/10 md:h-8"
                                 >
                                   <UserX className="h-3.5 w-3.5" />
-                                  <span className="hidden sm:inline">
-                                    Deactivate
-                                  </span>
+                                  <span>Deactivate</span>
                                 </Button>
                               ) : (
                                 <Button
@@ -605,13 +656,12 @@ export function AdminUsersPage() {
                                     handleOpenStatusDialog(targetUser)
                                   }
                                   title="Activate User"
+                                  aria-label={`Activate account for ${targetUser.name}`}
                                   data-testid={`toggle-status-btn-${targetUser.id}`}
-                                  className="h-8 px-2 text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 gap-1"
+                                  className="h-9 gap-1 px-2 text-xs text-positive hover:bg-positive/10 md:h-8"
                                 >
                                   <UserCheck className="h-3.5 w-3.5" />
-                                  <span className="hidden sm:inline">
-                                    Activate
-                                  </span>
+                                  <span>Activate</span>
                                 </Button>
                               )}
                             </div>
@@ -625,7 +675,7 @@ export function AdminUsersPage() {
 
             {/* Pagination */}
             {meta && meta.last_page > 1 && (
-              <div className="flex items-center justify-between border-t px-4 py-3 sm:px-6">
+              <div className="flex flex-col items-center justify-between gap-3 border-t px-4 py-3 sm:flex-row sm:px-6">
                 <div className="text-xs text-muted-foreground">
                   Showing page{' '}
                   <span className="font-medium">{meta.current_page}</span> of{' '}
@@ -676,7 +726,7 @@ export function AdminUsersPage() {
                 </>
               ) : (
                 <>
-                  <UserCheck className="h-5 w-5 text-emerald-600" />
+                  <UserCheck className="h-5 w-5 text-positive" />
                   <span>Activate User Account</span>
                 </>
               )}

@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\UpdateAdminUserRequest;
 use App\Http\Resources\Admin\AdminUserResource;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Support\LikePattern;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
@@ -31,10 +32,10 @@ final class AdminUserController extends Controller
 
         $search = (string) ($request->input('search') ?? $request->input('q') ?? '');
         if (trim($search) !== '') {
-            $needle = mb_strtolower(trim($search));
-            $query->where(static function ($q) use ($needle): void {
-                $q->whereRaw('LOWER(name) LIKE ?', ["%{$needle}%"])
-                    ->orWhereRaw('LOWER(email) LIKE ?', ["%{$needle}%"]);
+            $pattern = LikePattern::containsLower($search);
+            $query->where(static function ($q) use ($pattern): void {
+                $q->whereRaw("LOWER(name) LIKE ? ESCAPE '!'", [$pattern])
+                    ->orWhereRaw("LOWER(email) LIKE ? ESCAPE '!'", [$pattern]);
             });
         }
 

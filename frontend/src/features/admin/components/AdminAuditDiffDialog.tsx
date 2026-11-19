@@ -136,7 +136,7 @@ export function AdminAuditDiffDialog({
         </DialogHeader>
 
         {/* View mode toggle */}
-        <div className="flex items-center justify-between border-b border-border pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Split className="size-3.5" aria-hidden="true" />
             <span>
@@ -209,7 +209,7 @@ export function AdminAuditDiffDialog({
             </div>
           ) : isUpdate ? (
             <div
-              className="overflow-hidden rounded-control border border-border"
+              className="overflow-x-auto rounded-control border border-border"
               data-testid="update-diff-table"
             >
               <table className="w-full text-left text-xs">
@@ -232,13 +232,13 @@ export function AdminAuditDiffDialog({
                     const afterVal = afterObj?.[key];
                     return (
                       <tr key={key} className="align-top hover:bg-muted/20">
-                        <td className="px-3 py-2 font-mono font-medium text-foreground">
+                        <td className="px-3 py-2 font-mono font-medium break-words text-foreground">
                           {key}
                         </td>
-                        <td className="bg-negative/5 px-3 py-2 font-mono text-negative">
+                        <td className="bg-negative/5 px-3 py-2 font-mono break-all text-negative">
                           {formatValue(beforeVal)}
                         </td>
-                        <td className="bg-positive/5 px-3 py-2 font-mono text-positive font-medium">
+                        <td className="bg-positive/5 px-3 py-2 font-mono font-medium break-all text-positive">
                           {formatValue(afterVal)}
                         </td>
                       </tr>
@@ -249,7 +249,7 @@ export function AdminAuditDiffDialog({
             </div>
           ) : isCreate ? (
             <div
-              className="overflow-hidden rounded-control border border-border"
+              className="overflow-x-auto rounded-control border border-border"
               data-testid="create-diff-table"
             >
               <table className="w-full text-left text-xs">
@@ -266,10 +266,10 @@ export function AdminAuditDiffDialog({
                 <tbody className="divide-y divide-border/60">
                   {diffKeys.map((key) => (
                     <tr key={key} className="align-top hover:bg-muted/20">
-                      <td className="px-3 py-2 font-mono font-medium text-foreground">
+                      <td className="px-3 py-2 font-mono font-medium break-words text-foreground">
                         {key}
                       </td>
-                      <td className="bg-positive/5 px-3 py-2 font-mono text-positive font-medium">
+                      <td className="bg-positive/5 px-3 py-2 font-mono font-medium break-all text-positive">
                         {formatValue(afterObj?.[key])}
                       </td>
                     </tr>
@@ -279,7 +279,7 @@ export function AdminAuditDiffDialog({
             </div>
           ) : (
             <div
-              className="overflow-hidden rounded-control border border-border"
+              className="overflow-x-auto rounded-control border border-border"
               data-testid="delete-diff-table"
             >
               <table className="w-full text-left text-xs">
@@ -296,10 +296,10 @@ export function AdminAuditDiffDialog({
                 <tbody className="divide-y divide-border/60">
                   {diffKeys.map((key) => (
                     <tr key={key} className="align-top hover:bg-muted/20">
-                      <td className="px-3 py-2 font-mono font-medium text-foreground">
+                      <td className="px-3 py-2 font-mono font-medium break-words text-foreground">
                         {key}
                       </td>
-                      <td className="bg-negative/5 px-3 py-2 font-mono text-negative">
+                      <td className="bg-negative/5 px-3 py-2 font-mono break-all text-negative">
                         {formatValue(beforeObj?.[key])}
                       </td>
                     </tr>
@@ -312,7 +312,7 @@ export function AdminAuditDiffDialog({
           {/* Redaction Notice */}
           <div className="flex items-start gap-2 rounded-control border border-border/80 bg-muted/30 p-2.5 text-[11px] text-muted-foreground">
             <ShieldAlert
-              className="mt-0.5 size-3.5 shrink-0 text-amber-500"
+              className="mt-0.5 size-3.5 shrink-0 text-warning"
               aria-hidden="true"
             />
             <span>

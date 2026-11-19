@@ -33,6 +33,7 @@ final class ValueScoreCalculator
         $products = Product::query()
             ->published()
             ->where('category_id', $categoryId)
+            ->orderBy('id')
             ->with('specs.specDefinition')
             ->get();
 

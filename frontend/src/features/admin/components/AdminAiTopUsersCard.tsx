@@ -68,9 +68,10 @@ export function AdminAiTopUsersCard({
             No registered customer usage recorded in this timeframe.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-border text-muted-foreground">
+          <div className="md:overflow-x-auto">
+            <table className="block w-full text-left text-xs md:table">
+              <caption className="sr-only">Top AI usage consumers</caption>
+              <thead className="hidden border-b border-border text-muted-foreground md:table-header-group">
                 <tr>
                   <th scope="col" className="pb-2.5 font-medium">
                     User
@@ -86,14 +87,14 @@ export function AdminAiTopUsersCard({
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
+              <tbody className="block divide-y divide-border/50 md:table-row-group">
                 {topUsers.map((user, idx) => (
                   <tr
                     key={user.user_id}
-                    className="transition-colors hover:bg-muted/30"
+                    className="block space-y-2 py-3 transition-colors hover:bg-muted/30 md:table-row md:space-y-0 md:py-0"
                     data-testid={`top-user-row-${user.user_id}`}
                   >
-                    <td className="py-2.5 pr-2">
+                    <td className="block py-0 md:table-cell md:py-2.5 md:pr-2">
                       <div className="flex items-center gap-2">
                         <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-bold text-muted-foreground">
                           {idx + 1}
@@ -108,14 +109,21 @@ export function AdminAiTopUsersCard({
                         </div>
                       </div>
                     </td>
-                    <td className="py-2.5 text-right font-semibold text-foreground">
-                      {user.total_calls.toLocaleString('en-US')}
+                    <td className="flex items-center justify-between gap-2 py-0 text-right font-semibold text-foreground md:table-cell md:py-2.5">
+                      <span className="font-normal text-muted-foreground md:hidden">
+                        Calls
+                      </span>
+                      <span>{user.total_calls.toLocaleString('en-US')}</span>
                     </td>
-                    <td className="py-2.5 text-right font-mono text-muted-foreground">
-                      {user.total_tokens.toLocaleString('en-US')}
+                    <td className="flex items-center justify-between gap-2 py-0 text-right font-mono text-muted-foreground md:table-cell md:py-2.5">
+                      <span className="font-sans font-normal md:hidden">
+                        Tokens
+                      </span>
+                      <span>{user.total_tokens.toLocaleString('en-US')}</span>
                     </td>
-                    <td className="py-2.5 text-right text-muted-foreground">
-                      {formatLastActive(user.last_active_at)}
+                    <td className="flex items-center justify-between gap-2 py-0 text-right text-muted-foreground md:table-cell md:py-2.5">
+                      <span className="md:hidden">Last active</span>
+                      <span>{formatLastActive(user.last_active_at)}</span>
                     </td>
                   </tr>
                 ))}

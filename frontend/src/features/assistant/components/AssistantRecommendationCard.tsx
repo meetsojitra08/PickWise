@@ -11,6 +11,7 @@ import {
 import { Link } from 'react-router';
 import { PriceTag } from '@/components/shared/PriceTag';
 import { RatingStars } from '@/components/shared/RatingStars';
+import { AiMark } from '@/components/shared/VerdictPanel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -75,13 +76,16 @@ export function AssistantRecommendationCard({
     >
       <div>
         {/* Card Header & Badge Row */}
-        <CardHeader className="p-4 pb-2">
+        <CardHeader className="p-3 pb-2 sm:p-4 sm:pb-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <Badge
               variant={badgeConfig.variant}
-              className="font-semibold text-[11px]"
+              className="font-semibold text-[11px] gap-1"
             >
-              {badgeConfig.label}
+              {variant === 'recommendation' && (
+                <AiMark className="size-2.5 text-accent" />
+              )}
+              <span>{badgeConfig.label}</span>
             </Badge>
 
             {product.value_score !== null &&
@@ -97,8 +101,8 @@ export function AssistantRecommendationCard({
           </div>
 
           {/* Product Hero: Image + Details */}
-          <div className="mt-3 flex items-start gap-3.5">
-            <div className="relative size-20 shrink-0 overflow-hidden rounded-xl border border-border/80 bg-muted/40 shadow-2xs">
+          <div className="mt-3 flex items-start gap-3 sm:gap-3.5">
+            <div className="relative size-16 shrink-0 overflow-hidden rounded-xl border border-border/80 bg-muted/40 shadow-2xs sm:size-20">
               {showImage ? (
                 <img
                   src={imageUrl}
@@ -145,7 +149,7 @@ export function AssistantRecommendationCard({
         </CardHeader>
 
         {/* Card Content: Why it fits & Trade-offs */}
-        <CardContent className="space-y-2.5 p-4 pt-1 text-xs">
+        <CardContent className="space-y-2.5 p-3 pt-1 text-xs sm:p-4 sm:pt-1">
           {recommendation.reason && (
             <div className="rounded-lg border border-positive/20 bg-positive-subtle/50 dark:bg-positive/10 p-2.5">
               <div className="flex items-center gap-1.5 font-heading text-[11px] font-bold text-positive uppercase tracking-wide">
@@ -183,12 +187,12 @@ export function AssistantRecommendationCard({
       </div>
 
       {/* Card Footer: Actions */}
-      <CardFooter className="flex items-center justify-between gap-2 border-t border-border/60 bg-muted/15 p-3 px-4">
+      <CardFooter className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 bg-muted/15 px-3 py-2.5 sm:p-3 sm:px-4">
         <Button
           asChild
           variant="default"
           size="sm"
-          className="h-8 gap-1 text-xs font-semibold"
+          className="min-h-10 gap-1 text-xs font-semibold sm:h-8 sm:min-h-0"
         >
           <Link to={`/products/${product.slug}`}>
             <span>View product</span>
@@ -203,7 +207,7 @@ export function AssistantRecommendationCard({
             size="sm"
             onClick={() => toggleCompare(product)}
             aria-pressed={isCompared}
-            className="h-8 gap-1 text-xs"
+            className="min-h-10 gap-1 text-xs sm:h-8 sm:min-h-0"
             title={isCompared ? 'In compare tray' : 'Add to compare tray'}
           >
             <Columns3
@@ -222,12 +226,13 @@ export function AssistantRecommendationCard({
             size="sm"
             disabled={wishlistPending}
             onClick={() => toggleWishlist(product, !isWishlisted)}
+            aria-pressed={isWishlisted}
             aria-label={
               isWishlisted
                 ? `Remove ${product.name} from wishlist`
                 : `Save ${product.name} to wishlist`
             }
-            className="h-8 w-8 p-0"
+            className="size-10 p-0 sm:size-8"
             title={isWishlisted ? 'Saved to wishlist' : 'Save to wishlist'}
           >
             <Heart

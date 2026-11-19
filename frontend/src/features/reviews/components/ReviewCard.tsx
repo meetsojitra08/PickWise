@@ -75,6 +75,7 @@ export function ReviewCard({
                 type="button"
                 variant="ghost"
                 size="sm"
+                title={`Edit review: ${review.title}`}
                 onClick={() => setIsEditing(true)}
               >
                 Edit
@@ -84,6 +85,7 @@ export function ReviewCard({
                 variant="ghost"
                 size="sm"
                 className="text-negative"
+                title={`Delete review: ${review.title}`}
                 onClick={() => setIsConfirmingDelete(true)}
               >
                 Delete

@@ -72,7 +72,7 @@ export function GlobalSearchDialog() {
         </Button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-foreground/30" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-overlay backdrop-blur-[2px]" />
         <Dialog.Content
           aria-describedby="global-search-description"
           className="fixed inset-x-3 top-[12vh] z-50 mx-auto max-h-[76vh] max-w-2xl overflow-y-auto rounded-surface border border-border bg-popover text-popover-foreground shadow-float outline-none sm:inset-x-6"
@@ -81,6 +81,7 @@ export function GlobalSearchDialog() {
             document.getElementById('global-search-input')?.focus();
           }}
         >
+          <Dialog.Title className="sr-only">Search products</Dialog.Title>
           <div className="flex items-center gap-3 border-b border-border px-4">
             <Search
               className="size-5 shrink-0 text-muted-foreground"

@@ -199,7 +199,7 @@ export function ProductReviews({ slug }: { slug: string }) {
     : null;
 
   return (
-    <section className="mt-12" aria-labelledby="reviews-heading">
+    <section id="reviews" className="mt-12" aria-labelledby="reviews-heading">
       <div className="mb-5">
         <h2
           id="reviews-heading"

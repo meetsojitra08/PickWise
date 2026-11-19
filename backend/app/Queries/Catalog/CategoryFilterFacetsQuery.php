@@ -11,6 +11,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\SpecDefinition;
+use App\Services\CatalogFacetCacheService;
 use App\Support\MediaUrl;
 use App\Support\Money;
 use Illuminate\Database\DatabaseManager;
@@ -28,12 +29,28 @@ final class CategoryFilterFacetsQuery
 {
     public function __construct(
         private readonly DatabaseManager $database,
+        private readonly CatalogFacetCacheService $facetCache,
     ) {}
+
+    /**
+     * Build or retrieve cached dynamic filter facets for an active category slug.
+     */
+    public function forSlug(string $slug, bool $fresh = false): CategoryFilterFacets
+    {
+        if ($fresh) {
+            $this->facetCache->forget($slug);
+        }
+
+        return $this->facetCache->remember(
+            $slug,
+            fn (): CategoryFilterFacets => $this->computeForSlug($slug),
+        );
+    }
 
     /**
      * Build dynamic filter facets for an active category slug from published products and spec definitions.
      */
-    public function forSlug(string $slug): CategoryFilterFacets
+    public function computeForSlug(string $slug): CategoryFilterFacets
     {
         [$category, $categoryIds] = $this->resolveActiveCategoryScope($slug);
 

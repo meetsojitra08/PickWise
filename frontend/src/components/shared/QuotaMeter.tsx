@@ -1,4 +1,4 @@
-import { Sparkles } from 'lucide-react';
+import { AiMark } from '@/components/shared/VerdictPanel';
 import { Badge } from '@/components/ui/badge';
 import type { AiQuota } from '@/features/assistant/types/assistant';
 import { cn } from '@/lib/utils';
@@ -44,7 +44,7 @@ export function QuotaMeter({
         variant={isExhausted ? 'negative' : isLow ? 'warning' : 'secondary'}
         className="font-normal text-xs"
       >
-        <Sparkles className="mr-1 size-3 shrink-0" aria-hidden="true" />
+        <AiMark className="mr-1 size-3 shrink-0" />
         <span className="font-semibold tabular-nums">{quota.remaining}</span>
         <span className="ml-1">{unitLabel} left today</span>
       </Badge>

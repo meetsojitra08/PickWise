@@ -244,7 +244,7 @@ export function SpecDefinitionDrawer({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 p-4 sm:p-5">
           {/* Action Header */}
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="relative flex-1">
@@ -282,7 +282,7 @@ export function SpecDefinitionDrawer({
 
           {/* Inline Form */}
           {isFormOpen && (
-            <div className="rounded-panel border border-border bg-card p-4 space-y-3.5 shadow-sm">
+            <div className="space-y-3.5 rounded-card border border-border bg-card p-4 shadow-sm">
               <div className="flex items-center justify-between border-b border-border pb-2">
                 <h4 className="text-sm font-semibold">
                   {editingSpec
@@ -477,7 +477,7 @@ export function SpecDefinitionDrawer({
           {confirmDeleteSpec && (
             <div
               role="alert"
-              className="rounded-panel border border-destructive/30 bg-destructive/10 p-3.5 space-y-2 text-xs"
+              className="space-y-2 rounded-control border border-destructive/30 bg-destructive/10 p-3.5 text-xs"
             >
               <div className="flex items-center gap-2 font-semibold text-destructive">
                 <AlertTriangle className="size-4" />
@@ -529,7 +529,7 @@ export function SpecDefinitionDrawer({
               <Skeleton className="h-12 w-full rounded-control" />
             </div>
           ) : specs && specs.length > 0 ? (
-            <div className="divide-y divide-border rounded-panel border border-border">
+            <div className="divide-y divide-border rounded-card border border-border">
               {specs.map((spec) => {
                 const isNumber = spec.data_type === 'number';
 
@@ -557,17 +557,17 @@ export function SpecDefinitionDrawer({
 
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         {spec.is_filterable && (
-                          <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                          <span className="inline-flex items-center gap-1 text-positive">
                             <Filter className="size-3" /> Filterable
                           </span>
                         )}
                         {spec.is_comparable && (
-                          <span className="inline-flex items-center gap-1 text-sky-600 dark:text-sky-400">
+                          <span className="inline-flex items-center gap-1 text-primary">
                             <ArrowUpDown className="size-3" /> Comparable
                           </span>
                         )}
                         {isNumber && spec.higher_is_better !== null && (
-                          <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                          <span className="inline-flex items-center gap-1 text-warning">
                             <Check className="size-3" />
                             {spec.higher_is_better
                               ? 'Higher is better'
@@ -611,7 +611,7 @@ export function SpecDefinitionDrawer({
               })}
             </div>
           ) : (
-            <div className="rounded-panel border border-dashed border-border p-8 text-center">
+            <div className="rounded-card border border-dashed border-border p-8 text-center">
               <Sliders
                 className="mx-auto size-8 text-muted-foreground"
                 strokeWidth={1}

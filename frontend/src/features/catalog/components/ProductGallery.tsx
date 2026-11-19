@@ -44,6 +44,7 @@ export function ProductGallery({ name, images }: ProductGalleryProps) {
       </div>
       {images.length > 1 ? (
         <div
+          role="group"
           className="mt-3 flex gap-3 overflow-x-auto pb-1"
           aria-label="Product photos"
         >

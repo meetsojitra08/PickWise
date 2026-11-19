@@ -273,7 +273,11 @@ export function AdminActivityLogsPage() {
         <CardContent className="space-y-4 p-4 sm:p-5">
           {/* Top Row: Date Presets & Custom Dates */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div
+              role="group"
+              aria-label="Audit log time window presets"
+              className="flex flex-wrap items-center gap-1.5"
+            >
               <span className="mr-1 text-xs font-medium text-muted-foreground">
                 Window:
               </span>
@@ -282,6 +286,7 @@ export function AdminActivityLogsPage() {
                   key={days}
                   type="button"
                   variant={activePreset === days ? 'default' : 'outline'}
+                  aria-pressed={activePreset === days}
                   size="sm"
                   onClick={() => handlePresetChange(days)}
                   className="h-8 text-xs"
@@ -293,6 +298,7 @@ export function AdminActivityLogsPage() {
               <Button
                 type="button"
                 variant={activePreset === 'custom' ? 'default' : 'outline'}
+                aria-pressed={activePreset === 'custom'}
                 size="sm"
                 onClick={() => setActivePreset('custom')}
                 className="h-8 text-xs"
@@ -302,10 +308,10 @@ export function AdminActivityLogsPage() {
               </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1.5">
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+              <div className="flex w-full flex-wrap items-center gap-1.5 sm:w-auto">
                 <Calendar
-                  className="size-3.5 text-muted-foreground"
+                  className="size-3.5 shrink-0 text-muted-foreground"
                   aria-hidden="true"
                 />
                 <label htmlFor="audit-start-date" className="sr-only">
@@ -316,7 +322,7 @@ export function AdminActivityLogsPage() {
                   type="date"
                   value={startDate}
                   onChange={(e) => handleStartDateChange(e.target.value)}
-                  className="h-8 w-36 text-xs"
+                  className="h-9 min-w-0 flex-1 text-xs sm:h-8 sm:w-36 sm:flex-initial"
                   data-testid="start-date-input"
                 />
                 <span className="text-xs text-muted-foreground">to</span>
@@ -328,7 +334,7 @@ export function AdminActivityLogsPage() {
                   type="date"
                   value={endDate}
                   onChange={(e) => handleEndDateChange(e.target.value)}
-                  className="h-8 w-36 text-xs"
+                  className="h-9 min-w-0 flex-1 text-xs sm:h-8 sm:w-36 sm:flex-initial"
                   data-testid="end-date-input"
                 />
               </div>
@@ -548,12 +554,15 @@ export function AdminActivityLogsPage() {
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="md:overflow-x-auto">
               <table
-                className="w-full text-left text-xs"
+                className="block w-full text-left text-xs md:table"
                 data-testid="audit-logs-table"
               >
-                <thead className="border-b border-border bg-muted/40 text-muted-foreground">
+                <caption className="sr-only">
+                  Administrative audit log records
+                </caption>
+                <thead className="hidden border-b border-border bg-muted/40 text-muted-foreground md:table-header-group">
                   <tr>
                     <th scope="col" className="px-4 py-3 font-medium">
                       Timestamp
@@ -578,7 +587,7 @@ export function AdminActivityLogsPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/60">
+                <tbody className="block divide-y divide-border/60 md:table-row-group">
                   {logs.map((item) => {
                     const subjectBasename = item.subject_type
                       ? item.subject_type.split('\\').pop()
@@ -586,33 +595,46 @@ export function AdminActivityLogsPage() {
                     return (
                       <tr
                         key={item.id}
-                        className="hover:bg-muted/30"
+                        className="block space-y-2 p-4 hover:bg-muted/30 md:table-row md:space-y-0 md:p-0"
                         data-testid={`log-row-${item.id}`}
                       >
                         {/* Timestamp */}
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <div className="font-medium text-foreground">
-                            {formatRelativeTime(item.created_at)}
-                          </div>
-                          <div className="text-[11px] text-muted-foreground">
-                            {formatAbsoluteTime(item.created_at)}
+                        <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3 md:whitespace-nowrap">
+                          <span className="font-medium text-muted-foreground md:hidden">
+                            Timestamp
+                          </span>
+                          <div className="text-right md:text-left">
+                            <div className="font-medium text-foreground">
+                              {formatRelativeTime(item.created_at)}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground">
+                              {formatAbsoluteTime(item.created_at)}
+                            </div>
                           </div>
                         </td>
 
                         {/* Admin */}
-                        <td className="px-4 py-3">
-                          <div className="font-medium text-foreground">
-                            {item.admin?.name ?? 'System / Unknown'}
-                          </div>
-                          <div className="text-[11px] text-muted-foreground">
-                            {item.admin?.email ?? 'no email'}
+                        <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3">
+                          <span className="font-medium text-muted-foreground md:hidden">
+                            Administrator
+                          </span>
+                          <div className="min-w-0 text-right md:text-left">
+                            <div className="truncate font-medium text-foreground">
+                              {item.admin?.name ?? 'System / Unknown'}
+                            </div>
+                            <div className="truncate text-[11px] text-muted-foreground">
+                              {item.admin?.email ?? 'no email'}
+                            </div>
                           </div>
                         </td>
 
                         {/* Action Badge */}
-                        <td className="px-4 py-3 whitespace-nowrap">
+                        <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3 md:whitespace-nowrap">
+                          <span className="font-medium text-muted-foreground md:hidden">
+                            Action
+                          </span>
                           <span
-                            className={`inline-flex items-center rounded-control border px-2 py-0.5 text-xs font-mono font-medium ${getActionBadgeStyle(
+                            className={`inline-flex items-center rounded-control border px-2 py-0.5 font-mono text-xs font-medium ${getActionBadgeStyle(
                               item.action,
                             )}`}
                           >
@@ -621,7 +643,10 @@ export function AdminActivityLogsPage() {
                         </td>
 
                         {/* Subject */}
-                        <td className="px-4 py-3 whitespace-nowrap">
+                        <td className="flex items-center justify-between gap-2 p-0 md:table-cell md:px-4 md:py-3 md:whitespace-nowrap">
+                          <span className="font-medium text-muted-foreground md:hidden">
+                            Subject
+                          </span>
                           {subjectBasename ? (
                             <span className="text-xs text-foreground">
                               <strong>{subjectBasename}</strong> #
@@ -635,18 +660,22 @@ export function AdminActivityLogsPage() {
                         </td>
 
                         {/* IP Address */}
-                        <td className="px-4 py-3 whitespace-nowrap font-mono text-muted-foreground">
-                          {item.ip_address ?? '—'}
+                        <td className="flex items-center justify-between gap-2 p-0 font-mono text-muted-foreground md:table-cell md:px-4 md:py-3 md:whitespace-nowrap">
+                          <span className="font-sans font-medium text-muted-foreground md:hidden">
+                            IP Address
+                          </span>
+                          <span>{item.ip_address ?? '—'}</span>
                         </td>
 
                         {/* Changes / Inspect Action */}
-                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <td className="block border-t border-border/50 pt-2.5 text-right md:table-cell md:border-t-0 md:px-4 md:py-3 md:whitespace-nowrap">
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => setSelectedActivity(item)}
-                            className="h-7 gap-1 text-xs font-medium"
+                            aria-label={`Inspect audit diff for ${item.action}`}
+                            className="h-9 gap-1 text-xs font-medium md:h-7"
                             data-testid={`inspect-diff-btn-${item.id}`}
                           >
                             <Split className="size-3" aria-hidden="true" />
@@ -677,7 +706,7 @@ export function AdminActivityLogsPage() {
                 records
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
                 <select
                   value={perPage}
                   onChange={(e) => {

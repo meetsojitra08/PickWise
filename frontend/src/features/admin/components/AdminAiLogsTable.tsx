@@ -70,9 +70,10 @@ export function AdminAiLogsTable({
             No AI invocation logs match your criteria.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-border text-muted-foreground">
+          <div className="md:overflow-x-auto">
+            <table className="block w-full text-left text-xs md:table">
+              <caption className="sr-only">Recent AI request logs</caption>
+              <thead className="hidden border-b border-border text-muted-foreground md:table-header-group">
                 <tr>
                   <th scope="col" className="pb-2.5 font-medium">
                     Timestamp
@@ -97,23 +98,29 @@ export function AdminAiLogsTable({
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
+              <tbody className="block divide-y divide-border/50 md:table-row-group">
                 {logs.map((log) => {
                   return (
                     <tr
                       key={log.id}
-                      className="transition-colors hover:bg-muted/30"
+                      className="block space-y-2 py-3 transition-colors hover:bg-muted/30 md:table-row md:space-y-0 md:py-0"
                       data-testid={`ai-log-row-${log.id}`}
                     >
                       {/* Timestamp */}
-                      <td className="py-2.5 pr-2 whitespace-nowrap text-muted-foreground font-mono">
-                        {formatLogTimestamp(log.created_at)}
+                      <td className="flex items-center justify-between gap-2 py-0 font-mono text-muted-foreground md:table-cell md:py-2.5 md:pr-2 md:whitespace-nowrap">
+                        <span className="font-sans font-medium text-muted-foreground md:hidden">
+                          Timestamp
+                        </span>
+                        <span>{formatLogTimestamp(log.created_at)}</span>
                       </td>
 
                       {/* User */}
-                      <td className="py-2.5 pr-2">
+                      <td className="flex items-center justify-between gap-2 py-0 md:table-cell md:py-2.5 md:pr-2">
+                        <span className="font-medium text-muted-foreground md:hidden">
+                          User
+                        </span>
                         {log.user ? (
-                          <div className="min-w-0 max-w-[160px]">
+                          <div className="min-w-0 max-w-[160px] text-right md:text-left">
                             <div className="truncate font-semibold text-foreground">
                               {log.user.name}
                             </div>
@@ -129,7 +136,10 @@ export function AdminAiLogsTable({
                       </td>
 
                       {/* Feature */}
-                      <td className="py-2.5 pr-2">
+                      <td className="flex items-center justify-between gap-2 py-0 md:table-cell md:py-2.5 md:pr-2">
+                        <span className="font-medium text-muted-foreground md:hidden">
+                          Feature
+                        </span>
                         <span className="inline-flex items-center rounded-control bg-secondary px-2 py-0.5 text-[11px] font-medium text-secondary-foreground">
                           {log.feature === 'assistant'
                             ? 'Assistant'
@@ -140,27 +150,38 @@ export function AdminAiLogsTable({
                       </td>
 
                       {/* Model */}
-                      <td className="py-2.5 pr-2 text-muted-foreground font-mono">
-                        {log.model ?? '—'}
+                      <td className="flex items-center justify-between gap-2 py-0 font-mono text-muted-foreground md:table-cell md:py-2.5 md:pr-2">
+                        <span className="font-sans font-medium text-muted-foreground md:hidden">
+                          Model
+                        </span>
+                        <span className="truncate">{log.model ?? '—'}</span>
                       </td>
 
                       {/* Tokens */}
-                      <td className="py-2.5 pr-2 text-right">
-                        <div className="font-semibold text-foreground font-mono">
-                          {log.total_tokens > 0
-                            ? log.total_tokens.toLocaleString('en-US')
-                            : '—'}
-                        </div>
-                        {log.prompt_tokens !== null && (
-                          <div className="text-[10px] text-muted-foreground font-mono">
-                            {log.prompt_tokens} in /{' '}
-                            {log.completion_tokens ?? 0} out
+                      <td className="flex items-center justify-between gap-2 py-0 text-right md:table-cell md:py-2.5 md:pr-2">
+                        <span className="font-medium text-muted-foreground md:hidden">
+                          Tokens
+                        </span>
+                        <div>
+                          <div className="font-mono font-semibold text-foreground">
+                            {log.total_tokens > 0
+                              ? log.total_tokens.toLocaleString('en-US')
+                              : '—'}
                           </div>
-                        )}
+                          {log.prompt_tokens !== null && (
+                            <div className="font-mono text-[10px] text-muted-foreground">
+                              {log.prompt_tokens} in /{' '}
+                              {log.completion_tokens ?? 0} out
+                            </div>
+                          )}
+                        </div>
                       </td>
 
                       {/* Latency */}
-                      <td className="py-2.5 pr-2 text-right font-mono">
+                      <td className="flex items-center justify-between gap-2 py-0 text-right font-mono md:table-cell md:py-2.5 md:pr-2">
+                        <span className="font-sans font-medium text-muted-foreground md:hidden">
+                          Latency
+                        </span>
                         {log.latency_ms !== null ? (
                           <span className="inline-flex items-center gap-1 text-muted-foreground">
                             <Clock className="size-3 text-muted-foreground/60" />
@@ -172,9 +193,12 @@ export function AdminAiLogsTable({
                       </td>
 
                       {/* Status */}
-                      <td className="py-2.5 text-right whitespace-nowrap">
+                      <td className="flex items-center justify-between gap-2 py-0 text-right whitespace-nowrap md:table-cell md:py-2.5">
+                        <span className="font-medium text-muted-foreground md:hidden">
+                          Status
+                        </span>
                         {log.status === 'ok' ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-positive-subtle px-2 py-0.5 text-[11px] font-medium text-positive">
                             <CheckCircle2 className="size-3" />
                             Ok
                           </span>
@@ -188,7 +212,7 @@ export function AdminAiLogsTable({
                           </span>
                         ) : (
                           <span
-                            className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
+                            className="inline-flex items-center gap-1 rounded-full bg-warning-subtle px-2 py-0.5 text-[11px] font-medium text-foreground dark:text-warning"
                             title="Rate limited (daily quota exceeded)"
                           >
                             <ShieldAlert className="size-3" />
@@ -206,7 +230,7 @@ export function AdminAiLogsTable({
 
         {/* Pagination bar */}
         {last_page > 1 && (
-          <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+          <div className="mt-4 flex flex-col items-center justify-between gap-3 border-t border-border pt-3 sm:flex-row">
             <div className="text-xs text-muted-foreground">
               Page <strong>{current_page}</strong> of{' '}
               <strong>{last_page}</strong>

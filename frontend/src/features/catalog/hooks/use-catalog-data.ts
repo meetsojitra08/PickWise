@@ -26,6 +26,7 @@ export function useCatalogCategories() {
   return useQuery({
     queryKey: catalogKeys.categories(),
     queryFn: ({ signal }) => getCatalogCategories(signal),
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -58,6 +59,7 @@ export function useCatalogFacets(category: string) {
     queryKey: catalogKeys.facets(category),
     queryFn: ({ signal }) => getCatalogFacets(category, signal),
     enabled: category !== '',
+    staleTime: 5 * 60 * 1000,
   });
 }
 

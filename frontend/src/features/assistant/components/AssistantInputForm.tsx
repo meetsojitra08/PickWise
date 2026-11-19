@@ -145,7 +145,7 @@ export function AssistantInputForm({
         {/* Top Controls: Category & Budget Filters */}
         <div className="mb-2 flex flex-wrap items-center gap-2 border-b border-border/50 pb-2">
           {/* Category Select Pill */}
-          <div className="relative flex items-center">
+          <div className="relative flex min-w-0 flex-1 items-center sm:flex-initial">
             <Tag
               className="pointer-events-none absolute left-2.5 size-3.5 text-muted-foreground"
               aria-hidden="true"
@@ -162,7 +162,7 @@ export function AssistantInputForm({
                 setCategory(e.target.value);
               }}
               disabled={isPending || isQuotaExhausted}
-              className="h-7 cursor-pointer appearance-none rounded-full border border-border/70 bg-muted/40 pr-6 pl-7 text-[11px] font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+              className="h-10 w-full cursor-pointer appearance-none rounded-full border border-border/70 bg-muted/40 pr-6 pl-7 text-xs font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring sm:h-8 sm:w-auto sm:text-[11px]"
             >
               <option value="">All categories</option>
               {flatCategories.map((cat) => (
@@ -177,7 +177,7 @@ export function AssistantInputForm({
           </div>
 
           {/* Budget Input Pill */}
-          <div className="relative flex items-center">
+          <div className="relative flex min-w-0 flex-1 items-center sm:flex-initial">
             <Wallet
               className="pointer-events-none absolute left-2.5 size-3.5 text-muted-foreground"
               aria-hidden="true"
@@ -197,13 +197,13 @@ export function AssistantInputForm({
                 setBudgetMax(e.target.value);
               }}
               disabled={isPending || isQuotaExhausted}
-              className="h-7 w-32 rounded-full border border-border/70 bg-muted/40 pr-2.5 pl-7 text-[11px] font-medium text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring tabular-nums"
+              className="h-10 w-full rounded-full border border-border/70 bg-muted/40 pr-2.5 pl-7 text-xs font-medium text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring tabular-nums sm:h-8 sm:w-32 sm:text-[11px]"
             />
           </div>
 
           {isPreferencesActive && (
             <span
-              className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium text-accent shadow-2xs"
+              className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold text-accent-foreground dark:text-accent shadow-2xs"
               data-testid="saved-preferences-badge"
             >
               <Sparkles className="size-2.5" aria-hidden="true" />
@@ -215,7 +215,7 @@ export function AssistantInputForm({
             <button
               type="button"
               onClick={handleClearFilters}
-              className="cursor-pointer text-[10px] font-medium text-muted-foreground hover:text-foreground"
+              className="cursor-pointer rounded-xs text-[10px] font-medium text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               Clear filters
             </button>
@@ -269,7 +269,7 @@ export function AssistantInputForm({
                 disabled={!canSubmit}
                 onClick={handleSubmit}
                 aria-label="Send message"
-                className="size-8 rounded-full p-0 shadow-xs"
+                className="size-10 rounded-full p-0 shadow-xs sm:size-8"
               >
                 {isPending ? (
                   <Sparkles className="size-4 animate-spin" />

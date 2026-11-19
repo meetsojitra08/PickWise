@@ -15,9 +15,9 @@ function StorefrontLayout() {
   return (
     <div
       className={cn(
-        'flex min-h-screen flex-col bg-background text-foreground',
+        'flex min-h-dvh flex-col bg-background text-foreground',
         count > 0 && !isAssistant && 'pb-32',
-        isAssistant && 'h-screen overflow-hidden',
+        isAssistant && 'h-dvh overflow-hidden',
       )}
     >
       <WishlistIntentSync />
@@ -34,7 +34,7 @@ function StorefrontLayout() {
         id="main-content"
         tabIndex={-1}
         className={cn(
-          'flex-1 outline-none',
+          'min-w-0 flex-1 outline-none',
           isAssistant && 'flex flex-col overflow-hidden',
         )}
       >

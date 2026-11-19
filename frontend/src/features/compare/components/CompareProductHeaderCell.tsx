@@ -12,7 +12,7 @@ export function CompareProductHeaderCell({
   return (
     <th
       scope="col"
-      className="min-w-44 bg-card px-4 py-4 align-top font-medium sm:px-5 lg:sticky lg:top-16 lg:z-30"
+      className="min-w-40 bg-card px-3 py-4 align-top font-medium sm:min-w-44 sm:px-5 lg:sticky lg:top-16 lg:z-30"
     >
       <Link
         to={`/products/${product.slug}`}

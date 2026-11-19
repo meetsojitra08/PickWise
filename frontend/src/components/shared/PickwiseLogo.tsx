@@ -25,21 +25,21 @@ export function PickwiseLogo({
     >
       <span
         aria-hidden="true"
-        className="flex size-7 shrink-0 items-center justify-center rounded-sm bg-primary text-accent"
+        className="flex size-7 shrink-0 items-center justify-center rounded-sm bg-primary text-accent dark:text-primary-foreground"
       >
         <svg viewBox="0 0 24 24" className="size-4" fill="none">
           <path d="M12 3L20 12L12 21L4 12L12 3Z" fill="currentColor" />
           <path
             d="M12 7.5L15.5 12L12 16.5L8.5 12L12 7.5Z"
-            className="fill-primary-foreground"
+            className="fill-primary-foreground dark:fill-accent"
           />
         </svg>
       </span>
-      <span className="font-heading text-xl font-semibold tracking-tight">
+      <span className="font-heading text-lg font-semibold tracking-tight sm:text-xl">
         Pickwise
       </span>
       {labelSuffix ? (
-        <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+        <span className="hidden rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground sm:inline-flex">
           {labelSuffix}
         </span>
       ) : null}
