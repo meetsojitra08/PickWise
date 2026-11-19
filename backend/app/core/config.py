@@ -31,9 +31,12 @@ class Settings(BaseSettings):
         if self.DATABASE_URL:
             url = self.DATABASE_URL
             if url.startswith("postgres://"):
-                return url.replace("postgres://", "postgresql+asyncpg://", 1)
-            if url.startswith("postgresql://"):
-                return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+                url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif url.startswith("postgresql://"):
+                url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+            # asyncpg driver requires ?ssl= instead of ?sslmode=
+            if "sslmode=" in url:
+                url = url.replace("sslmode=", "ssl=")
             return url
         return (
             f"postgresql+asyncpg://{self.DB_USERNAME}:{self.DB_PASSWORD}@"
