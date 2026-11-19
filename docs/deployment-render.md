@@ -54,8 +54,7 @@ Pickwise includes a `render.yaml` Blueprint file at the repository root that def
 7. Render will automatically:
    - Provision PostgreSQL and link `DATABASE_URL`.
    - Run `pip install -r requirements.txt`.
-   - Run the pre-deploy command `python -m app.db.seed` (creates schema, triggers, search indexes, and seeds 60 products).
-   - Launch `uvicorn app.main:app` on port `$PORT`.
+   - Run `python -m app.db.seed` to initialize schema, triggers, and seed 60 products, then launch `uvicorn app.main:app` on port `$PORT`.
 
 ---
 
@@ -92,13 +91,9 @@ If you prefer configuring services step-by-step through the Render web UI:
      ```bash
      pip install --upgrade pip && pip install -r requirements.txt
      ```
-   - **Pre-Deploy Command**:
-     ```bash
-     python -m app.db.seed
-     ```
    - **Start Command**:
      ```bash
-     uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
+     python -m app.db.seed && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
      ```
    - **Instance Type**: **Free**.
 
