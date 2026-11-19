@@ -303,11 +303,12 @@ pickwise/
 
 ## Deployment
 
-Pickwise backend is production-ready for deployment on **Render**:
+Pickwise is production-ready for deployment with separate backend and frontend cloud architectures:
 
-- **Render Deployment Guide:** [`docs/deployment-render.md`](docs/deployment-render.md)
-- **Production Dockerfile:** [`docker/fastapi/Dockerfile.prod`](docker/fastapi/Dockerfile.prod)
+- **Frontend on Vercel:** [`docs/deployment-vercel.md`](docs/deployment-vercel.md) (Vite SPA with edge rewrites)
+- **Backend on Render:** [`docs/deployment-render.md`](docs/deployment-render.md) (FastAPI ASGI with Neon DB and Upstash Redis)
 - **Infrastructure Blueprint:** [`render.yaml`](render.yaml)
+- **Production Dockerfile:** [`docker/fastapi/Dockerfile.prod`](docker/fastapi/Dockerfile.prod)
 
 ---
 

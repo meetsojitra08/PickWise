@@ -6,8 +6,12 @@ import {
 
 export { ApiError };
 
-const API_BASE_URL = '/api/v1';
-const SANCTUM_CSRF_ENDPOINT = '/sanctum/csrf-cookie';
+const BACKEND_URL =
+  (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, '') ?? '';
+const API_BASE_URL = BACKEND_URL ? `${BACKEND_URL}/api/v1` : '/api/v1';
+const SANCTUM_CSRF_ENDPOINT = BACKEND_URL
+  ? `${BACKEND_URL}/sanctum/csrf-cookie`
+  : '/sanctum/csrf-cookie';
 const XSRF_COOKIE_NAME = 'XSRF-TOKEN';
 const MUTATING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
