@@ -10,6 +10,9 @@ grounded picks — with honest reasons and trade-offs.
 
 [![CI](https://github.com/meetsojitra08/pickwise/actions/workflows/ci.yml/badge.svg)](https://github.com/meetsojitra08/pickwise/actions/workflows/ci.yml)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7.svg)](https://pickwise-api-f5fx.onrender.com/docs)
+[![Frontend: Vercel](https://img.shields.io/badge/Frontend-Vercel-000000.svg?logo=vercel&logoColor=white)](docs/deployment-vercel.md)
+[![Database: Neon](https://img.shields.io/badge/Database-Neon%20Postgres-00E599.svg?logo=postgresql&logoColor=white)](https://neon.tech)
+[![Cache: Upstash](https://img.shields.io/badge/Cache-Upstash%20Redis-00E9A3.svg?logo=redis&logoColor=white)](https://upstash.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](./LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -38,15 +41,16 @@ grounded picks — with honest reasons and trade-offs.
 
 ---
 
-## Live demo
+## Live demo & deployment
 
-The Pickwise backend is deployed live on **Render** with **Neon PostgreSQL** and **Upstash Redis**:
+The Pickwise platform is production-ready across modern cloud services:
 
-- 🌐 **Live API Base:** [`https://pickwise-api-f5fx.onrender.com`](https://pickwise-api-f5fx.onrender.com)
+- 🌐 **Live Backend API (Render):** [`https://pickwise-api-f5fx.onrender.com`](https://pickwise-api-f5fx.onrender.com)
 - 📖 **Interactive Swagger UI:** [`https://pickwise-api-f5fx.onrender.com/docs`](https://pickwise-api-f5fx.onrender.com/docs)
 - 📑 **Interactive ReDoc:** [`https://pickwise-api-f5fx.onrender.com/redoc`](https://pickwise-api-f5fx.onrender.com/redoc)
-- 🩺 **Health Check:** [`https://pickwise-api-f5fx.onrender.com/up`](https://pickwise-api-f5fx.onrender.com/up)
-- 🛍️ **Seeded Products API:** [`https://pickwise-api-f5fx.onrender.com/api/v1/products`](https://pickwise-api-f5fx.onrender.com/api/v1/products)
+- 🩺 **API Health Check:** [`https://pickwise-api-f5fx.onrender.com/up`](https://pickwise-api-f5fx.onrender.com/up)
+- 🛍️ **Live Seeded Catalog:** [`https://pickwise-api-f5fx.onrender.com/api/v1/products`](https://pickwise-api-f5fx.onrender.com/api/v1/products)
+- 🚀 **Frontend SPA (Vercel):** Single-click deployable via [`docs/deployment-vercel.md`](docs/deployment-vercel.md) with edge proxying to avoid CORS and third-party cookie restrictions.
 
 ---
 
@@ -179,9 +183,9 @@ loading skeleton, ready, fallback, error with retry, and daily quota exceeded.
 | ORM & Validation | **SQLAlchemy 2.0 (async)** + **Pydantic v2** + **asyncpg** | Type-safe schema validation, async PostgreSQL engine |
 | Frontend | **React 19** + **TypeScript** + **Vite** | Single Page Application with TanStack Query and React Hook Form |
 | UI & Design | **shadcn/ui** + **Tailwind CSS** | Accessible component source, design tokens, light/dark themes |
-| Primary Database | **PostgreSQL 17** (Local Docker & **Neon Cloud**) | `tsvector` full-text search, `pg_trgm` fuzzy matching, GIN indexes |
-| Cache & Quotas | **Redis 7** (Local Docker & **Upstash Serverless**) | Session storage, token invalidation, sliding daily AI limits |
-| Cloud Hosting | **Render** | Production Web Service with automatic git-push CI/CD and health checks |
+| Primary Database | **PostgreSQL 17** (Local Docker & **Neon Serverless PostgreSQL**) | `tsvector` full-text search, `pg_trgm` fuzzy matching, GIN indexes, auto-SSL |
+| Cache & Quotas | **Redis 7** (Local Docker & **Upstash Serverless Redis**) | Session storage, token invalidation, sliding daily AI limits, auto TLS `rediss://` |
+| Cloud Hosting | **Render** (FastAPI) + **Vercel** (React SPA) | Production backend web service + zero-config frontend edge proxy |
 | AI Inference | **Groq API** (`qwen/qwen3.8-27b`) | Sub-second (~350ms) inference with database-grounded prompts |
 | Containerization | **Docker** + Docker Compose | Fully reproducible local dev & multi-stage production images |
 | Test Suites | **pytest** (backend) + **Vitest / Playwright** (frontend) | 20 Pytest async suites + 308 Vitest component tests |

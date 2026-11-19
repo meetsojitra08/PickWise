@@ -17,8 +17,8 @@ This guide walks you through deploying the **Pickwise FastAPI backend** to [Rend
                    |                               |                               |
                    v                               v                               v
        +-----------------------+       +-----------------------+       +-----------------------+
-       |   Render PostgreSQL   |       |      Redis Store      |       |       Groq API        |
-       |     (pickwise-db)     |       | (Upstash / Render KV) |       |  (Llama-3.3-70b AI)   |
+       |   Neon PostgreSQL     |       |     Upstash Redis     |       |       Groq API        |
+       |  (Serverless Postgres)|       |   (Serverless Redis)  |       |  (Qwen / Llama 3.3)   |
        +-----------------------+       +-----------------------+       +-----------------------+
 ```
 
@@ -28,33 +28,35 @@ This guide walks you through deploying the **Pickwise FastAPI backend** to [Rend
 
 1. **GitHub Repository**: Push your Pickwise code to GitHub.
 2. **Render Account**: Sign up at [render.com](https://render.com).
-3. **Groq API Key**: Create a free API key at [console.groq.com](https://console.groq.com).
-4. **Redis Provider**:
-   - **Recommended (100% Free)**: [Upstash Redis](https://upstash.com) (generous free tier, permanent, no card required).
-   - **Alternative**: Render Key-Value ($7/mo starter plan).
+3. **Database (Neon PostgreSQL - Recommended & 100% Free)**:
+   - Create a free database at [neon.tech](https://neon.tech).
+   - Copy the connection string (e.g. `postgresql://user:pass@ep-xyz.neon.tech/neondb?sslmode=require`).
+4. **Redis Provider (Upstash Redis - Recommended & 100% Free)**:
+   - Create a free Redis database at [upstash.com](https://upstash.com).
+   - Copy the Python/ioredis URL starting with `rediss://default:...@...upstash.io:6379`.
+5. **Groq API Key**: Create a free API key at [console.groq.com](https://console.groq.com).
 
 ---
 
-## 3. Deployment Method A: One-Click Blueprint (Recommended)
+## 3. Deployment via Blueprint (`render.yaml`)
 
-Pickwise includes a `render.yaml` Blueprint file at the repository root that defines both the web service and the PostgreSQL database.
+Pickwise includes a `render.yaml` Blueprint file at the repository root that defines the `pickwise-api` web service.
 
 ### Steps:
 1. Log in to the [Render Dashboard](https://dashboard.render.com).
 2. Click **New +** in the top navigation bar and select **Blueprint**.
 3. Connect your **Pickwise** GitHub repository.
-4. Render will parse `render.yaml` and display the resources to create:
-   - **`pickwise-db`**: PostgreSQL database (Free tier).
-   - **`pickwise-api`**: FastAPI Web Service (Free tier).
-5. Fill in the required parameters prompted by Render:
+4. Render will parse `render.yaml` and create the `pickwise-api` service.
+5. In the service's **Environment** tab, click **Edit** and set:
+   - `DATABASE_URL`: Your Neon PostgreSQL connection string (`postgresql://...`).
+   - `REDIS_URL`: Your Upstash Redis connection string (`rediss://...`).
    - `GROQ_API_KEY`: Your key from Groq Console (`gsk_...`).
-   - `REDIS_URL`: Your Redis connection URL (e.g. `rediss://default:...@...upstash.io:6379` from Upstash).
-   - `CORS_ALLOWED_ORIGINS`: Comma-separated list of allowed frontend URLs (e.g. `https://pickwise.vercel.app,http://localhost:5173`).
-6. Click **Apply**.
+   - `CORS_ALLOWED_ORIGINS`: Comma-separated list of allowed frontend URLs (e.g. `https://your-app.vercel.app,http://localhost:5173,http://localhost:8080`).
+6. Click **Save Changes**, then trigger **Manual Deploy** -> **Deploy latest commit**.
 7. Render will automatically:
-   - Provision PostgreSQL and link `DATABASE_URL`.
-   - Run `pip install -r requirements.txt`.
-   - Run `python -m app.db.seed` to initialize schema, triggers, and seed 60 products, then launch `uvicorn app.main:app` on port `$PORT`.
+   - Connect to Neon PostgreSQL.
+   - Run `python -m app.db.seed` to initialize schema, triggers, and seed 60 products.
+   - Launch `uvicorn app.main:app` with healthy proxy headers.
 
 ---
 
