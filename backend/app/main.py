@@ -62,13 +62,18 @@ app.add_exception_handler(Exception, generic_exception_handler)
 async def sanctum_csrf_cookie(response: Response):
     token = generate_csrf_token()
     response.status_code = 204
+    is_secure = (
+        settings.SESSION_COOKIE_SECURE
+        if settings.SESSION_COOKIE_SECURE is not None
+        else (settings.APP_ENV != "local" or settings.SESSION_COOKIE_SAMESITE == "none")
+    )
     response.set_cookie(
         key=settings.XSRF_COOKIE_NAME,
         value=token,
         path="/",
         httponly=False,  # JavaScript in browser reads this to send X-XSRF-TOKEN header
-        samesite="lax",
-        secure=settings.APP_ENV != "local",
+        samesite=settings.SESSION_COOKIE_SAMESITE,
+        secure=is_secure,
     )
     return response
 

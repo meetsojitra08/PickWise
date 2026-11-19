@@ -20,14 +20,20 @@ async def create_user_session(
 
     await redis.set(f"{SESSION_PREFIX}{session_id}", str(user_id), ex=ttl_seconds)
 
+    is_secure = (
+        settings.SESSION_COOKIE_SECURE
+        if settings.SESSION_COOKIE_SECURE is not None
+        else (settings.APP_ENV != "local" or settings.SESSION_COOKIE_SAMESITE == "none")
+    )
+
     # Set Session Cookie
     response.set_cookie(
         key=settings.SESSION_COOKIE_NAME,
         value=session_id,
         path="/",
         httponly=True,
-        samesite="lax",
-        secure=settings.APP_ENV != "local",
+        samesite=settings.SESSION_COOKIE_SAMESITE,
+        secure=is_secure,
         max_age=ttl_seconds,
     )
 
@@ -38,8 +44,8 @@ async def create_user_session(
         value=csrf_token,
         path="/",
         httponly=False,
-        samesite="lax",
-        secure=settings.APP_ENV != "local",
+        samesite=settings.SESSION_COOKIE_SAMESITE,
+        secure=is_secure,
         max_age=ttl_seconds,
     )
 
@@ -50,8 +56,24 @@ async def destroy_user_session(session_id: str | None, response: Response, redis
     if session_id:
         await redis.delete(f"{SESSION_PREFIX}{session_id}")
 
-    response.delete_cookie(settings.SESSION_COOKIE_NAME, path="/")
-    response.delete_cookie(settings.XSRF_COOKIE_NAME, path="/")
+    is_secure = (
+        settings.SESSION_COOKIE_SECURE
+        if settings.SESSION_COOKIE_SECURE is not None
+        else (settings.APP_ENV != "local" or settings.SESSION_COOKIE_SAMESITE == "none")
+    )
+
+    response.delete_cookie(
+        settings.SESSION_COOKIE_NAME,
+        path="/",
+        samesite=settings.SESSION_COOKIE_SAMESITE,
+        secure=is_secure,
+    )
+    response.delete_cookie(
+        settings.XSRF_COOKIE_NAME,
+        path="/",
+        samesite=settings.SESSION_COOKIE_SAMESITE,
+        secure=is_secure,
+    )
 
 
 async def get_optional_user(

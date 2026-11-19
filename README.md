@@ -290,6 +290,16 @@ pickwise/
 
 ---
 
+## Deployment
+
+Pickwise backend is production-ready for deployment on **Render**:
+
+- **Render Deployment Guide:** [`docs/deployment-render.md`](docs/deployment-render.md)
+- **Production Dockerfile:** [`docker/fastapi/Dockerfile.prod`](docker/fastapi/Dockerfile.prod)
+- **Infrastructure Blueprint:** [`render.yaml`](render.yaml)
+
+---
+
 ## License
 
 [MIT](./LICENSE) © 2026 Meet Sojitra
