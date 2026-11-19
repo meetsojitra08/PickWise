@@ -1,15 +1,16 @@
 # API Specification (v1)
 
-Base path: `/api/v1`. JSON only. Cookie (Sanctum) auth.
+Base path: `/api/v1`. JSON only. Cookie session auth (`pickwise_session` + `XSRF-TOKEN`).
 
-> **OpenAPI 3.1.0 Specification:**
-> Complete machine-readable OpenAPI 3.1.0 specifications are maintained in:
+> **OpenAPI 3.1.0 Specification & Interactive Docs:**
+> - Interactive Swagger UI: `http://localhost:8000/docs`
+> - Interactive ReDoc: `http://localhost:8000/redoc`
+> - Raw JSON Schema: `http://localhost:8000/openapi.json`
+> - Maintained static specifications:
+>   - [openapi.yaml](./openapi.yaml) (canonical YAML representation)
+>   - [openapi.json](./openapi.json) (formatted JSON representation)
 >
-> - [openapi.yaml](./openapi.yaml) (canonical YAML representation)
-> - [openapi.json](./openapi.json) (formatted JSON representation)
->
-> Re-generate or validate anytime using `php artisan openapi:generate` (or `php artisan openapi:generate --dry-run`).
-> Compatible with Swagger UI, Redoc, Postman, and VS Code OpenAPI/Swagger previewers. Full route coverage is verified in `backend/tests/Feature/Docs/OpenApiSpecTest.php`.
+> Full route conventions and schemas are automatically verified by FastAPI and Pydantic v2.
 
 ## Conventions
 

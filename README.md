@@ -1,28 +1,296 @@
+<div align="center">
+
 # Pickwise
 
-An AI-powered shopping decision platform that helps people decide *what to buy* — with structured catalog search, side-by-side product comparisons, AI review summaries, and a budget-aware shopping assistant grounded strictly in real database products.
+**An AI-powered shopping decision platform.**
 
-> **Status:** Foundation (`P0`) in progress. Detailed architecture, specifications, and build steps live in [`docs/`](./docs/README.md).
+Search a structured catalog, compare products side by side, and ask an AI assistant
+that turns *"I need a laptop for video editing under ₹90,000"* into a short list of
+grounded picks — with honest reasons and trade-offs.
 
-## Tech Stack
+[![CI](https://github.com/meetsojitra08/pickwise/actions/workflows/ci.yml/badge.svg)](https://github.com/meetsojitra08/pickwise/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](./LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-19-61dafb)](https://reactjs.org/)
 
-- **Backend:** Laravel 13 (REST API), Laravel Sanctum (SPA cookie auth)
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS, shadcn/ui, TanStack Query
-- **Database & Cache:** PostgreSQL (`tsvector` + `pg_trgm`), Redis (cache, queue, sessions, rate limits, daily AI quotas)
-- **AI:** Groq API (server-side only, database-grounded prompts, JSON validation)
-- **Tooling & Infra:** Docker, Pest, Laravel Pint, Larastan, ESLint, Prettier, Vitest, GitHub Actions
+</div>
 
-## Documentation
+---
 
-- [Documentation Index](./docs/README.md)
-- [Project Overview](./docs/project-overview.md)
-- [Architecture Context](./docs/architecture-context.md)
-- [Database Schema](./docs/database-schema.md)
-- [API Specification](./docs/api-spec.md)
-- [AI Integration](./docs/ai-integration.md)
-- [UI Context](./docs/ui-context.md)
-- [Progress Tracker](./docs/progress-tracker.md)
+## Screenshots
 
-## Local Setup
+| Home — AI hero | Catalog & filters |
+|:-:|:-:|
+| ![Home hero](docs/screenshots/01-home-hero.png) | ![Catalog](docs/screenshots/02-catalog.png) |
 
-> Docker services and application scaffolding will be added in the upcoming `P0` steps (`P0-S2`–`P0-S6`).
+| Product detail + AI review summary | Compare matrix + AI verdict |
+|:-:|:-:|
+| ![Product detail](docs/screenshots/03-product-detail.png) | ![Compare](docs/screenshots/04-compare-matrix.png) |
+
+| AI shopping assistant (dark) | Admin dashboard |
+|:-:|:-:|
+| ![Assistant](docs/screenshots/05-assistant.png) | ![Admin](docs/screenshots/06-admin-dashboard.png) |
+
+> Screenshots are taken at 1440 × 900 with the Docker demo stack running.
+> See [`docs/screenshots/README.md`](docs/screenshots/README.md) for the full list.
+
+---
+
+## What it does
+
+Pickwise is a **decision tool**, not a shop. Every page ends with an outbound
+"View on store" link. No cart. No payments.
+
+| Feature | Description |
+|---------|-------------|
+| 🔍 **Catalog search** | Full-text search, typo-tolerance via `pg_trgm`, and faceted filters (price, category, brand, rating, structured specs) |
+| ⚖️ **Value Score** | Transparent formula combining price, specs and rating — shown on every card and filterable |
+| 📊 **Price history** | Interactive chart of price changes over time (180 days) |
+| 🤖 **AI shopping assistant** | Natural-language budget-aware picks grounded strictly in real database products (never hallucinated) |
+| 🧠 **AI review summary** | Groq-powered pros/cons/themes per product, generated once and cached — zero latency on page load |
+| 🆚 **AI compare verdict** | Select 2–4 products, get a structured verdict: strengths, weaknesses, and a plain-language recommendation |
+| ❤️ **Wishlist** | Optimistic toggle, persisted to your account |
+| 💾 **Saved comparisons** | Save and share comparison views via a public token |
+| 🧑‍💼 **Admin panel** | Full catalog CRUD, review moderation queue, user management, AI usage analytics, append-only audit log |
+| 🌙 **Dark mode** | Full dark theme with WCAG 2.2 AA contrast across every screen |
+| ♿ **Accessibility** | Keyboard-navigable, screen-reader annotated, skip links, ARIA landmarks |
+
+---
+
+## Architecture
+
+```
+┌────────────────────────────────────┐
+│   Browser  (React SPA)             │
+│   React 19 · TypeScript · Tailwind │
+│   shadcn/ui · TanStack Query       │
+└──────────────┬─────────────────────┘
+               │  HTTPS  (cookie auth, JSON)
+┌──────────────▼─────────────────────┐
+│   Nginx  (reverse proxy)           │
+│   /       → React SPA              │
+│   /api    → FastAPI ASGI App       │
+│   /sanctum → CSRF compatibility    │
+│   /storage → uploaded images       │
+└──────────────┬─────────────────────┘
+               │
+┌──────────────▼─────────────────────────────────────────┐
+│                   FastAPI REST API                     │
+│  Routes → Middleware → Dependency Injection            │
+│         → Service Layer → SQLAlchemy 2.0 (async)       │
+│                                                        │
+│  AI flow:  DB products → Prompt → Groq → Validate IDs  │
+└──────┬────────────────────────┬───────────────────────┘
+       │                        │
+┌──────▼──────────┐   ┌─────────▼──────────┐
+│   PostgreSQL    │   │    Groq  API        │
+│  tsvector FTS   │   │  (server-side only) │
+│  pg_trgm typos  │   └────────────────────┘
+└─────────────────┘
+┌─────────────────┐
+│     Redis 7     │
+│  cache · quota  │
+│  session store  │
+└─────────────────┘
+```
+
+### Request → response flow (catalog search)
+
+```
+GET /api/v1/products?q=gaming+mouse&max_price=3000&sort=rating_desc
+  → RequestIdMiddleware (assigns X-Request-Id)
+  → catalog.search_products (CatalogService)
+  → PostgreSQL query (tsvector + pg_trgm fuzzy matching, dynamic spec filters)
+  → Redis cache check for facet counts
+  → PaginatedResponse[ProductCardOut]
+  → JSON envelope  { data: [...], meta: { total, per_page, ... } }
+```
+
+### AI assistant flow
+
+```
+POST /api/v1/assistant/conversations/{id}/messages  { message, category? }
+  → CsrfMiddleware (validates X-XSRF-TOKEN header against cookie)
+  → AiQuotaService (checks Redis daily counter)
+  → AssistantService:
+      1. PostgreSQL query → candidate matching products in DB
+      2. Grounded prompt with catalog candidate products
+      3. Call Groq with JSON mode enabled (20s timeout, fallback on error)
+      4. Database anti-hallucination check: ensure all recommended product IDs exist in DB
+      5. Save message in ai_messages and log telemetry to ai_usage_logs
+  → Consume quota counter on success
+  → ApiResponse[AssistantMessageOut] → SPA displays grounded recommendation cards
+```
+
+---
+
+## AI design notes
+
+### Why the AI only sees products from our database
+
+Every AI call in Pickwise is **database-grounded**: the assistant is given a filtered
+list of real products and may only recommend IDs from that list. The LLM never names
+a product we did not supply.
+
+1. **Hallucination prevention** — The model cannot invent products, prices or specs.
+   Every card the UI renders comes from a database row.
+2. **Budget enforcement in code, not in the prompt** — After the LLM replies, the
+   service validates that every recommended product's price is within the user's
+   budget.
+3. **Explainability** — The recommended products are real rows; every field shown to
+   the user (price, rating, specs) is fetched from the database. The AI only contributes
+   the *reasoning* ("why it fits").
+
+### Quota protection (Redis daily counter)
+
+Each user (or guest session) gets a daily AI call limit enforced by a Redis counter
+(`ai:quota:{user_or_session}:{YYYY-MM-DD}`, TTL to next UTC midnight).
+The counter is **only incremented on a successful AI reply** — provider failures,
+invalid JSON, and fallback paths do not cost quota.
+
+### The Verdict panel — one consistent AI surface
+
+All three AI outputs (assistant picks, compare verdict, review summary) surface
+through one shared component: `VerdictPanel`. It has a Marigold left-rule accent,
+a structured layout (fit meter, "why it fits", trade-offs), and six states: idle,
+loading skeleton, ready, fallback, error with retry, and daily quota exceeded.
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | **FastAPI (Python 3.12+)** — REST API, async I/O, background tasks |
+| ORM & Data | **SQLAlchemy 2.0 (async)** + **Pydantic v2** + **asyncpg** |
+| Frontend | **React 19** + **TypeScript** + **Vite** |
+| UI components | **shadcn/ui** (owned, accessible component source) |
+| Styling | **Tailwind CSS** + CSS custom-property design tokens |
+| Database | **PostgreSQL 17** — `tsvector` FTS, `pg_trgm`, composite GIN indexes |
+| Cache & sessions | **Redis 7** (asyncio connection pool) |
+| AI inference | **Groq API** (`llama-3.3-70b-versatile` via official async SDK) |
+| Environment | **Docker** + Docker Compose |
+| Backend tests | **pytest** + **pytest-asyncio** + **httpx** (20/20 passed) |
+| Frontend tests | **Vitest** + **Testing Library** + **Playwright** (308/308 passed) |
+| Reverse proxy | **Nginx** (proxies `/api`, `/sanctum`, and `/storage`) |
+
+---
+
+## Local setup
+
+### Prerequisites
+
+- Docker Desktop (or Docker Engine + Compose plugin)
+- A free [Groq API key](https://console.groq.com/)
+
+### 1 — Clone and configure
+
+```bash
+git clone https://github.com/meetsojitra08/pickwise.git
+cd pickwise
+```
+
+Set `GROQ_API_KEY` in `docker-compose.yml` or your `.env` file:
+
+```env
+GROQ_API_KEY=gsk_...
+```
+
+### 2 — Build and start
+
+```bash
+docker compose up -d --build
+```
+
+This starts six services: `nginx` (port **8080**), `app` (FastAPI Uvicorn ASGI on **8000**),
+`db` (PostgreSQL 17), `redis` (Redis 7), `web` (React Vite dev server on **5173**),
+and `mailpit` (**8025**).
+
+### 3 — Initialise the database & seed demo data
+
+```bash
+# Seed 6 categories, 21 brands, 60 products with specs, 180-day price curves, and test users
+docker compose exec app python -m app.db.seed
+```
+
+Demo accounts:
+- **Admin:** `admin@pickwise.test` / `password`
+- **Shopper:** `customer@pickwise.test` / `password`
+
+### 4 — Open the app
+
+| URL | What you see |
+|-----|-------------|
+| `http://localhost:8080` | Pickwise Storefront |
+| `http://localhost:8080/admin` | Admin panel |
+| `http://localhost:8000/docs` | Interactive Swagger API documentation |
+| `http://localhost:8000/redoc` | Interactive ReDoc API documentation |
+| `http://localhost:5173` | Vite dev server |
+| `http://localhost:8025` | Mailpit (local mail) |
+
+---
+
+## Running tests
+
+```bash
+# Backend integration test suite (20 test suites)
+docker compose exec app pytest tests/
+
+# Frontend unit & component test suite (308 tests)
+docker compose exec web npm test
+
+# Frontend production typecheck & build
+docker compose exec web npm run build
+```
+
+---
+
+## Project structure
+
+```
+pickwise/
+├── LICENSE
+├── README.md
+├── TASK.md
+├── docker-compose.yml
+├── docker/
+│   ├── nginx/default.conf       # Reverse proxy + security headers + CSP
+│   ├── fastapi/Dockerfile       # Python 3.12-slim ASGI Dockerfile
+│   └── node/Dockerfile          # Node.js container for React 19
+├── docs/                        # Architecture, schema, API spec, UI guide
+│   ├── openapi.yaml / .json     # Full OpenAPI 3.1.0 specification
+│   ├── screenshots/             # README screenshots
+│   └── feature-specs/           # 13 detailed feature specs
+├── backend/                     # FastAPI Application
+│   ├── app/
+│   │   ├── main.py              # Application entrypoint & CORS middleware
+│   │   ├── core/                # Config, security, auth dependencies, middleware
+│   │   ├── db/                  # Session, init_db, seed data
+│   │   ├── models/              # SQLAlchemy 2.0 async models
+│   │   ├── schemas/             # Pydantic v2 request & response schemas
+│   │   ├── services/            # Catalog, value score, assistant, groq client, admin
+│   │   └── api/v1/              # Versioned API routes
+│   ├── tests/                   # Pytest async test suite
+│   ├── pyproject.toml           # Python dependencies and pytest configuration
+│   └── requirements.txt         # Pinned requirements
+└── frontend/                    # React SPA
+    └── src/
+        ├── features/            # auth, catalog, product, compare, assistant, wishlist, account, admin
+        ├── components/shared/   # VerdictPanel, ErrorState, AiMark, ...
+        └── test/                # accessibility, dark-mode, responsive test suites
+```
+
+---
+
+## API documentation
+
+- **Interactive Swagger UI:** Visit `http://localhost:8000/docs`
+- **Interactive ReDoc:** Visit `http://localhost:8000/redoc`
+- **OpenAPI 3.1.0 Static Files:** [`docs/openapi.yaml`](docs/openapi.yaml) and [`docs/openapi.json`](docs/openapi.json)
+
+---
+
+## License
+
+[MIT](./LICENSE) © 2026 Meet Sojitra

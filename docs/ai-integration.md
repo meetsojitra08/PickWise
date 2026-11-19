@@ -7,21 +7,21 @@ We use the AI in a **basic, easy-to-explain way**: our backend sends a prompt to
 ## 1. How it works in one picture
 
 ```
-React app ──► Laravel API ──► (1) get real products from PostgreSQL
+React app ──► FastAPI API ──► (1) get real products from PostgreSQL
                               (2) build a prompt with those products
-                              (3) call Groq API
-                              (4) check the reply
-                         ◄── (5) return JSON to React
+                              (3) call Groq API (async SDK)
+                              (4) check the reply & anti-hallucination
+                         ◄── (5) return JSON envelope to React
 ```
 
 ## 2. Groq client
 
-- One class: `App\AI\GroqClient`. It is the **only** place that talks to Groq.
-- Uses Laravel's `Http` facade to call Groq's chat completions endpoint (Groq is OpenAI-compatible).
-- Settings come from `config/ai.php`: `GROQ_API_KEY`, `GROQ_BASE_URL`, `GROQ_MODEL`, timeout.
-- **Check the Groq docs for the current model name and how to request JSON replies.** Do not hard-code the model name.
-- Set a timeout (about 20 seconds). If Groq fails, throw a clear exception (see §6).
-- The API key lives only in the backend `.env`. The React app never sees it.
+- Async wrapper: `app/services/groq_client.py` (`GroqClientWrapper`). It is the **only** module that talks to Groq.
+- Uses official async `groq.AsyncGroq` Python SDK to call Groq's chat completions endpoint.
+- Settings come from `app/core/config.py` (`settings.GROQ_API_KEY`, `settings.GROQ_MODEL`, `settings.GROQ_TIMEOUT_SECONDS`).
+- Model: `llama-3.3-70b-versatile` with JSON response mode (`response_format={"type": "json_object"}`).
+- Set a timeout (about 20 seconds). If Groq fails, catches errors and provides deterministic fallback.
+- The API key lives only in the backend environment. The React app never sees it.
 
 ## 3. The three AI features
 
@@ -103,6 +103,6 @@ The user should never see a crash or a technical message.
 
 ## 9. How to explain this in an interview
 
-> "I integrated the Groq API from my Laravel backend. For the assistant, I first query PostgreSQL for real products that match the user's budget and category, then send only those to the model and ask it to pick and explain the best ones in JSON. I validate the reply so it can only recommend products that exist, and I show product data from my database. I also added a daily limit per user, error handling with a fallback, and the API key stays on the server."
+> "I integrated the Groq API from my FastAPI backend. For the assistant, I first query PostgreSQL for real products that match the user's budget and category, then send only those to the model and ask it to pick and explain the best ones in JSON. I validate the reply so it can only recommend products that exist, and I show product data from my database. I also added a daily limit per user, error handling with a fallback, and the API key stays on the server."
 
 Each part of that sentence maps to a small piece of code you wrote, so you can explain every line.

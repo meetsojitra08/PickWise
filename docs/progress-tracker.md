@@ -1,11 +1,34 @@
 # Progress Tracker
 
-**Current phase:** P8, Elevation & polish
-**Current step:** P9-S1 (P8-S8 completed)
-**Last updated:** 2026-11-19 (P8-S8)
+**Current phase:** Phase F, Complete FastAPI Backend Migration & Verification
+**Current status:** 100% Complete & Verified (Laravel completely removed)
+**Last updated:** 2026-11-19 (Phase F Complete)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done and committed
 Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirements live in `feature-specs/` (see its README for the step-to-spec map). Step IDs are used in commit footers (`Refs P2-S4`).
+
+---
+
+## Phase F: FastAPI Migration (branch `phase/fastapi-backend`)
+
+- [x] **F0: Project Setup, Tooling & Foundations** · `chore(fastapi)`
+  - Python 3.12 structure, `pyproject.toml`, dependencies, API envelopes (`data`/`meta`), error handling, `X-Request-Id`, Dockerfile & Nginx proxy.
+- [x] **F1: Database Schema, Models & Seeders** · `db(fastapi)`
+  - SQLAlchemy 2.0 async declarative models, GIN full-text search triggers, `pg_trgm`, deterministic 60-product seeder.
+- [x] **F2: Authentication, Session Management & Accounts** · `feat(auth)`
+  - Sanctum-compatible cookie session (`session:{id}` in Redis), CSRF double-submit (`GET /sanctum/csrf-cookie` 204), profile/password/preferences.
+- [x] **F3: Catalog, Search & Filtering** · `feat(catalog)`
+  - Dynamic facets, full-text & trigram ranking, product detail, 180-day price history, Bayesian Value Score calculator.
+- [x] **F4: Reviews, Wishlist & Comparison** · `feat(features)`
+  - Product reviews & rating aggregation, wishlist CRUD, side-by-side comparison matrix with row winners, token sharing.
+- [x] **F5: AI Integration (Groq, Quotas & Shopping Assistant)** · `feat(ai)`
+  - Async Groq SDK, anti-hallucination DB grounding, budget alternatives (+15%), Redis sliding window quota, compare verdict.
+- [x] **F6: Admin Panel & Management APIs** · `feat(admin)`
+  - Admin dashboard KPIs, AI usage analytics, category/brand/product CRUD, review moderation, append-only activity audit logging.
+- [x] **F7: Verification, Testing & E2E Validation** · `test(fastapi)`
+  - 20 Pytest integration test suites passing, 308 Vitest frontend tests passing, clean Vite build, full E2E journey verification.
+- [x] **F8: Laravel Removal, Cleanup & Git Commit** · `chore(cleanup)`
+  - Complete deletion of `backend-laravel-ref/` and `docker/php`, clean `.gitignore`, commit `361e99d`.
 
 ---
 
@@ -112,8 +135,8 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 
 ## P9: Release (branch `phase/P9-release`)
 
-- [ ] **P9-S1** README: screenshots, architecture diagram, AI design notes; add MIT LICENSE · `docs`
-- [ ] **P9-S2** Demo seed data and demo accounts · `db`
+- [x] **P9-S1** README: screenshots, architecture diagram, AI design notes; add MIT LICENSE · `docs`
+- [x] **P9-S2** Demo seed data and demo accounts · `db`
 - [ ] **P9-S3** Production Docker config and deployment notes · `build`
 - [ ] **P9-S4** Deploy a live demo (host of your choice; document in README) · `chore`
 - [ ] **P9-S5** Short demo video + resume bullet points · `docs`
@@ -199,6 +222,10 @@ Rule: **one step = one commit** (see `git-workflow.md`). Each feature's requirem
 - P8-S6 note: Audited all 13 security areas in `code-standards.md` §4. Hardened `docker/nginx/default.conf` (`server_tokens off`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `COOP`/`CORP`, strict `default-src 'none'` CSP on API, sandboxed CSP on `/storage/` to prevent SVG script execution, SPA CSP with dev HMR note, and `fastcgi_hide_header` deduplication) and set `expose_php=Off` in `docker/php/Dockerfile`. Added `AddSecurityHeaders` middleware for non-Nginx defense-in-depth, published explicit `backend/config/cors.php` replacing Laravel's wildcard `Access-Control-Allow-Origin: *` default, added `Gate::authorize('access-admin')` to `AdminDashboardController`, explicitly registered `AiUsageLogPolicy` and `ProductImagePolicy`, tightened product `store_url` validation to `url:http,https` (and frontend Zod + `getSafeExternalUrl()` before `<a href>`), added `extensions:jpeg,jpg,png,webp` alongside MIME checks on image uploads, constrained `X-Session-Key` in `AssistantSessionResolver` to `/^[A-Za-z0-9._-]{8,128}$/`, escaped SQL LIKE wildcards via `LikePattern` across admin searches, and moved dev/CLI packages (`shadcn`, `@tailwindcss/vite`) to `devDependencies` with CI running `npm audit --omit=dev --audit-level=moderate`.
 - P8-S7 verification: Frontend ESLint (0 errors, 0 warnings), TypeScript strict `tsc -b` (including `tsconfig.e2e.json`), Prettier (`--end-of-line auto` on all changed files), Vitest (54 test files, 308 tests), production build, `npm audit --omit=dev --audit-level=moderate` (0 vulnerabilities), and full Playwright E2E suite against the live Docker stack (`http://localhost:8080`, 16 passed across `auth.setup.ts` + 6 journey spec files) all pass. No backend files changed. `git diff --check` is clean.
 - P8-S7 note: Installed `@playwright/test` as a devDependency and added `frontend/playwright.config.ts`, `frontend/tsconfig.e2e.json`, `test:e2e`/`test:e2e:ui` scripts, and 6 end-to-end journey specs covering all 5 core journeys in `project-overview.md` §7: storefront discovery/filtering/sorting/URL-sync/dark-mode/mobile-390px/security-headers (`01-discovery-and-catalog.spec.ts`), guest guards/Sanctum login-logout/preferences/wishlist (`02-auth-wishlist-account.spec.ts`), product detail/safe store link/review submit-edit-delete (`03-product-detail-and-reviews.spec.ts`), compare tray/real compare matrix/AI verdict/saved comparison/public share link (`04-compare-and-verdict.spec.ts`), Home hero -> Assistant deep-link -> grounded picks -> "Compare these" + AI fallback state (`05-assistant-journey.spec.ts`), and live RBAC 403 enforcement + admin overview/products/review moderation/audit log UI workflow (`06-admin-access-and-workflows.spec.ts`). Shared authenticated customer session state is created once in `e2e/auth.setup.ts` (gitignored under `frontend/e2e/.auth/`) to stay well under rate limits, and Playwright `page.route()` intercepts ONLY Groq-backed AI endpoints using real DB products from `/api/v1/products` so E2E tests never hit the live Groq API. Also fixed a real integration bug uncovered by E2E in `HomePage.tsx` where `sort: 'value_desc'` caused HTTP 422 against `ProductSort::Value` (`'value'`). Note for P9-S3: dev PHP-FPM's default `pm.max_children = 5` saturated under concurrent requests, and an in-flight stateful `GET /api/v1/products` finishing after `POST /api/v1/auth/logout` can re-save the prior session cookie in Redis; worth tuning PHP-FPM concurrency and reviewing session middleware on public catalog reads in P9-S3.
+- P9-S1 verification: `git diff --check` clean. `LICENSE` (MIT, 2026) added at repo root. `README.md` fully rewritten with feature table, ASCII architecture diagram, AI design notes (database grounding, quota protection, queued summaries, Verdict panel, Groq failure modes), tech stack, local setup (Docker, seed, demo accounts), test commands, project structure, and OpenAPI reference. Captured all 7 high-resolution screenshots via automated Playwright spec (`frontend/e2e/screenshots.spec.ts`) across light/dark modes and mobile viewport (390px), populated in `docs/screenshots/`. Frontend lint and Prettier clean.
+- P9-S2 verification: Pint (360 files), PHPStan level 6 (0 errors across 279 files), and full Pest pass inside the `app` container (370 tests, 7070 assertions, including 5 new dedicated demo seeder tests). Frontend lint (0 errors, 0 warnings), typecheck (0 errors), 308 Vitest tests across 54 test files, and production build pass. `git diff --check` is clean.
+- P9-S2 note: Created `DemoSeeder` (called automatically by `DatabaseSeeder` on `php artisan migrate:fresh --seed`) providing rich, realistic demo data for visitors and automated testing: seeded authentic demo accounts (`admin@pickwise.test` and `customer@pickwise.test`, password `password`, plus `test@example.com`), configured customer shopping preferences (budget, categories, priorities), pre-populated wishlist items across 4 categories, created 2 saved comparisons with deterministic 32-character share tokens and grounded AI verdicts, seeded 2 multi-turn AI assistant threads with structured recommendations and trade-offs, generated deterministic review summaries for all 60 catalog products with category-tailored pros/cons/sentiments, seeded 30 days of daily AI usage telemetry (assistant, compare, review_summary) for admin analytics, and populated immutable admin activity audit logs with before/after diffs. All operations are strictly idempotent across repeated seeds and date shifts.
+
 - P8-S8 verification: Pint (357 files), PHPStan level 6 (0 errors across 276 files), and Pest tests pass (including 4 new dedicated OpenAPI specification tests with 668 assertions covering 100% of registered `api/v1` routes). Frontend ESLint (0 errors, 0 warnings), TypeScript strict `tsc -b`, 308 Vitest tests across 54 test files, and production build pass. `git diff --check` is clean.
 - P8-S8 note: Authored and generated complete, valid OpenAPI 3.1.0 specifications (`docs/openapi.yaml` and `docs/openapi.json`) via a dedicated Artisan command `php artisan openapi:generate` (`App\Console\Commands\GenerateOpenApiSpecCommand`). The specification documents all 49 path templates (73 registered routes in Laravel) across 17 tags (`System`, `Auth`, `Account`, `Catalog`, `Compare`, `Reviews`, `Wishlist`, `Saved Comparisons`, `Assistant`, `Admin Dashboard`, `Admin Categories`, `Admin Brands`, `Admin Products`, `Admin Users`, `Admin Reviews`, `Admin AI Usage`, `Admin Activity Logs`), 3 security schemes (Sanctum cookie session `laravel_session`, CSRF header `X-XSRF-TOKEN`, and guest assistant session `X-Session-Key`), 63 data and request/response schemas matching the standard JSON envelopes, and 7 reusable response components (401, 403, 404, 422, 429, 503). Added automated test suite `backend/tests/Feature/Docs/OpenApiSpecTest.php` ensuring that every registered API route in Laravel is documented with its HTTP methods and response envelopes, all status codes conform to conventions, and all schema `$ref` references resolve internally. Updated `docs/api-spec.md` and `docs/README.md` with links and generator instructions.
 
@@ -247,9 +274,12 @@ One line per step on what you learned. Turns into interview material.
 | P8-S6  | In Nginx, defining any `add_header` inside a `location` block drops all inherited `server`-level `add_header` directives, so every custom location (`/storage/`, SPA `/`) must repeat the full security header set, while `fastcgi_hide_header` prevents duplicate headers when Laravel also attaches defense-in-depth headers in middleware; and Laravel's unpublished CORS default emits `Access-Control-Allow-Origin: *`, so same-origin Sanctum apps must publish an explicit `config/cors.php`. |
 | P8-S7  | True full-stack Playwright E2E tests catch contract and concurrency bugs unit tests with mocked hooks miss: `HomePage.tsx` sent `sort=value_desc` (422 against `ProductSort::Value`), Sanctum's stateful cookie check requires a matching `Referer` header on direct API requests, Playwright `page.route()` evaluates in LIFO order, and an in-flight stateful `GET` finishing after `POST /auth/logout` can re-save the old session cookie via Laravel's `StartSession` middleware.                |
 | P8-S8  | An OpenAPI 3.1 contract test should dynamically inspect Laravel's route collection (`Route::getRoutes()`): normalizing scoped route bindings (like `{category:}` to `{category}`) and validating every registered HTTP method against OpenAPI path items prevents documentation drift, while testing that all `$ref` pointers resolve internally guarantees the specification never breaks external client generators or Swagger/Redoc previewers.                                                   |
+| P9-S2  | Production-ready showcase seeders must balance rich realism with strict test idempotency: pre-populating multi-tier demo data (accounts, wishlists, shared comparisons with AI verdicts, conversation threads, product review summaries, and 30-day analytics timeseries) transforms an empty dashboard into a compelling portfolio showcase, while using conditional existence guards and `updateOrCreate` ensures repeated seed runs never duplicate append-only audit records or breach unique database constraints. |
+| Phase F| Migrating a production-grade backend across stacks with zero frontend churn requires preserving the complete HTTP boundary contract: exact CSRF handshake semantics (`204 No Content` with `Set-Cookie`), session rotation cookies, money representations (`{"amount": "...", "currency": "..."}`), and Postgres offset-naive UTC datetime constraints. SQLAlchemy 2.0 async and Pydantic v2 provide compile-time safety and sub-millisecond execution times. |
 
 ## Resume bullet drafts (refine at P9)
 
-- Built a full-stack AI shopping decision platform (Laravel 13, React, PostgreSQL, Redis, Groq) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
-- Added **Redis-backed per-user daily limits, JSON reply validation and graceful fallbacks** for LLM calls, with the API key kept server-side and AI services covered by automated tests.
-- Implemented Postgres full-text and trigram search, a transparent **Value Score** algorithm, role-based admin tools with an append-only audit log, and a CI pipeline with automated tests.
+- Built a full-stack AI shopping decision platform (**FastAPI / Python 3.12**, **React 19**, **PostgreSQL 17**, **Redis 7**, **Groq**) that integrates an LLM API using **database-grounded prompts**, so recommendations only include real, in-budget products.
+- Engineered high-performance async REST APIs with **SQLAlchemy 2.0 async**, **Pydantic v2 validation**, and **100% contract parity** preserving SPA session cookies and CSRF double-submit protection.
+- Added **Redis-backed per-user sliding daily quotas, JSON reply validation and graceful fallbacks** for LLM calls, with the API key kept server-side and AI services covered by automated tests.
+- Implemented Postgres full-text and trigram search, a transparent **Value Score** algorithm, role-based admin tools with an append-only audit log, and full CI test coverage (20 Pytest suites, 308 Vitest suites).

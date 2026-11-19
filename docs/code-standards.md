@@ -10,39 +10,34 @@
 6. **Comments explain why, not what.**
 7. **Don't repeat yourself, but don't abstract until a pattern appears three times.**
 
-## 2. Backend (Laravel 13 / PHP)
+## 2. Backend (FastAPI / Python 3.12+)
 
 ### Style and tooling
-- PSR-12 via **Laravel Pint** (`./vendor/bin/pint`). Static analysis via **Larastan** (target level 6+, raise over time).
-- `declare(strict_types=1);` in every PHP file. Type-hint all parameters, returns and properties.
-- Use backed **enums** for statuses and roles, never raw strings.
-- Use **constructor injection**. No facades inside domain logic where an injected service is clearer.
+- PEP 8 formatted and checked with **Ruff** (`ruff check .`, `ruff format --check .`).
+- Strict typing checked with **MyPy** (`mypy app`).
+- Type-hint all parameters, return types, and model fields explicitly.
+- Use Python standard library or Pydantic enums for statuses and roles, never arbitrary raw strings.
+- Use **FastAPI Dependency Injection** (`Depends(get_db)`, `Depends(get_current_user)`) for services and database sessions.
 
 ### Naming
 | Thing | Convention | Example |
 |-------|-----------|---------|
-| Classes | PascalCase | `ProductSearchQuery` |
-| Methods / variables | camelCase | `calculateValueScore()` |
-| DB tables / columns | snake_case, plural tables | `review_summaries` |
-| Routes | kebab-case, plural nouns | `/price-history` |
-| Actions | Verb + Noun | `CreateReview`, `ApproveReview` |
-| Form requests | Verb + Noun + Request | `StoreProductRequest` |
-| Resources | Noun + Resource | `ProductResource` |
-| Policies | Model + Policy | `ReviewPolicy` |
-| Enums | Singular noun | `ReviewStatus` |
+| Classes & Models | PascalCase | `Product`, `CompareService` |
+| Functions, methods, variables | snake_case | `calculate_value_score()` |
+| DB tables & columns | snake_case, plural tables | `review_summaries` |
+| Routes & URLs | kebab-case, plural nouns | `/price-history`, `/reviews` |
+| Pydantic Schemas | PascalCase + suffix | `LoginRequest`, `ProductCardOut` |
+| Enums | PascalCase (singular) | `UserRole`, `ReviewStatus` |
 
 ### Rules
-- Validation **only** in FormRequests. Authorisation in Policies/FormRequest `authorize()`.
-- Controllers: max ~10 lines per method; no queries, no business rules.
-- Responses **only** through API Resources and the standard envelope.
-- Multi-step writes in `DB::transaction()`.
-- **Mass assignment:** explicit `$fillable`; never `$guarded = []`.
-- **N+1 prevention:** `Model::preventLazyLoading(! app()->isProduction())`; eager load deliberately.
-- Migrations: reversible `down()`, foreign keys and indexes defined, never edit a migration that has been merged; add a new one.
-- Config via `config()`; `env()` only inside `config/*.php`.
-- Use queues for slow or retryable work (LLM calls). Jobs must be idempotent.
-- **Redis:** always set a TTL on cache keys, namespace keys (`pickwise:catalog:facets:{category}`), never store the only copy of data in Redis, and clear related cache keys when admin data changes.
-- Money: `numeric(12,2)` in DB, string in JSON. Never floats for money logic.
+- **Validation**: Enforced purely through Pydantic v2 `BaseModel` schemas.
+- **Route handlers**: Keep route handlers lightweight: authenticate via `Depends()`, delegate to Service, return `ApiResponse` or `PaginatedResponse`.
+- **Response envelope**: All endpoints return `ApiResponse[T]` (`{"data": ...}`) or `PaginatedResponse[T]` (`{"data": [...], "meta": {...}, "links": {...}}`).
+- **Database sessions**: Pure SQLAlchemy 2.0 async syntax (`select()`, `await db.execute()`, `await db.commit()`).
+- **N+1 query prevention**: Use `selectinload()` or `joinedload()` explicitly whenever accessing related models.
+- **Timestamps**: All timestamps stored in UTC; sanitize to offset-naive before querying PostgreSQL `timestamp without time zone` columns.
+- **Redis hygiene**: Always specify `ex=` TTL on cache keys; never store irreplaceable data solely in Redis.
+- **Money formatting**: Decimal values represented as strings in JSON payloads (`{"amount": "89999.00", "currency": "INR"}`) to eliminate float precision loss.
 
 ## 3. Frontend (React / TypeScript)
 
