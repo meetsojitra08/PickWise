@@ -1,4 +1,5 @@
 from typing import Literal
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from pydantic import computed_field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -34,10 +35,39 @@ class Settings(BaseSettings):
                 url = url.replace("postgres://", "postgresql+asyncpg://", 1)
             elif url.startswith("postgresql://"):
                 url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
-            # asyncpg driver requires ?ssl= instead of ?sslmode=
-            if "sslmode=" in url:
-                url = url.replace("sslmode=", "ssl=")
-            return url
+            elif not url.startswith("postgresql+asyncpg://"):
+                url = f"postgresql+asyncpg://{url.split('://', 1)[-1]}"
+
+            parsed = urlparse(url)
+            query_params = dict(parse_qsl(parsed.query))
+
+            # asyncpg requires ?ssl= instead of ?sslmode=
+            if "sslmode" in query_params:
+                ssl_val = query_params.pop("sslmode")
+                if "ssl" not in query_params and ssl_val in ("require", "verify-ca", "verify-full"):
+                    query_params["ssl"] = ssl_val
+
+            # Remove libpq-only parameters unsupported by asyncpg
+            unsupported = {
+                "channel_binding",
+                "target_session_attrs",
+                "application_name",
+                "options",
+                "gssencmode",
+            }
+            for key in unsupported:
+                query_params.pop(key, None)
+
+            return urlunparse(
+                (
+                    parsed.scheme,
+                    parsed.netloc,
+                    parsed.path,
+                    parsed.params,
+                    urlencode(query_params),
+                    parsed.fragment,
+                )
+            )
         return (
             f"postgresql+asyncpg://{self.DB_USERNAME}:{self.DB_PASSWORD}@"
             f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_DATABASE}"
