@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import computed_field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -86,16 +86,16 @@ class Settings(BaseSettings):
     XSRF_COOKIE_NAME: str = "XSRF-TOKEN"
     XSRF_HEADER_NAME: str = "x-xsrf-token"
 
-    CORS_ALLOWED_ORIGINS: list[str] = [
+    CORS_ALLOWED_ORIGINS: list[str] | str = [
         "http://localhost:8080",
         "http://localhost:5173",
         "http://127.0.0.1:8080",
         "http://127.0.0.1:5173",
     ]
 
-    @field_validator("CORS_ALLOWED_ORIGINS", mode="before")
+    @field_validator("CORS_ALLOWED_ORIGINS", mode="after")
     @classmethod
-    def assemble_cors_origins(cls, v: Any) -> list[str]:
+    def assemble_cors_origins(cls, v: list[str] | str) -> list[str]:
         if isinstance(v, str):
             if v.startswith("[") and v.endswith("]"):
                 import json
@@ -107,9 +107,7 @@ class Settings(BaseSettings):
                 except Exception:
                     pass
             return [origin.strip() for origin in v.split(",") if origin.strip()]
-        if isinstance(v, list):
-            return [str(item) for item in v]
-        return []
+        return v
 
 
 settings = Settings()
