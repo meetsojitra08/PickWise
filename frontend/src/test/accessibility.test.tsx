@@ -31,9 +31,10 @@ function jsonResponse(body: unknown, status = 200): Response {
 describe('Accessibility Standards Audit (P8-S3)', () => {
   beforeEach(() => {
     window.localStorage.clear();
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
-      jsonResponse({ data: null }),
-    ));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(jsonResponse({ data: null })),
+    );
   });
 
   afterEach(() => {
@@ -54,7 +55,9 @@ describe('Accessibility Standards Audit (P8-S3)', () => {
         </QueryClientProvider>,
       );
 
-      const skipLink = screen.getByRole('link', { name: /skip to main content/i });
+      const skipLink = screen.getByRole('link', {
+        name: /skip to main content/i,
+      });
       expect(skipLink).toBeInTheDocument();
       expect(skipLink).toHaveAttribute('href', '#main-content');
 
@@ -93,7 +96,9 @@ describe('Accessibility Standards Audit (P8-S3)', () => {
         </QueryClientProvider>,
       );
 
-      const skipLink = screen.getByRole('link', { name: /skip to auth content/i });
+      const skipLink = screen.getByRole('link', {
+        name: /skip to auth content/i,
+      });
       expect(skipLink).toBeInTheDocument();
       expect(skipLink).toHaveAttribute('href', '#auth-main-content');
 
